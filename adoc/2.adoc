@@ -1,10 +1,10 @@
-= Introduction
+= Your first test
 Salomon BRYS
 :toc:
 :icons: font
 
 
-== Your first test
+== Writing it
 
 To start, we'll write some code that is common to all platform.
 
@@ -42,15 +42,77 @@ image:2-3.png[test file]
 import com.mybusiness.*
 import kotlin.test.*
 
-@Test
-fun testSimpleAddition() {
-    assertEquals(5, addition(2, 3))
-}
+class AdditionTests {
+    @Test
+    fun testSimpleAddition() {
+        assertEquals(5, addition(2, 3))
+    }
 
-@Test
-fun testNegativeAddition() {
-    assertEquals(-1, addition(2, -3))
+    @Test
+    fun testNegativeAddition() {
+        assertEquals(-1, addition(2, -3))
+    }
 }
 ----
 
-Let
+As you can see, testing works much like JUnit.
+Nothing new under the sun!
+
+All that remain is to run our tests.
+
+
+== Running it
+
+In the Gradle pane, double click on `Tasks` > `verification` > `allTests` to run the `allTests` Gradle task.
+
+image:2-4.png[allTests gradle task]
+
+Look at the command line result, you should find that gradle has run the following tasks: `jsTest`, `jvmTest` & `linuxTest`.
+This means that the tests were compiled by the three different compilers and run on three different targets.
+
+In fact, let's see all testing in action.
+Add this at the end of your build.gradle.kts file:
+
+.build.gradle.kts > kotlin > sourceSets
+[source,kotlin]
+----
+afterEvaluate {
+    tasks.withType<AbstractTestTask>().forEach {
+        it.testLogging {
+            events("passed", "skipped", "failed")
+        }
+    }
+}
+----
+
+Rerun the `allTests` task and... nothing happens.
+Everything is "up to date": because the code hasn't change, gradle does not rerun the tests.
+You first need to run the `clean` task (in the `build` group), then rerun the `allTests` task.
+
+Lo and behold:
+
+.allTests result
+----
+...
+> Task :jsBrowserTest
+AdditionTests.testSimpleAddition PASSED
+AdditionTests.testNegativeAddition PASSED
+...
+> Task :jvmTest
+AdditionTests > testSimpleAddition PASSED
+AdditionTests > testNegativeAddition PASSED
+...
+> Task :linuxTest
+AdditionTests.testSimpleAddition PASSED
+AdditionTests.testNegativeAddition PASSED
+----
+
+Now try to change one of the two tests to fail, and see what happens when you run them.
+Unsurprisingly, all three test task fail.
+Gradle generated an HTML report with a link at the end.
+Open it in a browser to see what went wrong ;)
+
+
+TIP: As you can see, when running the `allTests` task runs, well, all tests.
+     The Kotlin/JVM is the fastest and most reliable compiler so, most of the time, running the `jvmTest` task will be faster and give results easier to understand.
+     Only once all tests have been proven correct in the JVM should you start running `allTests` to proof your code on each other targetted platform.
