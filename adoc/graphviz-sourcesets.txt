@@ -1,0 +1,206 @@
+digraph G {
+    rankdir = LR
+
+    node [shape = box]
+
+    commonTest, jvmTest, jsTest, linuxX64Test, macosX64Test, mingwX64Test, iosArm32Test, iosArm64Test, iosX64Test [style = filled, color = "#c0ffc5"]
+
+    {rank = same commonMain commonTest}
+
+    commonMain -> commonTest
+
+    subgraph cluster_jvm {
+        color = red
+        {rank = same jvmMain jvmTest}
+        jvmMain -> jvmTest
+    }
+    commonMain -> jvmMain
+    commonTest -> jvmTest
+
+    subgraph cluster_js {
+        color = red
+        {rank = same jsMain jsTest}
+        jsMain -> jsTest
+    }
+    commonMain -> jsMain
+    commonTest -> jsTest
+
+    subgraph cluster_linuxX64 {
+        color = red
+        {rank = same linuxX64Main linuxX64Test}
+        linuxX64Main -> linuxX64Test
+    }
+    commonMain -> linuxX64Main
+    commonTest -> linuxX64Test
+
+    subgraph cluster_macosX64 {
+        color = red
+        {rank = same macosX64Main macosX64Test}
+        macosX64Main -> macosX64Test
+    }
+    commonMain -> macosX64Main
+    commonTest -> macosX64Test
+
+    subgraph cluster_mingwX64 {
+        color = red
+        {rank = same mingwX64Main mingwX64Test}
+        mingwX64Main -> mingwX64Test
+    }
+    commonMain -> mingwX64Main
+    commonTest -> mingwX64Test
+
+    subgraph cluster_iosArm32 {
+        color = red
+        {rank = same iosArm32Main iosArm32Test}
+        iosArm32Main -> iosArm32Test
+    }
+    commonMain -> iosArm32Main
+    commonTest -> iosArm32Test
+
+    subgraph cluster_iosArm64 {
+        color = red
+        {rank = same iosArm64Main iosArm64Test}
+        iosArm64Main -> iosArm64Test
+    }
+    commonMain -> iosArm64Main
+    commonTest -> iosArm64Test
+
+    subgraph cluster_iosX64 {
+        color = red
+        {rank = same iosX64Main iosX64Test}
+        iosX64Main -> iosX64Test
+    }
+    commonMain -> iosX64Main
+    commonTest -> iosX64Test
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+digraph G {
+    rankdir = LR
+    newrank = true
+
+    node [shape = box]
+
+    {rank = same commonMain commonTest}
+    {rank = same nativeMain nativeTest}
+    {rank = same hostMain hostTest}
+    {rank = same iosMain iosTest}
+
+    commonTest, jvmTest, jsTest, nativeTest, hostTest, linuxX64Test, macosX64Test, mingwX64Test, iosTest, iosArm32Test, iosArm64Test, iosX64Test [style = filled, color = "#c0ffc5"]
+
+    commonMain -> commonTest
+
+    subgraph cluster_jvm {
+        color = red
+        {rank = same jvmMain jvmTest}
+        jvmMain -> jvmTest
+    }
+    commonMain -> jvmMain
+    commonTest -> jvmTest
+
+    subgraph cluster_js {
+        color = red
+        {rank = same jsMain jsTest}
+        jsMain -> jsTest
+    }
+    commonMain -> jsMain
+    commonTest -> jsTest
+
+    subgraph cluster_native {
+        nativeMain -> nativeTest
+
+        subgraph cluster_host {
+            color = red
+            hostMain -> hostTest
+
+            subgraph cluster_linuxX64 {
+                style = invis
+                {rank = same linuxX64Main linuxX64Test}
+                linuxX64Main -> linuxX64Test
+            }
+            hostMain -> linuxX64Main
+            hostTest -> linuxX64Test
+
+            subgraph cluster_macosX64 {
+                style = invis
+                {rank = same macosX64Main macosX64Test}
+                macosX64Main -> macosX64Test
+            }
+            hostMain -> macosX64Main
+            hostTest -> macosX64Test
+
+            subgraph cluster_mingwX64 {
+                style = invis
+                {rank = same mingwX64Main mingwX64Test}
+                mingwX64Main -> mingwX64Test
+            }
+            hostMain -> mingwX64Main
+            hostTest -> mingwX64Test
+        }
+        nativeMain -> hostMain
+        nativeTest -> hostTest
+
+        subgraph cluster_ios {
+            color = red
+            iosMain -> iosTest
+
+            subgraph cluster_iosArm32 {
+                style = invis
+                {rank = same iosArm32Main iosArm32Test}
+                iosArm32Main -> iosArm32Test
+            }
+            iosMain -> iosArm32Main
+            iosTest -> iosArm32Test
+
+            subgraph cluster_iosArm64 {
+                style = invis
+                {rank = same iosArm64Main iosArm64Test}
+                iosArm64Main -> iosArm64Test
+            }
+            iosMain -> iosArm64Main
+            iosTest -> iosArm64Test
+
+            subgraph cluster_iosX64 {
+                style = invis
+                {rank = same iosX64Main iosX64Test}
+                iosX64Main -> iosX64Test
+            }
+            iosMain -> iosX64Main
+            iosTest -> iosX64Test
+        }
+        nativeMain -> iosMain
+        nativeTest -> iosTest
+    }
+
+    commonMain -> nativeMain
+    commonTest -> nativeTest
+
+    {rank = same linuxX64Main jsMain, jvmMain}
+}

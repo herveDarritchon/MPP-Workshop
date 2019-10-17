@@ -1,0 +1,76 @@
+= Introduction
+Salomon BRYS
+:toc:
+:icons: font
+
+Welcome to the Mobile Multiplatform Kotlin Workshop.
+
+Learning to develop with Kotlin multiplatform is exactly like learning for any other technology: it is a set of skills that can be divided into three categories:
+
+* The technology: how it works.
+* The architectures and best practices: how to take the most advantage of it.
+* The ecosystem: how to focus on your business
+
+This workshop proposes to learn the technology & the associated best practices intertwined.
+The ecosystem discovery, however, is treated in its own set of chapters, at the end of this workshop.
+
+
+== Definition
+=== Goals
+
+The goals of this workshop are:
+
+* to make you understand how the Kotlin/Multiplatform infrastructure works,
+* to make you able to easily create a mobile Kotlin/Multiplatform project,
+* to give you the tools to write multi-platform code that can be deployed on each platform,
+* to make able to deploy it on at least one platform,
+* and of course, to test it all once!
+
+[CAUTION]
+====
+It is important to understand what this workshop is NOT:
+
+* *It is not* meant to teach you the Kotlin language.
+* *It is not* meant to teach in depth the three mobile platforms that we are targeting.
+====
+
+
+=== Pre-requisites
+
+The only pre-requisite for this workshop is *basic Knowledge and experience of regular Kotlin*, whatever the target (yes, server side kotlin does count).
+
+Basic understanding of at least one of the mobile targets (Android, iOS, Web) is better, though not formally required.
+
+
+=== Admonitions
+
+NOTE: This is a note that gives *more information* or context on what is being developed.
+
+TIP: This is a *complimentary tip*.
+
+CAUTION: Act carefully, this *could* result into *unwanted behaviour*.
+
+WARNING: Warning! This *could* lead to *runtime crash*.
+
+IMPORTANT: This is important: if not taken care of, it *will* result into *unwanted behaviour or runtime crash*.
+
+
+== What? How?
+
+During this workshop, we are going to build a multiplatform ???
+
+
+== Install
+
+Do you have what it takes to develop with Kotlin/Multiplatform?
+
+Before starting this workshop, you need:
+
+* a JVM installed (no vendor required, 1.8 minimum)
+* https://www.jetbrains.com/idea/[IntelliJ IDEA], either Community or Ultimate (I recommend installing it via https://www.jetbrains.com/toolbox-app/[Jetbrains Toolbox]).
+* If you intend to target Android: https://developer.android.com/studio[Android Studio] (which you can also install via https://www.jetbrains.com/toolbox-app/[Jetbrains Toolbox]) with the Android SDK & emulator installed.
+* If you intend to target iOS: https://developer.apple.com/xcode/[XCode] with the iOS SDK & simulator installed.
+
+NOTE: You can only compile Kotlin/Native code for iOS on a MacOS X computer.
+
+TIP: You can develop on a non-Mac computer and just compile for iOS on a Mac.
