@@ -73,10 +73,20 @@ Do you have what it takes to develop with Kotlin/Multiplatform?
 
 Before starting this workshop, you need:
 
-* a JVM installed (no vendor required, 1.8 minimum)
+* a *JDK* installed (no vendor required, 1.8 minimum)
 * https://www.jetbrains.com/idea/[IntelliJ IDEA], either Community or Ultimate (We recommend installing it via https://www.jetbrains.com/toolbox-app/[Jetbrains Toolbox]).
 * If you intend to target Android: https://developer.android.com/studio[Android Studio] (which you can also install via https://www.jetbrains.com/toolbox-app/[Jetbrains Toolbox]) with the Android SDK & emulator installed.
 * If you intend to target iOS: https://developer.apple.com/xcode/[XCode] with the iOS SDK & simulator installed.
+
+[IMPORTANT]
+====
+If you are using a Linux or MacOS X computer you'll need extra installation to work with the *Kotlin/Native* compiler
+
+* For MacOS: the installation of https://developer.apple.com/xcode/[XCode] is necessary
+* For Linux: You'll need to install the `ncurses` package
+** on Fedora 26+ `yum install ncurses-compat-libs`
+** on recent Ubuntu `apt install libncurses5`
+====
 
 NOTE: You can only compile Kotlin/Native code for iOS on a MacOS X computer.
 
