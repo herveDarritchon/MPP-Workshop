@@ -7,7 +7,7 @@ The first thing to do is to create a new Kotlin/Multiplatform project.
 Easy, you think: there's a handy `Kotlin | Mobile Android/iOS | Gradle` template in the IDEA's new project wizard. +
 Well, we're not going to use it.
 
-Take a deep breath, stay with me. +
+Take a deep breath, stay with us. +
 This templates...
 
 * ...gives you everything on a golden platter ; you need to learn how it is done.
@@ -17,7 +17,7 @@ This templates...
 == The creation wizard
 
 We are going to create a new Gradle project. +
-While we're at it, we'll be using the Gradle Kotlin DSL (if you haven't used it already, now's you're chance!).
+While we're at it, we'll be using the Gradle Kotlin DSL (if you haven't used it already, now's your chance!).
 
 TIP: The Gradle Kotlin DSL allows you to bring type safety as well as IDE completion & API exploration into your build script.
 
@@ -30,27 +30,27 @@ Then, give your project a group ID, and name the artifact `business-library`.
 
 image:1-1.png[New project configuration wizard]
 
-Finally, select where the code rests, click finish, and enjoy you're newly created multiplatform projecJe prent :)
+Finally, select where the code rests, click finish, and enjoy you're newly created multiplatform project :)
 
 
 == Targets & compilers
 
 The Kotlin infrastructure provides 3 compilers:
 
-* The *Kotlin/JVM* compiler, that compiles to JVM bytecode, which can be used on a JVM or on Android.
+* The *Kotlin/JVM* compiler, that compiles to JVM bytecode, which can be used on a JVM, as Android.
 * The *Kotlin/JS* compiler, that compiles to machine JavaScript (not human-readable), which can be used in a browser, or on NodeJS.
 * The *Kotlin/Native* compiler, that compiles to specific machine binary code, which can be run on this specific machine.
 
 Each compiler can support one to multiple targets:
 
-* The Kotlin/JVM compiler supports only one target: the JVM
-* The Kotlin/JS compiler supports only one target: JavaScript
+* The *Kotlin/JVM* compiler supports only one target: the `JVM`
+* The *Kotlin/JS* compiler supports only one target: `JavaScript`
 
 However:
 
-* The Kotlin/Native compiler supports multiple targets: `linuxX64`, `macosX64`, `mingw64`, `iosX64`, `iosArm32`, `iosArm64`, and many others.
+* The *Kotlin/Native* compiler supports multiple targets: `linuxX64`, `macosX64`, `mingw64`, `iosX64`, `iosArm32`, `iosArm64`, and many others.
 
-When using Kotlin/Multiplatform to compile for multiple targets, it helps to understand which compiler is compiling for which target, as they each get their specific configuration.
+When using Kotlin/Multiplatform to compile for multiple targets, it helps to understand which compiler is compiling for which target, as each of them get their specific configuration.
 
 
 == Gradle configuration
@@ -92,9 +92,13 @@ First we'll replace the following lines...
 .build.gradle.kts > kotlin
 [source,kotlin]
 ----
-/* Targets configuration omitted.
-*  To find out how to configure the targets, please follow the link:
-*  https://kotlinlang.org/docs/reference/building-mpp-with-gradle.html#setting-up-targets */
+kotlin {
+    ...
+    /* Targets configuration omitted.
+    *  To find out how to configure the targets, please follow the link:
+    *  https://kotlinlang.org/docs/reference/building-mpp-with-gradle.html#setting-up-targets */
+    ...
+}
 ----
 
 ...with the list of targets we intend to support. +
@@ -102,32 +106,41 @@ First we'll replace the following lines...
 .build.gradle.kts > kotlin
 [source,kotlin]
 ----
+kotlin {
+    ...
     jvm()             // JVM & Android
 
     js { browser() }  // Browser JS
 
     iosX64()          // iOS simulator
+    ...
+}
 ----
 
-NOTE: We will see later how to also target iregular Phones
+NOTE: We will see later how to also target regular iPhones
 
 We also need to add our host native target, so we can test native code directly while coding.
 
 .build.gradle.kts > kotlin
 [source,kotlin]
 ----
+kotlin {
+    ...
     val os = org.gradle.internal.os.OperatingSystem.current()
     val hostTarget = when {
         os.isLinux -> linuxX64("linux")
         os.isMacOsX -> macosX64("macos")
         os.isWindows -> mingwX64("mingw")
+        else -> throw IllegalStateException("Your OS [$os] is not supported!")
     }
+    ...
+}
 ----
 
-This code adds the native target corresponding to your host OS, and configure its sourceset to use the same source directory (`src/hostMain/kotlin`) whatever the target.
+This code adds the native target corresponding to your host OS, and configure its source set to use the same source directory (`src/hostMain/kotlin`) whatever the target.
 
 
-=== Understanding sourcesets
+=== Understanding source sets
 
 A source set is a directory containing sources and/or resources.
 
@@ -140,7 +153,7 @@ In a Kotlin/Multiplatform, by default, there are `targets + 1` source sets :
 
 Each source set is itself divided into "Main" where the regular code lives, and "Test"
 
-These are the sourceSets we have defined for our project :
+These are the source sets we have defined for our project :
 
 NOTE: If you are not using linux, then you have created instead either `macosMain` & `macosTest`, or `mingwMain` & `mingwTest`.
 
@@ -191,13 +204,13 @@ digraph G {
 }
 ....
 
-=== sourceset configuration
+=== Source sets configuration
 
 What happens next is the configuration of each source set, and particularly their dependencies.
 
 By default, the creation wizard has already configured our main common source set to depend on the common standard library, and our test common source set to depend on the common test utils.
 
-Let's add the configuration of the source set we created:
+Let's add the configuration of the source set we've created:
 
 .build.gradle.kts > kotlin > sourceSets
 [source,kotlin]
@@ -240,11 +253,11 @@ Let's add the configuration of the source set we created:
     }
 ----
 
-NOTE: We have not configured the native target source sets because there's no need to right now.
+NOTE: We have not configured the native target source sets because there's no need right now.
       Both the standard library & the test utils are included by the native compiler.
 
 
-== Source set directories
+== Source sets directories
 
 Before starting to code, we need the directories in which we are going to put that code ;)
 
