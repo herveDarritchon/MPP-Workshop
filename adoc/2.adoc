@@ -1,4 +1,4 @@
-= Your first test
+= Write your first common test
 Salomon BRYS
 :toc:
 :icons: font
@@ -6,7 +6,7 @@ Salomon BRYS
 
 == Writing it
 
-To start, we'll write some code that is common to all platform.
+To start, we'll write some code that is common to all platforms.
 
 First, in `commonMain/kotlin`, let's create a package and a kotlin source file:
 
@@ -58,7 +58,7 @@ class AdditionTests {
 As you can see, testing works much like JUnit.
 Nothing new under the sun!
 
-All that remain is to run our tests.
+Now, all that remain is to run our tests.
 
 
 == Running it
@@ -67,19 +67,22 @@ In the Gradle pane, double click on `Tasks` > `verification` > `allTests` to run
 
 image:2-4.png[allTests gradle task]
 
-Look at the command line result, you should find that gradle has run the following tasks: `jsTest`, `jvmTest` & `linuxTest`.
+Look at the command line result, you should find that gradle has run some talks, more importantly you should see the following ones: `jsTest`, `jvmTest` & `linuxTest`.
 This means that the tests were compiled by the three different compilers and run on three different targets.
 
 In fact, let's see all testing in action.
-Add this at the end of your build.gradle.kts file:
+Add this at the end of the `sourceSets` block in your build.gradle.kts file:
 
 .build.gradle.kts > kotlin > sourceSets
 [source,kotlin]
 ----
-afterEvaluate {
-    tasks.withType<AbstractTestTask>().forEach {
-        it.testLogging {
-            events("passed", "skipped", "failed")
+sourceSets {
+    ...
+    afterEvaluate {
+        tasks.withType<AbstractTestTask>().forEach {
+            it.testLogging {
+                events("passed", "skipped", "failed")
+            }
         }
     }
 }
@@ -109,10 +112,10 @@ AdditionTests.testNegativeAddition PASSED
 
 Now try to change one of the two tests to fail, and see what happens when you run them.
 Unsurprisingly, all three test task fail.
-Gradle generated an HTML report with a link at the end.
-Open it in a browser to see what went wrong ;)
 
+TIP: Gradle generated an HTML report with a link at the end.
+     Open it in a browser to see what went wrong ;)
 
 TIP: As you can see, when running the `allTests` task runs, well, all tests.
      The Kotlin/JVM is the fastest and most reliable compiler so, most of the time, running the `jvmTest` task will be faster and give results easier to understand.
-     Only once all tests have been proven correct in the JVM should you start running `allTests` to proof your code on each other targetted platform.
+     Only once all tests have been proven correct in the JVM, you should start running `allTests` to proof your code on each other targeted platform.
