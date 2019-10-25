@@ -1,0 +1,62 @@
+= Platform specific behaviors
+Salomon BRYS
+:toc:
+:icons: font
+
+== The `expect` and `actual` syntax
+
+In some specific cases the common code cannot be shared, often due to platform's internal infrastructure or definition.
+For example, dates, their definition isn't the same on JVM, iOS or JavaScript, thus we should be able to provide a sort of bridge for each platform.
+Another example, the coroutines cannot be used in the same way on Android and iOS. Indeed, iOS doesn't allow (yet) multithreading in a coroutine context, so we should be able to work with every specificities of each platform in our common code.
+
+That's why Kotlin/Multiplatform provide a way to define an `expect`/`actual` mechanism.
+In the common code, we define the `expect`ed behaviors, allowing us to provide the `actual` behavior in each targeted platform.
+
+The expectation [`expect`] code will be defined in the common module:
+
+- `commonMain`
+
+[source,kotlin]
+----
+expect fun printMessage()
+----
+
+And the implementation [`actual`] will be defined for each targeted platform as:
+
+- `jsMain`
+
+[source,kotlin]
+----
+actual fun printMessage(message: String) = console.log(message)
+----
+
+- `iosX64Main`
+
+[source,kotlin]
+----
+actual fun printMessage(message: String) = NSLog(message)
+----
+
+- `jvmMain` (here Android)
+
+[source,kotlin]
+----
+actual fun printMessage(message: String) = Log.d("[APP]", message)
+----
+
+- `linuxMain`
+
+[source,kotlin]
+----
+actual fun printMessage(message: String) = printf(message)
+----
+
+== Write your first multi-platform code!
+
+In this section we will prepare our common code to be executable and testable for each targeted platform.
+
+=== [expect] common shared code
+
+
+=== [actual] platform specific code
+
