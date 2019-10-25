@@ -269,6 +269,13 @@ Create the following directories:
 * `src/linuxMain/kotlin` & `src/linuxTest/kotlin` (or whatever your host os is)
 * `src/iosX64Main/kotlin` & `src/iosX64Test/kotlin` (if you are targetting iOS)
 
-image:1-2.png[source directory structure]
+[TIP]
+====
+If your using IntelliJ IDEA 2019.3 EAP or superior, it will suggest you the right folder creating regarding of your build script.
+image:1-2.png[new directory]
+Select all and type RETURN
+====
+
+image:1-3.png[source directory structure]
 
 Are you ready to write some code?
