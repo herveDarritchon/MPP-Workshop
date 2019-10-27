@@ -3,14 +3,15 @@ Salomon BRYS
 :toc:
 :icons: font
 
-== The `expect` and `actual` syntax
+
+== What is ``expect``ed must ``actual``y exist
 
 In some specific cases the common code cannot be shared, often due to platform's internal infrastructure or definition.
-For example, dates, their definition isn't the same on JVM, iOS or JavaScript, thus we should be able to provide a sort of bridge for each platform.
-Another example, the coroutines cannot be used in the same way on Android and iOS. Indeed, iOS doesn't allow (yet) multithreading in a coroutine context, so we should be able to work with every specificities of each platform in our common code.
+Take dates, for example. Their definition isn't the same on JVM, iOS or JavaScript, thus we should be able to provide a sort of bridge for each platform.
+Another example: the coroutines cannot be used in the same way on Android and iOS as iOS doesn't allow (yet) multithreading in a coroutine context, so we should be able to work with every specifics of each platform in our common code.
 
-That's why Kotlin/Multiplatform provide a way to define an `expect`/`actual` mechanism.
-In the common code, we define the `expect`ed behaviors, allowing us to provide the `actual` behavior in each targeted platform.
+That's why Kotlin/Multiplatform provides a way to define an `expect`/`actual` mechanism.
+In the common code, we define the ``expect``ed behaviors, allowing us to provide the `actual` behavior in each targeted platform.
 
 The expectation [`expect`] code will be defined in the common module:
 
@@ -18,7 +19,7 @@ The expectation [`expect`] code will be defined in the common module:
 
 [source,kotlin]
 ----
-expect fun printMessage()
+expect fun logMessage(message: String)
 ----
 
 And the implementation [`actual`] will be defined for each targeted platform as:
@@ -27,28 +28,28 @@ And the implementation [`actual`] will be defined for each targeted platform as:
 
 [source,kotlin]
 ----
-actual fun printMessage(message: String) = console.log(message)
+actual fun logMessage(message: String) = console.log(message)
 ----
 
 - `iosX64Main`
 
 [source,kotlin]
 ----
-actual fun printMessage(message: String) = NSLog(message)
+actual fun logMessage(message: String) = NSLog(message)
 ----
 
 - `jvmMain` (here Android)
 
 [source,kotlin]
 ----
-actual fun printMessage(message: String) = Log.d("[APP]", message)
+actual fun logMessage(message: String) = Log.d("[APP]", message)
 ----
 
 - `linuxMain`
 
 [source,kotlin]
 ----
-actual fun printMessage(message: String) = printf(message)
+actual fun printMessage(message: String) = printf("%s\n", message)
 ----
 
 == Write your first multi-platform code!
