@@ -49,7 +49,7 @@ actual fun logMessage(message: String) = Log.d("[APP]", message)
 
 [source,kotlin]
 ----
-actual fun printMessage(message: String) = printf("%s\n", message)
+actual fun logMessage(message: String) = printf("%s\n", message)
 ----
 
 == Write your first multi-platform code!
