@@ -98,7 +98,7 @@ This is because we've used the `expect` keyword without defining any `actual` be
 [TIP]
 ====
 If you put your cursor on the function name you'll see the following tooltip
-image:3-1.png[expect/actual error]
+image:res/3-1.png[expect/actual error]
 ====
 
 To fix this error we will need to provide an `actual` function `platformName()` for every targeted platform.
@@ -115,8 +115,8 @@ Meaning, you'll have to create a file `showMessage.kt` for each platform:
 
 [cols="2", grid="none", frame="none"]
 |====
-^|image:ok.png[OK]
-^|image:nok.png[NOT OK]
+^|image:res/ok.png[OK]
+^|image:res/nok.png[NOT OK]
 |
 ``src/commonMain/kotlin/com.mybusiness/showMessage.kt``
 ``src/jvmMain/kotlin/com.mybusiness/platformName.kt``
@@ -158,20 +158,20 @@ actual fun platformName(): String = "iOS"
 ====
 You can use the *Context Actions* in IntelliJ (Linux/Windows `Alt + Return` - MacOS `Option + Return`)
 
-image:3-2.png[expect/actual context actions]
+image:res/3-2.png[expect/actual context actions]
 ====
 
 Now, you should have the following source map
 
-image:3-5.png[source map]
+image:res/3-5.png[source map]
 
 [TIP]
 ====
 In IntelliJ you can quickly spot `expect`/`actual` members with the gutter icons
 
-image:3-3.png[expect gutter icon]
+image:res/3-3.png[expect gutter icon]
 
-image:3-4.png[actual gutter icon]
+image:res/3-4.png[actual gutter icon]
 ====
 
 === Testing your multi-platform library
@@ -282,8 +282,10 @@ Now you can prepare your library to be used on different platform by building it
 
 In the Gradle pane, double click on `Tasks` > `build` > `build` to run the `build` Gradle task.
 
+image:res/3-6.png[build directory]
+
 You should see a `build` directory appearing in your project tree:
 
-image:3-7.png[build directory]
+image:res/3-7.png[build directory]
 
 In the next section, we will see how to use our multi-platform library within specific platform, as *Android*, *iOS* and *JavaScript*.

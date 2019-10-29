@@ -10,13 +10,13 @@ To start, we'll write some code that is common to all platforms.
 
 First, in `commonMain/kotlin`, let's create a package and a kotlin source file:
 
-image:2-1.png[source directory structure]
+image:res/2-1.png[source directory structure]
 
 [TIP]
 ====
 At the moment, if you want to create a package, you need to manually create the directory structure.
 
-image:2-2.png[new directory]
+image:res/2-2.png[new directory]
 ====
 
 Let's write our first multiplatform function:
@@ -34,7 +34,7 @@ fun addition(left: Int, right: Int): Int {
 Now that we have our first function, we can test it.
 Let's create the appropriate test file:
 
-image:2-3.png[test file]
+image:res/2-3.png[test file]
 
 .functionsTest.kt
 [source,kotlin]
@@ -65,7 +65,7 @@ Now, all that remain is to run our tests.
 
 In the Gradle pane, double click on `Tasks` > `verification` > `allTests` to run the `allTests` Gradle task.
 
-image:2-4.png[allTests gradle task]
+image:res/2-4.png[allTests gradle task]
 
 Look at the command line result, you should find that gradle has run some talks, more importantly you should see the following ones: `jsTest`, `jvmTest` & `linuxTest`.
 This means that the tests were compiled by the three different compilers and run on three different targets.
