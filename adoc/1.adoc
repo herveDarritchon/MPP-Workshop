@@ -272,7 +272,9 @@ Create the following directories:
 [TIP]
 ====
 If your using IntelliJ IDEA 2019.3 EAP or superior, it will suggest you the right folder creating regarding of your build script.
+
 image:1-2.png[new directory]
+
 Select all and type RETURN
 ====
 
