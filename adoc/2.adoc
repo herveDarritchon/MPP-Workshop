@@ -110,6 +110,10 @@ AdditionTests.testSimpleAddition PASSED
 AdditionTests.testNegativeAddition PASSED
 ----
 
+NOTE: You may have noticed that even you defined an iOS target there is nothing showed here.
+      This is because Kotlin/Multiplatform plugin does not support running tests on other platform than the host platforms.
+      We will see how to do this in the following steps.
+
 Now try to change one of the two tests to fail, and see what happens when you run them.
 Unsurprisingly, all three test task fail.
 
