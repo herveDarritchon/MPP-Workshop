@@ -38,11 +38,11 @@ actual fun logMessage(message: String) = console.log(message)
 actual fun logMessage(message: String) = NSLog(message)
 ----
 
-- `jvmMain` (here Android)
+- `jvmMain`
 
 [source,kotlin]
 ----
-actual fun logMessage(message: String) = Log.d("[APP]", message)
+actual fun logMessage(message: String) = println(message)
 ----
 
 - `linuxMain`
@@ -63,10 +63,10 @@ For each targeted platform, we will print on the screen/console a message, with 
 [source]
 ----
 Hello KotlinConf, Kotlin/Multiplatform is awesome! <1>
-We are running on Android! <2>
+We are running on JVM! <2>
 ----
 <1> Common message for every platform
-<2> Platform specific message, for *_Android_* is this case
+<2> Platform specific message, for the *_JVM_* is this case
 
 *Let's code!*
 
@@ -120,35 +120,37 @@ Meaning, you'll have to create a new kotlin file for each platform:
 ^|image:res/nok.png[NOT OK]
 |
 ``src/commonMain/kotlin/com.mybusiness/showMessage.kt``
-``src/jvmMain/kotlin/com.mybusiness/platformName.kt``
+``src/jvmMain/kotlin/com.mybusiness/showMessageJvm.kt``
 |
 ``src/commonMain/kotlin/com.mybusiness/showMessage.kt``
 ``src/jvmMain/kotlin/com.mybusiness/showMessage.kt``
 |====
 ====
 
-.jvmMain > kotlin > com.mybusiness/platformName.kt
+NOTE: By convention, the naming of the files that contains `actual` definition is `[expect filename][platform].kt`
+
+.jvmMain > kotlin > com.mybusiness/showMessageJvm.kt
 [source,kotlin]
 ----
 package com.mybusiness
-actual fun platformName(): String = "Android"
+actual fun platformName(): String = "JVM"
 ----
 
-.jsMain > kotlin > com.mybusiness/platformName.kt
+.jsMain > kotlin > com.mybusiness/showMessageJs.kt
 [source,kotlin]
 ----
 package com.mybusiness
 actual fun platformName(): String = "JavaScript"
 ----
 
-.linuxMain > kotlin > com.mybusiness/platformName.kt
+.linuxMain > kotlin > com.mybusiness/showMessageLinux.kt
 [source,kotlin]
 ----
 package com.mybusiness
 actual fun platformName(): String = "Linux"
 ----
 
-.iosX64Main > kotlin > com.mybusiness/platformName.kt
+.iosX64Main > kotlin > com.mybusiness/showMessageIos.kt
 [source,kotlin]
 ----
 package com.mybusiness
@@ -188,73 +190,118 @@ Reminder: Every source set is divide into two parts, *_Main_* and *_Test_*.
 Here we will work on the *_Test_* part
 ====
 
-Add a class `SayHelloKotlinConfTest` for each *_Test_* module, except the common one.
+==== Testing the common code
 
-.jvmTest > kotlin > SayHelloKotlinConfTest.kt
+Add a class `SayHelloKotlinConfTest` for the common *_Test_* module.
+
+.commonTest > kotlin > SayHelloKotlinConfTest.kt
 [source,kotlin]
 ----
+import com.mybusiness.sayHelloKotlinConf
+import kotlin.test.*
+
 class SayHelloKotlinConfTest {
     @Test
-    fun testSayHelloAndroid() {
+    fun testSayHelloCommon() {
         assertEquals(
-            """
-            |Hello KotlinConf, Kotlin/Multiplatform is awesome!
-            |We are running on Android
-            """.trimMargin(), sayHelloKotlinConf()
+            "Hello KotlinConf, Kotlin/Multiplatform is awesome!",
+            sayHelloKotlinConf().lines().first()
         )
     }
 }
 ----
 
-.jsTest > kotlin > SayHelloKotlinConfTest.kt
+
+==== Testing the platform specific code
+
+Add a test class `SayHelloKotlinConfTest` for each platform specific *_Test_* module.
+
+[IMPORTANT]
+====
+As for the `expect`/`actual` files, your platform specific test classes cannot be named as the common test class.
+
+[cols="2", grid="none", frame="none"]
+|====
+^|image:res/ok.png[OK]
+^|image:res/nok.png[NOT OK]
+|
+``src/commonTest/kotlin/SayHelloKotlinConfTest.kt``
+``src/jvmTest/kotlin/SayHelloKotlinConfJvmTest.kt``
+|
+``src/commonTest/kotlin/SayHelloKotlinConfTest.kt``
+``src/jvmTest/kotlin/SayHelloKotlinConfTest.kt``
+|====
+====
+
+.jvmTest > kotlin > SayHelloKotlinConfJvmTest.kt
 [source,kotlin]
 ----
-class SayHelloKotlinConfTest {
+import com.mybusiness.sayHelloKotlinConf
+import kotlin.test.*
+
+class SayHelloKotlinConfJvmTest {
     @Test
-    fun testSayHelloJS() {
+    fun testSayHelloJvm() {
         assertEquals(
-            """
-            |Hello KotlinConf, Kotlin/Multiplatform is awesome!
-            |We are running on JavaScript
-            """.trimMargin(), sayHelloKotlinConf()
+            "We are running on JVM",
+            sayHelloKotlinConf().lines().last()
         )
     }
 }
 ----
 
-.linuxTest > kotlin > SayHelloKotlinConfTest.kt
+.jsTest > kotlin > SayHelloKotlinConfJsTest.kt
 [source,kotlin]
 ----
-class SayHelloKotlinConfTest {
+import com.mybusiness.sayHelloKotlinConf
+import kotlin.test.*
+
+class SayHelloKotlinConfJsTest {
+    @Test
+    fun testSayHelloJs() {
+        assertEquals(
+            "We are running on JavaScript",
+            sayHelloKotlinConf().lines().last()
+        )
+    }
+}
+----
+
+.linuxTest > kotlin > SayHelloKotlinConfLinuxTest.kt
+[source,kotlin]
+----
+import com.mybusiness.sayHelloKotlinConf
+import kotlin.test.*
+
+class SayHelloKotlinConfLinuxTest {
     @Test
     fun testSayHelloLinux() {
         assertEquals(
-            """
-            |Hello KotlinConf, Kotlin/Multiplatform is awesome!
-            |We are running on Linux
-            """.trimMargin(), sayHelloKotlinConf()
+            "We are running on Linux",
+            sayHelloKotlinConf().lines().last()
         )
     }
 }
 ----
 
-.iosX64Test > kotlin > SayHelloKotlinConfTest.kt
+.iosX64Test > kotlin > SayHelloKotlinConfIosTest.kt
 [source,kotlin]
 ----
-class SayHelloKotlinConfTest {
+import com.mybusiness.sayHelloKotlinConf
+import kotlin.test.*
+
+class SayHelloKotlinConfIosTest {
     @Test
-    fun testSayHelloIOS() {
+    fun testSayHelloIos() {
         assertEquals(
-            """
-            |Hello KotlinConf, Kotlin/Multiplatform is awesome!
-            |We are running on iOS
-            """.trimMargin(), sayHelloKotlinConf()
+            "We are running on iOS",
+            sayHelloKotlinConf().lines().last()
         )
     }
 }
 ----
 
-You can run all your tests with Gradle.
+You can now run all your tests with Gradle.
 
 In the Gradle pane, double click on `Tasks` > `verification` > `allTests` to run the `allTests` Gradle task.
 
@@ -264,14 +311,14 @@ You should have the following output:
 [source]
 ----
 ...
-> Task :jsBrowserTest
-SayHelloKotlinConfTest.testSayHelloJS PASSED
+SayHelloKotlinConfTest.testSayHelloCommon PASSED
+SayHelloKotlinConfJsTest.testSayHelloJs PASSED
 ...
-> Task :jvmTest
-SayHelloKotlinConfTest > testSayHelloAndroid PASSED
+SayHelloKotlinConfTest > testSayHelloCommon PASSED
+SayHelloKotlinConfJvmTest > testSayHelloJvm PASSED
 ...
-> Task :linuxTest
-SayHelloKotlinConfTest.testSayHelloLinux PASSED
+SayHelloKotlinConfTest.testSayHelloCommon PASSED
+SayHelloKotlinConfLinuxTest.testSayHelloLinux PASSED
 ...
 ----
 
@@ -314,8 +361,6 @@ tasks.getByName("allTests").dependsOn(iosTest) <7>
 <6> Execute a command that will spawn the iPhone simulator and run our tests
 <7> Set the `iosTest` task as part of the test chain
 
-
-
 Now you can rerun your task `allTests` and you will see new lines printed.
 
 .Gradle AllTest task
@@ -324,15 +369,19 @@ Now you can rerun your task `allTests` and you will see new lines printed.
 ...
 > Task :iosTest
 ...
-[==========] Running 1 tests from 1 test cases.
+[==========] Running 2 tests from 2 test cases.
 [----------] Global test environment set-up.
 [----------] 1 tests from SayHelloKotlinConfTest
-[ RUN      ] SayHelloKotlinConfTest.testSayHelloIOS
-[       OK ] SayHelloKotlinConfTest.testSayHelloIOS (0 ms)
-[----------] 1 tests from SayHelloKotlinConfTest (1 ms total)
+[ RUN      ] SayHelloKotlinConfTest.testSayHelloCommon
+[       OK ] SayHelloKotlinConfTest.testSayHelloCommon (0 ms)
+[----------] 1 tests from SayHelloKotlinConfTest (0 ms total)
+[----------] 1 tests from SayHelloKotlinConfIosTest
+[ RUN      ] SayHelloKotlinConfIosTest.testSayHelloIos
+[       OK ] SayHelloKotlinConfIosTest.testSayHelloIos (0 ms)
+[----------] 1 tests from SayHelloKotlinConfIosTest (0 ms total)
 [----------] Global test environment tear-down
-[==========] 1 tests from 1 test cases ran. (1 ms total)
-[  PASSED  ] 1 tests.
+[==========] 2 tests from 2 test cases ran. (0 ms total)
+[  PASSED  ] 2 tests.
 ...
 ----
 
