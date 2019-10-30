@@ -42,7 +42,7 @@ actual fun logMessage(message: String) = NSLog(message)
 
 [source,kotlin]
 ----
-actual fun logMessage(message: String) = println(message)
+actual fun logMessage(message: String) = Logger.getLogger("App").log(Level.INFO, message)
 ----
 
 - `linuxMain`
