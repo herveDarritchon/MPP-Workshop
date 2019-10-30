@@ -8,12 +8,12 @@ Salomon BRYS
 
 In some specific cases the common code cannot be shared, often due to platform's internal infrastructure or definition.
 Take dates, for example. Their definition isn't the same on JVM, iOS or JavaScript, thus we should be able to provide a sort of bridge for each platform.
-Another example: the coroutines cannot be used in the same way on Android and iOS as iOS doesn't allow (yet) multithreading in a coroutine context, so we should be able to work with every specifics of each platform in our common code.
+Another example: the coroutines cannot be used in the same way on Android and iOS, as iOS doesn't allow (yet) multithreading in a coroutine context. So we should be able to work with every specifics of each platform in our common code.
 
 That's why Kotlin/Multiplatform provides a way to define an `expect`/`actual` mechanism.
 In the common code, we define the ``expect``ed behaviors, allowing us to provide the `actual` behavior in each targeted platform.
 
-The expectation [`expect`] code will be defined in the common module:
+===== The expectation [`expect`] code will be defined in the common module
 
 - `commonMain`
 
@@ -22,7 +22,7 @@ The expectation [`expect`] code will be defined in the common module:
 expect fun logMessage(message: String)
 ----
 
-And the implementation [`actual`] will be defined for each targeted platform as:
+===== And the implementation [`actual`] will be defined for each targeted platform
 
 - `jsMain`
 
@@ -56,7 +56,7 @@ actual fun logMessage(message: String) = printf("%s\n", message)
 
 In this section we will prepare our common code to be executable and testable for each targeted platform.
 
-To show you how it works, and how yo play with the `expect`/`actual` behavior, we will use a simple example.
+To show you how it works, and how yo play with the `expect`/`actual` mechanism, we will use a simple example.
 For each targeted platform, we will print on the screen/console a message, with a specific part, different for each platform.
 
 .Example of a platform specific message
@@ -98,20 +98,21 @@ This is because we've used the `expect` keyword without defining any `actual` be
 [TIP]
 ====
 If you put your cursor on the function name you'll see the following tooltip
+
 image:res/3-1.png[expect/actual error]
 ====
 
-To fix this error we will need to provide an `actual` function `platformName()` for every targeted platform.
+To fix this error we will need to provide an `actual` implementation for the  `platformName()` function, for every targeted platform.
 
 === [actual] platform specific code
 
 Following the previous section you'll have to provide an `actual` function `platformName()` for each of the platform you are targeting.
-Meaning, you'll have to create a file `showMessage.kt` for each platform:
+Meaning, you'll have to create a new kotlin file for each platform:
 
 [IMPORTANT]
 ====
 1. You must define your `actual` members into the same package as the ``expect``ed behavior
-2. Your `actual` members shouldn't be in a file with the same name as your `expect` members, otherwise your could have conflict at build time.
+2. Your `actual` members shouldn't be in a file with the same name as your `expect` members, otherwise your could have conflicts at build time.
 
 [cols="2", grid="none", frame="none"]
 |====
@@ -176,9 +177,9 @@ image:res/3-4.png[actual gutter icon]
 
 === Testing your multi-platform library
 
-To empower our example we should provide tests for each of the targeted platform.
-Our test environment is already configured, though we just have to write a test for our `sayHelloKotlinConf()`
-function, for every platform.
+To empower our example, we should provide some tests for each of the targeted platform.
+Our test environment is already configured, so we just have to write a test for our `sayHelloKotlinConf()`
+function, on every platform.
 
 [NOTE]
 ====
@@ -186,6 +187,8 @@ Reminder: Every source set is divide into two parts, *_Main_* and *_Test_*.
 
 Here we will work on the *_Test_* part
 ====
+
+Add a class `SayHelloKotlinConfTest` for each *_Test_* module, except the common one.
 
 .jvmTest > kotlin > SayHelloKotlinConfTest.kt
 [source,kotlin]
@@ -272,13 +275,70 @@ SayHelloKotlinConfTest.testSayHelloLinux PASSED
 ...
 ----
 
+Cool, right ?
+
 ==== The iOS special case
 
-    TODO ?
+WARNING: This part is for MacOS users that have already installed https://developer.apple.com/xcode/[XCode]
+
+As we already saw, by default, the Kotlin/Multiplatform doesn't run the task `iosTest`.
+So we need to manually define it with the following block at the end of our Gradle build.
+
+.build.gradle.kts
+[source,kotlin]
+----
+val iosTest: Task by tasks.creating { <1>
+    val testExecutable = kotlin.targets
+              .getByName<KotlinNativeTarget>("iosX64").binaries.getTest("DEBUG") <2>
+
+    dependsOn(testExecutable.linkTaskName) <3>
+    group = JavaBasePlugin.VERIFICATION_GROUP
+    description = "Runs tests for target 'ios' on an iOS simulator"
+
+    doLast { <4>
+        exec {
+            val device = project.findProperty("iosDevice")?.toString() ?: "iPhone 8" <5>
+            commandLine( "xcrun", "simctl", "spawn",
+                        "--standalone", device, testExecutable.outputFile.absolutePath) <6>
+        }
+    }
+}
+
+tasks.getByName("allTests").dependsOn(iosTest) <7>
+----
+<1> Create a new task named `iosTest`
+<2> Find the compiled executable for the source set `iosX64` defined earlier
+<3> The new task *must* depends on the executable compilation task
+<4> This block is the part of the task that will be executed each time we call `iosTest`
+<5> Define a targeted iPhone simulator to execute the tests on
+<6> Execute a command that will spawn the iPhone simulator and run our tests
+<7> Set the `iosTest` task as part of the test chain
+
+
+
+Now you can rerun your task `allTests` and you will see new lines printed.
+
+.Gradle AllTest task
+[source]
+----
+...
+> Task :iosTest
+...
+[==========] Running 1 tests from 1 test cases.
+[----------] Global test environment set-up.
+[----------] 1 tests from SayHelloKotlinConfTest
+[ RUN      ] SayHelloKotlinConfTest.testSayHelloIOS
+[       OK ] SayHelloKotlinConfTest.testSayHelloIOS (0 ms)
+[----------] 1 tests from SayHelloKotlinConfTest (1 ms total)
+[----------] Global test environment tear-down
+[==========] 1 tests from 1 test cases ran. (1 ms total)
+[  PASSED  ] 1 tests.
+...
+----
 
 === Building your multi-platform library
 
-Now you can prepare your library to be used on different platform by building it with Gradle.
+Before going further, you can prepare your library to be used on different platform by building it with Gradle.
 
 In the Gradle pane, double click on `Tasks` > `build` > `build` to run the `build` Gradle task.
 
