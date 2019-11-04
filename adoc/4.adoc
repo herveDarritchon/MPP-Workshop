@@ -1,4 +1,4 @@
 =  Using you multi-platform library on Android
-Salomon BRYS
+Salomon BRYS & Romain BOISSELLE
 :toc:
 :icons: font

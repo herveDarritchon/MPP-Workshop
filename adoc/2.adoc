@@ -1,5 +1,5 @@
 = Write your first test
-Salomon BRYS
+Salomon BRYS & Romain BOISSELLE
 :toc:
 :icons: font
 

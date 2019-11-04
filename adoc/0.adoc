@@ -1,5 +1,5 @@
 = Introduction
-Salomon BRYS
+Salomon BRYS & Romain BOISSELLE
 :toc:
 :icons: font
 
