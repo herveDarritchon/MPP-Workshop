@@ -22,7 +22,7 @@ While we're at it, we'll be using the Gradle Kotlin DSL (if you haven't used it 
 TIP: The Gradle Kotlin DSL allows you to bring type safety as well as IDE completion & API exploration into your build script.
 
 In IntelliJ's new project wizard, create a new project, and select `Gradle` > `Kotlin/Multiplatform`. +
-Don't forget to check the `Kotlin DSL nuild script` checkbox.
+Don't forget to check the `Kotlin DSL build script` checkbox.
 
 image:res/1-0.png[New project type wizard]
 
