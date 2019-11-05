@@ -1,4 +1,35 @@
-=  Using you multi-platform library on Android
+=  Using you Kotlin multi-platform library on Android
 Salomon BRYS & Romain BOISSELLE
 :toc:
 :icons: font
+
+We will start by the simplest way to use a Kotlin multi-platform.
+The first target of Kotlin multi-platform is the JVM, so we will be use our library on Android.
+
+//. Requirements
+//.. To go on the Android path you should have installed https://developer.android.com/studio[Android Studio].
+
+== Creation Wizard
+
+Open https://developer.android.com/studio[Android Studio] and create a new project:
+
+image:res/4-1.png[creation wizard]
+
+Choose a project template: *Empty Activity*.
+
+image:res/4-2.png[project template]
+
+Then, set the application details
+
+- package name: `com.mybusiness.android`
+- Set your project location
+- Language: `Kotlin`
+- Minimum SDK target: `API 21: Android 5.0`
+
+image:res/4-3.png[project details]
+
+Click the *Finish* button, you now have your *_Android_* application!
+
+== Gradle configuration
+
+== Run
