@@ -385,7 +385,7 @@ Now you can rerun your task `allTests` and you will see new lines printed.
 ...
 ----
 
-=== Building your multi-platform library
+=== Building and publishing your multi-platform library
 
 Before going further, we need to prepare our multi-platform library by building and publishing it with Gradle.
 
