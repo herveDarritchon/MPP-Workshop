@@ -243,19 +243,21 @@ Open the *Android Virtual Device Manager* in the *No devices* dropdown
 
 image:res/4-7.png[device configuration dropdown,240]
 
-image:res/4-8.png[device wizard,480]
-Click on *+ Create a Virtual Device...*
-
-image:res/4-9.png[select hardware,480]
-Select a targeted hardware (here the *_Google Pixel 3_*)
-
-image:res/4-10.png[select software,480]
+[cols="70%,<.^30%a",grid="none",frame="none"]
+|===
+|image:res/4-8.png[device wizard]
+|Click on *+ Create a Virtual Device...*
+|image:res/4-9.png[select hardware]
+|Select a targeted hardware (here the *_Google Pixel 3_*)
+|image:res/4-10.png[select software]
+|
 Select the targeted Android version (here *_Android 10_*)
 
 NOTE: if you don't have the SDK already, click on *Download*.
 
-image:res/4-11.png[finalize device,480]
-Click *Finish* and close the *AVD Manager*
+|image:res/4-11.png[finalize device]
+|Click *Finish* and close the *AVD Manager*
+|===
 
 === Run the application
 
