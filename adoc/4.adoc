@@ -274,4 +274,4 @@ Here we go ! We can see, displayed on the screen:
 - the *JVM* specific message: `JVM`
 
 == What's next ?
-In the next step we will see how to do the same with *_XCode_* for the *_iOS_* platform.
+In the next step we will see how to do the same with *_Xcode_* for the *_iOS_* platform.

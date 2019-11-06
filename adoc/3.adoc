@@ -326,7 +326,7 @@ Cool, right ?
 
 ==== The iOS special case
 
-WARNING: This part is for MacOS users that have already installed https://developer.apple.com/xcode/[*_XCode_*]
+WARNING: This part is for MacOS users that have already installed https://developer.apple.com/xcode/[*_Xcode_*]
 
 As we already saw, by default, the Kotlin/Multiplatform doesn't run the task `iosTest`.
 So we need to manually define it with the following block at the end of our Gradle build.
@@ -433,7 +433,7 @@ NOTE: On a real world project, you would have published your library on a remote
 ==== The iOS special case
 
 Building libraries for *_iOS_* is also a special case in our build script.
-In fact, to be able to use our common library in *_XCode_*, we need to build a *_framework_* file.
+In fact, to be able to use our common library in *_Xcode_*, we need to build a *_framework_* file.
 
 To do so, we have to modify our Gradle build script in two places.
 In the `target` definition for *_iOS_* we need to add the following block of code:
@@ -463,7 +463,7 @@ If you run the Gradle task `build` you'll find the `businessLibrary.framework` i
 image:res/3-7.png[build directory]
 ====
 
-To use this newly generated *_framework_* file in *_XCode_* we need to provide a new Gradle task to copy
+To use this newly generated *_framework_* file in *_Xcode_* we need to provide a new Gradle task to copy
 the file into a shared place.
 
 Open your `build.gradle.kts` file and put the following block at the end.
@@ -491,7 +491,7 @@ val packForXcode by tasks.creating(Sync::class) { <1>
 
 tasks.getByName("build").dependsOn(packForXcode) <5>
 ----
-<1> Create a new task to make the framework available for *_XCode_*
+<1> Create a new task to make the framework available for *_Xcode_*
 <2> The new task depends on the fact that the framework has been built
 <3> Move the built framework from the build directory
 <4> To a new location (could/should be a remote path)
