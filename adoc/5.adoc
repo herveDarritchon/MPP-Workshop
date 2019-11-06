@@ -44,3 +44,37 @@ This task should have built and published the `framework` needed by *_Xcode_* to
 .Kotlin multi-platform library build directory.
 image:res/3-8.png[build directory]
 
+To be able to use your newly generated `framework` you need to get you *_Xcode_* instance, and manually add it to the configuration.
+
+[cols="65%,<.^35%a",grid="none",frame="none"]
+|===
+|image:res/5-6.png[project settings]
+|Open your project settings, on the *General* tab. Then, in *Framework, Libraries and Embedded Content* click the `+` button
+|image:res/5-7.png[add framework]
+|We need to find our `framework`, so click on *Add Other...*, then *Add Files...*
+|image:res/5-8.png[broswe files]
+|Browse to your `framework` and click *Open*
+|image:res/5-9.png[add framework result]
+|You now see your `framework`, added to the configuration
+|===
+
+Right now, if you try to build your application, it will fail. You also need to tell to *_Xcode_* where to look for the `framework`.
+
+[grid="none",frame="none"]
+|===
+|Open your project settings, on the *Build Settings* tab, with the filters *All* and *Combined* activated.
+
+Then find the *Search Paths* section
+|image:res/5-10.png[project build settings]
+|Add the directory that contains your built `framework` to *Framework Search Paths*.
+|image:res/5-11.png[add search path]
+|===
+
+Now that we have configured our project we will be able to use our Kotlin multi-platform library in Swift.
+
+== Using your Kotlin multi-platform library in Swift
+
+
+
+== What's next ?
+In the next step we will see how to use our Kotlin multi-platform library on the Web, with *_Kotlin/JS_*.
