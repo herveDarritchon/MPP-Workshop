@@ -74,7 +74,60 @@ Now that we have configured our project we will be able to use our Kotlin multi-
 
 == Using your Kotlin multi-platform library in Swift
 
+=== Modifying the code
 
+By using *_SwiftUI_* we don't need to change the view through an *_XML_*, or whatever view configuration files *_Xcode_* can work with.
+
+Here we will only change one file, `ContentView.swift` to import our common code, and display our specific message to the screen.
+
+[NOTE]
+====
+.Reminder
+
+In our Kotlin multi-platform library we have defined the iOS target to be built as a `framework` named *_businessLibrary_*
+[source,kotlin]
+----
+kotlin {
+    iosX64 {
+        binaries {
+            framework {
+                baseName = "businessLibrary"
+            }
+        }
+    }
+}
+----
+====
+
+.iOS Application > ContentView.swift
+[source,swift]
+----
+import SwiftUI
+import businessLibrary <1>
+
+struct ContentView: View {
+    var body: some View {
+        Text(ShowMessageKt.sayHelloKotlinConf()) <2>
+            .font(.system(size: 40))
+            .multilineTextAlignment(.center)
+    }
+}
+----
+<1> import the Kotlin multi-platform library package named as *_businessLibrary_*.
+<2> call the `sayHelloKotlinConf()` function defined in the `ShowMessageKt` class.
+
+=== Running the app
+
+NOTE: Contrary to *Android Studio* there no need to manually configure an *_iOS_* simulator. *_Xcode_* has already ready to use simulators.
+
+Run the *_iOS_* application by clicking on the image:res/run-ios.png[run ios, 32] button.
+
+image:res/5-12.png[final result]
+
+Here we are ! We can see, displayed on the screen:
+
+- the common message: `Hello KotlinConf, Kotlin/Multiplatform is awesome! We are running on`
+- the *_iOS_* specific message: `iOS`
 
 == What's next ?
 In the next step we will see how to use our Kotlin multi-platform library on the Web, with *_Kotlin/JS_*.

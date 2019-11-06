@@ -268,7 +268,7 @@ An Android simulator will open with the following screen:
 
 image:res/4-13.png[final result,360]
 
-Here we go ! We can see, displayed on the screen:
+Here we are ! We can see, displayed on the screen:
 
 - the common message: `Hello KotlinConf, Kotlin/Multiplatform is awesome! We are running on`
 - the *JVM* specific message: `JVM`
