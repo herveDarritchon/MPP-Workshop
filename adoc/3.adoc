@@ -3,17 +3,19 @@ Salomon BRYS & Romain BOISSELLE
 :toc:
 :icons: font
 
+In some specific cases the common code cannot be shared, often due to platform's internal infrastructure or definition.
+
+Take dates, for example. Their definition is not the same on *_JVM_*, *_iOS_* or *_JavaScript_*, thus we should be able to provide a sort of bridge for each platform. +
+Another example: the coroutines cannot be used in the same way on *_Android_* and *_iOS_*, as *_Kotlin/Native_* does not allow (yet) multithreading in a coroutine context. +
+So we should be able to work with every specifics of each platform in our common code.
+
 
 == What is ``expect``ed must ``actual``y exist
 
-In some specific cases the common code cannot be shared, often due to platform's internal infrastructure or definition.
-Take dates, for example. Their definition isn't the same on *_JVM_*, *_iOS_* or *_JavaScript_*, thus we should be able to provide a sort of bridge for each platform.
-Another example: the coroutines cannot be used in the same way on *_Android_* and *_iOS_*, as *_iOS_* doesn't allow (yet) multithreading in a coroutine context. So we should be able to work with every specifics of each platform in our common code.
-
-That's why Kotlin/Multiplatform provides a way to define an `expect`/`actual` mechanism.
+Kotlin/Multiplatform provides a way to define an `expect`/`actual` mechanism.
 In the common code, we define the ``expect``ed behaviors, allowing us to provide the `actual` behavior in each targeted platform.
 
-*_The expectation [`expect`] code will be defined in the common module_*
+*The expectation [`expect`] code will be defined in the common module:*
 
 - `commonMain`
 
@@ -22,7 +24,7 @@ In the common code, we define the ``expect``ed behaviors, allowing us to provide
 expect fun logMessage(message: String)
 ----
 
-*_And the implementation [`actual`] will be defined for each targeted platform_*
+*And the implementation [`actual`] will be defined for each targeted platform:*
 
 - `jsMain`
 
@@ -83,8 +85,8 @@ package com.mybusiness
 
 fun sayHelloKotlinConf() =
     """
-    |Hello KotlinConf, Kotlin/Multiplatform is awesome!
-    |We are running on ${ platformName() }
+    Hello KotlinConf, Kotlin/Multiplatform is awesome!
+    We are running on ${ platformName() }
     """.trimMargin()
 
 expect fun platformName(): String
@@ -106,13 +108,13 @@ To fix this error we will need to provide an `actual` implementation for the  `p
 
 === [actual] platform specific code
 
-Following the previous section you'll have to provide an `actual` function `platformName()` for each of the platform you are targeting.
+Following the previous section you'll have to provide an `actual` function `platformName()` for each platform you are targeting.
 Meaning, you'll have to create a new kotlin file for each platform:
 
 [IMPORTANT]
 ====
 1. You must define your `actual` members into the same package as the ``expect``ed behavior
-2. Your `actual` members shouldn't be in a file with the same name as your `expect` members, otherwise your could have conflicts at build time.
+2. Your `actual` members should not be in a file with the same name as your `expect` members, otherwise your could have conflicts at build time.
 
 [cols="2", grid="none", frame="none"]
 |====
@@ -328,30 +330,30 @@ Cool, right ?
 
 WARNING: This part is for MacOS users that have already installed https://developer.apple.com/xcode/[*_Xcode_*]
 
-As we already saw, by default, the Kotlin/Multiplatform doesn't run the task `iosTest`.
-So we need to manually define it with the following block at the end of our Gradle build.
+As we already saw, by default, the Kotlin/Multiplatform does not provide an `iosTest` task.
+So we need to manually define it with the following block at the end of our Gradle build file.
 
 .build.gradle.kts
 [source,kotlin]
 ----
-val iosTest: Task by tasks.creating { <1>
+val iosTest: Task by tasks.creating { //<1>
     val testExecutable = kotlin.targets
-              .getByName<KotlinNativeTarget>("iosX64").binaries.getTest("DEBUG") <2>
+              .getByName<KotlinNativeTarget>("iosX64").binaries.getTest("DEBUG") //<2>
 
-    dependsOn(testExecutable.linkTaskName) <3>
+    dependsOn(testExecutable.linkTaskName) //<3>
     group = JavaBasePlugin.VERIFICATION_GROUP
     description = "Runs tests for target 'ios' on an iOS simulator"
 
-    doLast { <4>
+    doLast { //<4>
         exec {
-            val device = project.findProperty("iosDevice")?.toString() ?: "iPhone 8" <5>
+            val device = project.findProperty("iosDevice")?.toString() ?: "iPhone 8" //<5>
             commandLine( "xcrun", "simctl", "spawn",
-                        "--standalone", device, testExecutable.outputFile.absolutePath) <6>
+                        "--standalone", device, testExecutable.outputFile.absolutePath) //<6>
         }
     }
 }
 
-tasks.getByName("allTests").dependsOn(iosTest) <7>
+tasks.getByName("allTests").dependsOn(iosTest) //<7>
 ----
 <1> Create a new task named `iosTest`
 <2> Find the compiled executable for the source set `iosX64` defined earlier
@@ -389,33 +391,34 @@ Now you can rerun your task `allTests` and you will see new lines printed.
 
 Before going further, we need to prepare our multi-platform library by building and publishing it with Gradle.
 
-In your Gradle build file `build.gradle.kts` add the plugin `maven-publish` and change the version of your library, `1.0.0` be proud :)
+In your Gradle build file `build.gradle.kts` add the plugin `maven-publish` and change the version of your library, `1.0.0` to be proud :)
 
 .build.gradle.kts > plugin
 [source,kotlin]
 ----
 plugins {
-    ...
-    `maven-publish`
+    //...
+    `maven-publish` //<1>
 }
-...
+//...
 version = "1.0.0"
 ----
+<1> Notice the use back ticks ```
 
-In the Gradle pane, you should see a new group, named `publishing`, if not hint the refresh button
+In the Gradle pane, you should see a new task group, named `publishing` (hit the refresh button if you don't).
 
 image:res/3-6.png[gradle publishing]
 
-Then, double click on `Tasks` > `publishing` > `publishToMavenLocal` to run the `publishToMavenLocal` Gradle task.
+Then, in `Tasks` > `publishing`, double click on `publishToMavenLocal` to run this Gradle task.
 
 .If your open a terminal and run the following command you could see that your library has been published locally.
 [source]
 ----
- $ ls .m2/repository/com/mybusiness/
-business-library-iosx64
+ $ ls ~/.m2/repository/com/mybusiness/
+business-library-iosx64 <1>
 business-library-js
 business-library-jvm
-business-library-macos
+business-library-linux <2>
 business-library-metadata
 
  $ ls .m2/repository/com/mybusiness/business-library-jvm
@@ -427,75 +430,74 @@ business-library-jvm-1.0.0-sources.jar
 business-library-jvm-1.0.0.jar
 business-library-jvm-1.0.0.pom
 ----
+<1> if you are targetting iOS
+<2> or macos, or mingw
 
-NOTE: On a real world project, you would have published your library on a remote repository (maven / bintray / etc)
+NOTE: On a real world project, you may publish your library to a remote repository (Maven / Bintray / etc).
 
 ==== The iOS special case
 
 Building libraries for *_iOS_* is also a special case in our build script.
-In fact, to be able to use our common library in *_Xcode_*, we need to build a *_framework_* file.
+In fact, to be able to use our common library in *_Xcode_*, we need to build a *_framework_* directory.
 
-To do so, we have to modify our Gradle build script in two places.
-In the `target` definition for *_iOS_* we need to add the following block of code:
-
-.build.gradle.kts > kotlin
-[source,kotlin]
-----
-kotlin {
-    ...
-    iosX64 {
-        binaries {
-            framework { <1>
-                baseName = "businessLibrary" <2>
-            }
-        }
-    }
-    ...
-}
-----
-<1> define that the output binaries must be a *_framework_* file
-<2> with the name `businessLibrary`
-
-[NOTE]
-====
-If you run the Gradle task `build` you'll find the `businessLibrary.framework` in your build directory
-
-image:res/3-7.png[build directory]
-====
-
-To use this newly generated *_framework_* file in *_Xcode_* we need to provide a new Gradle task to copy
-the file into a shared place.
-
-Open your `build.gradle.kts` file and put the following block at the end.
+First, in the `target` definition for *_iOS_* we need to add the following block of code:
 
 .build.gradle.kts
 [source,kotlin]
 ----
-...
-val packForXcode by tasks.creating(Sync::class) { <1>
-    /// selecting the right configuration for the iOS
-    /// framework depending on the environment
-    /// variables set by Xcode build
-    val mode = System.getenv("CONFIGURATION") ?: "DEBUG"
+kotlin {
+    //...
+    iosX64 {
+        binaries {
+            framework { //<1>
+                baseName = "businessLibrary" //<2>
+            }
+        }
+    }
+    //...
+}
+----
+<1> define that the output binaries must be a *_framework_* file...
+<2> ...with the name `businessLibrary`
+
+[NOTE]
+====
+If you run the Gradle task `build` you'll find `businessLibrary.framework` in your build directory
+
+image:res/3-7.png[build directory]
+====
+
+To use this newly generated *_framework_* directory in *_Xcode_* we need to provide a new Gradle task to copy
+it into a shared place.
+
+Add the following block at the end of your Gradle build file:
+
+.build.gradle.kts
+[source,kotlin]
+----
+//...
+val packForXcode by tasks.creating(Sync::class) { //<1>
+    val mode = System.getenv("CONFIGURATION") ?: "DEBUG" //<2>
     val framework = kotlin.targets
         .getByName<KotlinNativeTarget>("iosX64")
         .binaries.getFramework(mode)
     inputs.property("mode", mode)
 
-    dependsOn(framework.linkTask) <2>
+    dependsOn(framework.linkTask) //<3>
 
     val targetDir = File(buildDir, "xcode-frameworks")
-    from({ framework.outputDirectory }) <3>
-    into(targetDir) <4>
+    from({ framework.outputDirectory }) //<4>
+    into(targetDir) //<5>
 }
 
-tasks.getByName("build").dependsOn(packForXcode) <5>
+tasks.getByName("build").dependsOn(packForXcode) //<6>
 ----
 <1> Create a new task to make the framework available for *_Xcode_*
-<2> The new task depends on the fact that the framework has been built
-<3> Move the built framework from the build directory
-<4> To a new location (could/should be a remote path)
-<5> Set the `packForXcode` task as part of the `build` task
+<2> Selecting the right configuration depending on the environment variables set by Xcode build
+<3> The new task depends on the fact that the framework has been built
+<4> Move the built framework from the build directory
+<5> To a new location (could/should be a remote path)
+<6> Set the `packForXcode` task as part of the `build` task
 
 Now after running the Gradle task `build`, by double clicking on `Tasks` > `build` > `build`, you should see the following build tree:
 
@@ -503,4 +505,4 @@ image:res/3-8.png[build directory]
 
 === What's next ?
 
-In the next section, we will see how to use our multi-platform library within specific platform, as *_Android_*, *_iOS_* and *_JavaScript_*.
+In the next section, we will see how to use our multi-platform library on the various platforms we are targetting, namely *_Android_*, *_iOS_* and *_JavaScript_*.

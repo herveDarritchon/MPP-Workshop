@@ -3,9 +3,10 @@ Salomon BRYS & Romain BOISSELLE
 :toc:
 :icons: font
 
-Now that we have a working *_Android_* application, we will try, and succeed, the use of our Kotlin multi-platform library on *_iOS_*.
+Now that we have a working *_Android_* application, we will try, and succeed, to use our Kotlin multi-platform library on *_iOS_*.
 
-IMPORTANT: You'll be able to fulfill this part only if you have a MacOS computer. Otherwise, consider following up with your neighbor :)
+IMPORTANT: You will be able to fulfill this part only if you have a MacOS computer.
+           Otherwise, consider either following up with your neighbor, or skipping this chapter.
 
 == Project Creation Wizard
 
@@ -76,7 +77,7 @@ Now that we have configured our project we will be able to use our Kotlin multi-
 
 === Modifying the code
 
-By using *_SwiftUI_* we don't need to change the view through an *_XML_*, or whatever view configuration files *_Xcode_* can work with.
+By using *_SwiftUI_* we do not need to change the view through an *_XML_*, or whatever view configuration files *_Xcode_* can work with.
 
 Here we will only change one file, `ContentView.swift` to import our common code, and display our specific message to the screen.
 
@@ -86,6 +87,7 @@ Here we will only change one file, `ContentView.swift` to import our common code
 
 In our Kotlin multi-platform library we have defined the iOS target to be built as a `framework` named *_businessLibrary_*
 [source,kotlin]
+.build.gradle.kts
 ----
 kotlin {
     iosX64 {
@@ -103,11 +105,11 @@ kotlin {
 [source,swift]
 ----
 import SwiftUI
-import businessLibrary <1>
+import businessLibrary //<1>
 
 struct ContentView: View {
     var body: some View {
-        Text(ShowMessageKt.sayHelloKotlinConf()) <2>
+        Text(ShowMessageKt.sayHelloKotlinConf()) //<2>
             .font(.system(size: 40))
             .multilineTextAlignment(.center)
     }
@@ -118,7 +120,8 @@ struct ContentView: View {
 
 === Running the app
 
-NOTE: Contrary to *Android Studio* there no need to manually configure an *_iOS_* simulator. *_Xcode_* has already ready to use simulators.
+NOTE: Contrary to *Android Studio* there is no need to manually configure an *_iOS_* simulator.
+      *Xcode* already provides simulators.
 
 Run the *_iOS_* application by clicking on the image:res/run-ios.png[run ios, 32] button.
 
@@ -126,8 +129,8 @@ image:res/5-12.png[final result]
 
 Here we are ! We can see, displayed on the screen:
 
-- the common message: `Hello KotlinConf, Kotlin/Multiplatform is awesome! We are running on`
-- the *_iOS_* specific message: `iOS`
+- the common message: `Hello KotlinConf, Kotlin/Multiplatform is awesome!`
+- the *_iOS_* specific message: `We are running on iOS`
 
 == What's next ?
 In the next step we will see how to use our Kotlin multi-platform library on the Web, with *_Kotlin/JS_*.

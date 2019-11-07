@@ -3,6 +3,9 @@ Salomon BRYS & Romain BOISSELLE
 :toc:
 :icons: font
 
+One of the core benefits of Kotlin/Multiplatform is the ability to test once and gain confidence in your code on all platforms at once.
+
+To demonstrate that, let's design our first unit test.
 
 == Writing it
 
@@ -63,33 +66,30 @@ Now, all that remain is to run our tests.
 
 == Running it
 
-In the Gradle pane, double click on `Tasks` > `verification` > `allTests` to run the `allTests` Gradle task.
+In the Gradle pane, open `Tasks` > `verification` and double click ont `allTests` to run the `allTests` Gradle task.
 
 image:res/2-4.png[allTests gradle task]
 
-Look at the command line result, you should find that gradle has run some talks, more importantly you should see the following ones: `jsTest`, `jvmTest` & `linuxTest`.
+Look at the command line result, you should find that gradle has run some tasks, more importantly you should see the following ones: `jsTest`, `jvmTest` & `linuxTest` (or `macosTest`, or `mingwTest`).
 This means that the tests were compiled by the three different compilers and run on three different targets.
 
 In fact, let's see all testing in action.
-Add this at the end of the `sourceSets` block in your build.gradle.kts file:
+Add this at the end of your Gradle build file:
 
-.build.gradle.kts > kotlin > sourceSets
+.build.gradle.kts
 [source,kotlin]
 ----
-sourceSets {
-    ...
-    afterEvaluate {
-        tasks.withType<AbstractTestTask>().forEach {
-            it.testLogging {
-                events("passed", "skipped", "failed")
-            }
+afterEvaluate {
+    tasks.withType<AbstractTestTask>().forEach {
+        it.testLogging {
+            events("passed", "skipped", "failed")
         }
     }
 }
 ----
 
 Rerun the `allTests` task and... nothing happens.
-Everything is "up to date": because the code hasn't change, gradle does not rerun the tests.
+Everything is "up to date": because the code has not change, Gradle does not rerun the tests.
 You first need to run the `clean` task (in the `build` group), then rerun the `allTests` task.
 
 Lo and behold:
@@ -110,9 +110,9 @@ AdditionTests.testSimpleAddition PASSED
 AdditionTests.testNegativeAddition PASSED
 ----
 
-NOTE: You may have noticed that even you defined an iOS target there is nothing showed here.
+NOTE: You may have noticed that even if you defined an iOS target there is nothing showed here.
       This is because Kotlin/Multiplatform plugin does not support running tests on other platform than the host platforms.
-      We will see how to do this in the following steps.
+      We will see how to go around this in a following chapter.
 
 Now try to change one of the two tests to fail, and see what happens when you run them.
 Unsurprisingly, all three test task fail.

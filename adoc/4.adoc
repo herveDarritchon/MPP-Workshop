@@ -4,6 +4,7 @@ Salomon BRYS & Romain BOISSELLE
 :icons: font
 
 We will start by the simplest way to use a Kotlin multi-platform library.
+
 The first target of Kotlin was the *JVM*, thus its the easiest integration, so we will be using our library on *_Android_*.
 
 == Project Creation Wizard
@@ -17,16 +18,17 @@ Choose a project template: *Empty Activity*.
 
 image:res/4-2.png[project template,600]
 
-Then, set the application details
+Then, set the application details:
 
 - package name: `com.mybusiness.android`
-- uet your project location
+- your project location
 - choose Kotlin as the language
 - set the minimum API level: `API 21: Android 5.0`
 
 image:res/4-3.png[project details,600]
 
 Click the *Finish* button, you now have an empty *_Android_* application, with one screen, ready to display a `Hello World!`.
+
 Before running our app we will change the configuration and the code to integrate our Kotlin multi-platform library.
 
 == Gradle configuration
@@ -65,25 +67,27 @@ This is where we will bound the application with our Kotlin multi-platform libra
 Remember, in the previous step we have built and published our library on *_Maven Local_*,
 thus we need to add *_Maven Local_* to the Gradle configuration.
 +
-.app > build.gradle > repositories
+.app > build.gradle
 [source,groovy]
 ----
+//...
 repositories {
     mavenLocal()
 }
+//...
 ----
 +
 Then, add the following dependency to your `build.gradle` into the `app` module
 +
-.app > build.gradle > dependencies
+.app > build.gradle
 [source,groovy]
 ----
-
+//...
 dependencies {
     // implementations
-    ...
+    //...
     implementation 'com.mybusiness:business-library-jvm:1.0.0'
-    ...
+    //...
     // testImplementation
     // androidTestImplementation
 }
@@ -125,11 +129,11 @@ You will need to exclude `kotlin_module` files in your `build.gradle`:
 [source,groovy]
 ----
 android {
-    ...
+    //...
     packagingOptions {
         exclude 'META-INF/*.kotlin_module'
     }
-    ...
+    //...
 }
 ----
 ====
@@ -185,18 +189,16 @@ First, we need to change the `TextView` in the _XML_ file
 .res/layout/activity_main.xml
 [source,xml]
 ----
-    ...
     <TextView
-        android:id="@+id/mainTextView" <1>
+        android:id="@+id/mainTextView" <!--1-->
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="40sp" <2>
-        android:textAlignment="center" <3>
+        android:textSize="40sp" <!--2-->
+        android:textAlignment="center" <!--3-->
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-    ...
 ----
 <1> Give a unique ID to the `TextView` to be able to call it from our Kotlin code
 <2> Set the text to a bigger size
@@ -207,14 +209,14 @@ Then, we need to change the Kotlin code to display our message in the `TextView`
 .com.mybusiness.android.MainActivity
 [source,kotlin]
 ----
-import com.mybusiness.sayHelloKotlinConf <1>
+import com.mybusiness.sayHelloKotlinConf //<1>
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        mainTextView.text = sayHelloKotlinConf() <2>
+        mainTextView.text = sayHelloKotlinConf() //<2>
     }
 }
 ----
@@ -235,7 +237,7 @@ To run and test your application locally you need to configure an _Android Virtu
 
 === Android Virtual Device Manager
 
-If you don't have any configured device like in the following screenshot
+If you do not have any configured device like in the following screenshot
 
 image:res/4-6.png[device configuration,640]
 
@@ -253,7 +255,7 @@ image:res/4-7.png[device configuration dropdown,240]
 |
 Select the targeted Android version (here *_Android 10_*)
 
-NOTE: if you don't have the SDK already, click on *Download*.
+NOTE: if you do not have the SDK already, click on *Download*.
 
 |image:res/4-11.png[finalize device]
 |Click *Finish* and close the *AVD Manager*
@@ -270,8 +272,8 @@ image:res/4-13.png[final result,360]
 
 Here we are ! We can see, displayed on the screen:
 
-- the common message: `Hello KotlinConf, Kotlin/Multiplatform is awesome! We are running on`
-- the *JVM* specific message: `JVM`
+- the common message: `Hello KotlinConf, Kotlin/Multiplatform is awesome!`
+- the *JVM* specific message: `We are running on JVM`
 
 == What's next ?
 In the next step we will see how to do the same with *_Xcode_* for the *_iOS_* platform.
