@@ -87,7 +87,7 @@ fun sayHelloKotlinConf() =
     """
     Hello KotlinConf, Kotlin/Multiplatform is awesome!
     We are running on ${ platformName() }
-    """.trimMargin()
+    """.trimIndent()
 
 expect fun platformName(): String
 ----
