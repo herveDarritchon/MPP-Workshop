@@ -133,4 +133,4 @@ Here we are ! We can see, displayed on the screen:
 - the *_iOS_* specific message: `We are running on iOS`
 
 == What's next ?
-In the next step we will see how to use our Kotlin multi-platform library on the Web, with *_Kotlin/JS_*.
+In the next step we will see how to use our Kotlin multi-platform library on the Web, with *_JavaScript_*.

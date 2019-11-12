@@ -2,3 +2,7 @@
 Salomon BRYS & Romain BOISSELLE
 :toc:
 :icons: font
+
+Finally, after running our Kotlin multi-platform library on *_Android_* and *_iOS_*, we only have to make it work on the Web.
+To do so, we will create a simple *_JavaScript_* project.
+
