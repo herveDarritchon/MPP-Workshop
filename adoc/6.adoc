@@ -6,3 +6,39 @@ Salomon BRYS & Romain BOISSELLE
 Finally, after running our Kotlin multi-platform library on *_Android_* and *_iOS_*, we only have to make it work on the Web.
 To do so, we will create a simple *_JavaScript_* project.
 
+== Project Creation Wizard
+
+For the simplicity of this workshop, we will use *_IntelliJ Community/Ultimate_* to create our project.
+
+[cols="^50%a,^50%a",grid="none",frame="none"]
+|===
+|_Community Edition_
+|_Ultimate Edition_
+|image:res/6-1.png[create project community edition]
+|image:res/6-2.png[create project ultimate edition]
+|Create a new _Empty Project_
+|Create a new _Static Web_ project
+|===
+
+
+[cols="^65%,<.^35%a",grid="none",frame="none"]
+|===
+|image:res/6-3.png[project name]
+|Set name and location for your project
+|_Community Edition_
+|
+|image:res/6-4.png[project name]
+|_Press the *OK* button to create an empty project_
+|===
+
+Then, you will have a shiny project ready to build your web application :).
+
+[cols="^50%a,^50%a",grid="none",frame="none"]
+|===
+|_Community Edition_
+|_Ultimate Edition_
+|image:res/6-5.png[project community edition]
+|image:res/6-6.png[project ultimate edition]
+|===
+
+
