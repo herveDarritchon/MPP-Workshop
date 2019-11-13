@@ -4,11 +4,12 @@ Salomon BRYS & Romain BOISSELLE
 :icons: font
 
 Finally, after running our Kotlin multi-platform library on *_Android_* and *_iOS_*, we only have to make it work on the Web.
-To do so, we will create a simple ewb page project, to run our Kotlin multi-platform library with *_JavaScript_*.
+
+To do so, we will create a simple web page project, to run our Kotlin multi-platform library with *_JavaScript_*.
 
 == Project Creation Wizard
 
-For the simplicity of this workshop, we will use *_IntelliJ Community/Ultimate_* to create our project.
+For the simplicity of this workshop, we will use *_IntelliJ IDEA Community/Ultimate_* to create our project.
 
 NOTE: The IntelliJ Ultimate Edition have more facilities to create project, so we will see both usage.
 
@@ -166,9 +167,9 @@ You should now see the libraries in your project's hierarchy:
 
 image:res/6-14.png[project hierarchy,300]
 
-==== What's does contains our module ?
+==== What's does our module contain?
 
-If you have been curious, you may have opened `business-library.js` to see whats in it.
+If you have been curious, you may have opened `business-library.js` to see what is in it.
 
 .libraries/business-library.js
 [source,javascript]
