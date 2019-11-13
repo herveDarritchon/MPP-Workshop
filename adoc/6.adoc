@@ -4,7 +4,7 @@ Salomon BRYS & Romain BOISSELLE
 :icons: font
 
 Finally, after running our Kotlin multi-platform library on *_Android_* and *_iOS_*, we only have to make it work on the Web.
-To do so, we will create a simple *_JavaScript_* project.
+To do so, we will create a simple ewb page project, to run our Kotlin multi-platform library with *_JavaScript_*.
 
 == Project Creation Wizard
 
@@ -43,7 +43,7 @@ Then, you will have a shiny project ready to build your web application :).
 |
 [NOTE]
 ====
-You should switch from *Project* view to *Project Files* view by using the above menu
+In _Community Edition_, you should switch from *Project* view to *Project Files* view by using the above menu
 
 image:res/6-7.png[,175]
 ====
@@ -57,7 +57,7 @@ image:res/6-7.png[,175]
 Before reaching our goal to use Kotlin multi-platform code with *_JavaScript_*,
 we will build a simple web page and see how to display it into our browser.
 
-To do so, we will create a new HTML file in our project, and add some HTML to it.
+To do so, we will create a new *_HTML_* file in our project, and add some *_HTML_* to it.
 
 [cols="^65%,<.^35%a",grid="none",frame="none"]
 |===
@@ -95,7 +95,7 @@ in the top right corner of the editor image:res/6-11.png[tooltip,100]
 |===
 
 Now we can see our web page.
-image:res/6-12.png[web page]
+image:res/6-12.png[web page,720]
 
 == Integrating your Kotlin multi-platform library
 
@@ -109,25 +109,27 @@ If you go back to this project, and browse the `/build` directory you will find 
 |===
 |image:res/6-13.png[build js]
 |
-The files that will get our attention are `business-library.js` and `kotlin.js`.
+The files that will need our attention are `business-library.js` and `kotlin.js`.
 
-* `kotiln.js` contains the JS part of the Kotlin standard library
-* `business-library.js` is our Kotlin multi-platform library, that rely on `kotlin.js`
+* `kotlin.js` contains the Kotlin standard library for the *_JavaScript_* platform
+* `business-library.js` is our Kotlin multi-platform library, it rely on `kotlin.js`
 
 So, we will need to import both modules in our project.
 |===
 
-To import the libraries into our project we can use the command line to copy them, depending on where you have set your projects locations.
+To import the libraries into our project we can use the command line to copy them, depending on where you have set your projects location.
 
-* On Linux / MacOS, open a terminal.
+* On *_Linux_* / *_MacOS_*, open a terminal and run the following command.
 +
-.Create a `/libraries` directory for your project.
+WARNING: do not forget to change the path of your projects if needed
++
+.Create a `/libraries` directory for your web application project.
 [source,shell script]
 ----
 mkdir workspace/kotlinconf/webapp/libraries
 ----
 +
-.Copy the `kotlin.js` file.
+.Copy the `kotlin.js` file, from the `/build` directory of the `business-library` project to the `/libraries` directory of your web application project.
 [source,shell script]
 ----
 cp workspace/kotlinconf/business-library/build/js/packages_imported/kotlin/1.3.50/kotlin.js workspace/kotlinconf/webapp/libraries
@@ -138,15 +140,17 @@ cp workspace/kotlinconf/business-library/build/js/packages_imported/kotlin/1.3.5
 ----
 cp workspace/kotlinconf/business-library/build/js/packages/business-library/kotlin/business-library.js workspace/kotlinconf/webapp/libraries
 ----
-* On Windows, open a terminal.
+* On Windows, open a terminal and run the following command.
 +
-.Create a `/libraries` directory for your project.
+WARNING: do not forget to change the path of your projects if needed
++
+.Create a `/libraries` directory for your web application project.
 [source,shell script]
 ----
 mkdir C:\workspace\kotlinconf\webapp\libraries
 ----
 +
-.Copy the `kotlin.js` file.
+.Copy the `kotlin.js` file, from the `/build` directory of the `business-library` project to the `/libraries` directory of your web application project.
 [source,shell script]
 ----
 copy C:\workspace\kotlinconf\business-library\build\js\packages_imported\kotlin\1.3.50\kotlin.js C:\workspace\kotlinconf\webapp\libraries
@@ -158,13 +162,13 @@ copy C:\workspace\kotlinconf\business-library\build\js\packages_imported\kotlin\
 copy C:\workspace\kotlinconf\business-library\build\js\packages\business-library\kotlin\business-library.js C:\workspace\kotlinconf\webapp\libraries
 ----
 
-You should now see the libraries in your project's hierarchy.
+You should now see the libraries in your project's hierarchy:
 
 image:res/6-14.png[project hierarchy,300]
 
 ==== What's does contains our module ?
 
-If you have been curious you may have opened `business-library.js` to see what's in it.
+If you have been curious, you may have opened `business-library.js` to see whats in it.
 
 .libraries/business-library.js
 [source,javascript]
@@ -196,11 +200,11 @@ If you have been curious you may have opened `business-library.js` to see what's
 <2> Set the module accessible with `this['business-library']` from any *_JavaScript_* code.
 <3> Our previously created common function `sayHelloKotlinConf()`.
 <4> The *_JavaScript_*  expect function for `platformName()`.
-<5> Managing packages, thus we will need to call the full qualified name to reach our function.
+<5> Managing packages, thus we will need to call the full qualified name to reach the module members.
 
 === Use your Kotlin multi-platform code
 
-To use our Kotlin multi-platform library in our HTML project we need to reference them. Go to the `index.html` file and add the following script in the `head` of the web page.
+To use our Kotlin multi-platform library in our *_HTML_* project we need to reference them. Go to the `index.html` file and add the following script in the `head` of the web page.
 
 .index.html
 [source,html]
@@ -209,7 +213,7 @@ To use our Kotlin multi-platform library in our HTML project we need to referenc
 <html lang="en">
 <head>
 <!-- ... -->
-    <script type="text/javascript" src="libraries/`kotlin.js`"></script>
+    <script type="text/javascript" src="libraries/kotlin.js`"></script>
     <script type="text/javascript" src="libraries/business-library.js"></script>
 </head>
 <!-- ... -->
@@ -239,20 +243,19 @@ Now, you can change the `body` of your web page to use the Kotlin multi-platform
 </body>
 ----
 <1> Defining a *_JavaScript_* based script.
-<2> Accessing the *h1* `kotlin_mpp_message` to set its inner text.
-<3> Calling our `sayHelloKotlinConf()` function from`the module `business-library`, with its full qualified name.
+<2> Accessing the *h1* `kotlin_mpp_message` to be able to set its _inner text_.
+<3> Calling our `sayHelloKotlinConf()` function from the module `business-library`, with its full qualified name.
 
 Now rerun the page in a browser by clicking on the tooltip bar
 in the top right corner of the editor image:res/6-11.png[tooltip,100], or by reloading the page that you have already opened in your browser.
 
-Now we can see our web page.
-image:res/6-15.png[final web page]
+image:res/6-15.png[final web page, 720]
 
-We can see, displayed on the screen:
+Nice! We can see, displayed on the screen:
 
 - the common message: `Hello KotlinConf, Kotlin/Multiplatform is awesome!`
 - the *_JavaScript_* specific message: `We are running on JavaScript`
 
 == What's next ?
 
-Now that you know how to work with Kotlin/Multiplatform we will go further, by building a real case application.
+Now that you know how to work with *_Kotlin/Multiplatform_* we will go further, by building a real case application.
