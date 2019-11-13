@@ -158,9 +158,101 @@ copy C:\workspace\kotlinconf\business-library\build\js\packages_imported\kotlin\
 copy C:\workspace\kotlinconf\business-library\build\js\packages\business-library\kotlin\business-library.js C:\workspace\kotlinconf\webapp\libraries
 ----
 
-You should now see the libraries in your project hierarchy.
+You should now see the libraries in your project's hierarchy.
 
 image:res/6-14.png[project hierarchy,300]
 
+==== What's does contains our module ?
+
+If you have been curious you may have opened `business-library.js` to see what's in it.
+
+.libraries/business-library.js
+[source,javascript]
+----
+(function (root, factory) {
+    // ...
+    if (typeof kotlin === 'undefined') { // <1>
+      throw new Error("Error loading module 'business-library'. Its dependency 'kotlin' was not found. Please, check whether 'kotlin' is loaded prior to 'business-library'.");
+    }
+    root['business-library'] = factory(typeof this['business-library'] === 'undefined' ? {} : this['business-library'], kotlin); // <2>
+}(this, function (_, Kotlin) {
+  'use strict';
+  var trimIndent = Kotlin.kotlin.text.trimIndent_pdl1vz$;
+  function sayHelloKotlinConf() { // <3>
+    return trimIndent('\n' + '    Hello KotlinConf, Kotlin/Multiplatform is awesome!' + '\n' + '    We are running on ' + platformName() + '\n' + '    ');
+  }
+  function platformName() { // <4>
+    return 'JavaScript';
+  }
+  var package$com = _.com || (_.com = {}); // <5>
+  var package$mybusiness = package$com.mybusiness || (package$com.mybusiness = {});
+  package$mybusiness.sayHelloKotlinConf = sayHelloKotlinConf;
+  package$mybusiness.platformName = platformName;
+  Kotlin.defineModule('business-library', _);
+  return _;
+}));
+----
+<1> Checks if the module `kotlin.js` is present.
+<2> Set the module accessible with `this['business-library']` from any *_JavaScript_* code.
+<3> Our previously created common function `sayHelloKotlinConf()`.
+<4> The *_JavaScript_*  expect function for `platformName()`.
+<5> Managing packages, thus we will need to call the full qualified name to reach our function.
+
 === Use your Kotlin multi-platform code
 
+To use our Kotlin multi-platform library in our HTML project we need to reference them. Go to the `index.html` file and add the following script in the `head` of the web page.
+
+.index.html
+[source,html]
+----
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- ... -->
+    <script type="text/javascript" src="libraries/`kotlin.js`"></script>
+    <script type="text/javascript" src="libraries/business-library.js"></script>
+</head>
+<!-- ... -->
+</html>
+----
+
+IMPORTANT: The order of the script references really matters. As the module `kotlin.js` is referenced in `business-library.js`, it must be declared first.
+
+NOTE: Your web page should work, but nothing will change. However, to see if there is some ongoing issues you can check the console of the developer console of your browser by clicking on the `F12` key on your keyboard.
+
+Now, you can change the `body` of your web page to use the Kotlin multi-platform library.
+
+.index.html
+[source,html]
+----
+<body>
+<!-- ... -->
+    <h1 id="kotlin_mpp_message">
+        Hello multi-platform workshopers !
+    </h1>
+
+    <script type="text/javascript"> // <1>
+        document.getElementById('kotlin_mpp_message').innerText = // <2>
+        this['business-library'].com.mybusiness.sayHelloKotlinConf() // <3>
+    </script>
+<!-- ... -->
+</body>
+----
+<1> Defining a *_JavaScript_* based script.
+<2> Accessing the *h1* `kotlin_mpp_message` to set its inner text.
+<3> Calling our `sayHelloKotlinConf()` function from`the module `business-library`, with its full qualified name.
+
+Now rerun the page in a browser by clicking on the tooltip bar
+in the top right corner of the editor image:res/6-11.png[tooltip,100], or by reloading the page that you have already opened in your browser.
+
+Now we can see our web page.
+image:res/6-15.png[final web page]
+
+We can see, displayed on the screen:
+
+- the common message: `Hello KotlinConf, Kotlin/Multiplatform is awesome!`
+- the *_JavaScript_* specific message: `We are running on JavaScript`
+
+== What's next ?
+
+Now that you know how to work with Kotlin/Multiplatform we will go further, by building a real case application.
