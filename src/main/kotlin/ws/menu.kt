@@ -20,6 +20,11 @@ import kotlin.browser.window
 
 private object Styles : StyleSheet("menu", isStatic = true) {
     val menu by css {
+        universal {
+            margin(0.px)
+            padding(0.px)
+        }
+
         backgroundColor = Color.white
         boxShadow(color = Color.gray, blurRadius = 6.px, spreadRadius = 1.px)
         zIndex = 1
@@ -28,6 +33,7 @@ private object Styles : StyleSheet("menu", isStatic = true) {
         flexDirection = FlexDirection.column
 
         "h1" {
+            fontSize = 2.5.em
             margin(1.em, 0.5.em)
             color = Color("#703f1c")
             textAlign = TextAlign.center
@@ -42,6 +48,7 @@ private object Styles : StyleSheet("menu", isStatic = true) {
             a {
                 padding(0.5.em)
                 display = Display.flex
+                flexDirection = FlexDirection.row
                 alignItems = Align.center
 
                 span {
@@ -50,7 +57,7 @@ private object Styles : StyleSheet("menu", isStatic = true) {
                         alignItems = Align.center
                         justifyContent = JustifyContent.center
                         color = Color.white
-                        backgroundColor = Color("rgba(0, 0, 0, 0.8)")
+                        backgroundColor = Color("#CCCCCC")
                         borderRadius = 50.pct
                         width = 1.67.em
                         height = 1.67.em

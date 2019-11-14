@@ -59,6 +59,8 @@ tasks {
                 "source-highlighter" to "highlightjs",
                 "highlightjsdir" to "highlightjs",
                 "linkcss" to "true",
+                "sectanchors" to "true",
+                "nofooter" to "true",
                 "highlightjs-theme" to highlightStyle
         )
 

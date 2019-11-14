@@ -11,13 +11,13 @@ import react.useEffect
 import react.useState
 import styled.css
 import styled.styledDiv
-import styled.styledIframe
 import ws.utils.*
 import kotlin.browser.window
 
 
 interface AppProps : RProps {
     var index: Int
+    var anchor: String?
 }
 
 val app by functionalComponent<AppProps> {
@@ -45,11 +45,6 @@ val app by functionalComponent<AppProps> {
 
     styledDiv {
         css {
-            universal {
-                margin(0.px)
-                padding(0.px)
-            }
-
             fontFamily = "'Open Sans', sans-serif"
 
             "h1" {
@@ -73,19 +68,14 @@ val app by functionalComponent<AppProps> {
         styledDiv {
             css {
                 flex(1.0)
+                width = LinearDimension("calc(100% - 20em)")
             }
-            styledIframe {
-                css {
-                    width = 100.pct
-                    height = 100.pct
-                    borderWidth = 0.px
-                }
-                attrs {
-                    if (titles.isNotEmpty() && it.index >= 0 && it.index <= titles.lastIndex)
-                    this.src = "${it.index}.html"
-
-
-                }
+            if (titles.isNotEmpty()) {
+                fchild(page {
+                    this.index = it.index
+                    this.anchor = it.anchor
+                    this.titles = titles
+                })
             }
         }
     }
