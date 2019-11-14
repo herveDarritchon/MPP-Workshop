@@ -1,9 +1,11 @@
 import groovy.json.JsonOutput
 import org.asciidoctor.gradle.jvm.AsciidoctorTask
+import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack
 
 plugins {
     id("org.asciidoctor.jvm.convert") version "2.3.0"
     kotlin("js") version "1.3.50"
+    id("org.ajoberstar.git-publish") version "2.1.1"
 }
 
 version = "1.0"
@@ -122,3 +124,21 @@ kotlin {
         }
     }
 }
+
+gitPublish {
+    repoUri.set("git@github.com:SalomonBrys/MPP-Workshop.git")
+    branch.set("gh-pages")
+
+    contents {
+        val processResources = tasks["processResources"] as ProcessResources
+        from(processResources.outputs.files)
+        val browserWebpack = tasks["browserWebpack"] as KotlinWebpack
+        from(browserWebpack.archiveFile)
+    }
+
+    preserve {
+        include("CNAME")
+    }
+}
+
+tasks["gitPublishCopy"].dependsOn("assemble")
