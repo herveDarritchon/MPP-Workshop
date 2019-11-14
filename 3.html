@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 2.0.10">
+<title>Platform specific behaviors</title>
+<link rel="stylesheet" href="./golo.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<body class="article">
+<div id="header">
+<h1>Platform specific behaviors</h1>
+<div class="details">
+<span id="revnumber">version 1.0</span>
+</div>
+<div id="toc" class="toc">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#_what_is_expected_must_actualy_exist">What is <code>expect</code>ed must <code>actual</code>y exist</a></li>
+<li><a href="#_write_your_first_multi_platform_code">Write your first multi-platform code!</a>
+<ul class="sectlevel2">
+<li><a href="#_expect_common_shared_code">[expect] common shared code</a></li>
+<li><a href="#_actual_platform_specific_code">[actual] platform specific code</a></li>
+<li><a href="#_testing_your_multi_platform_library">Testing your multi-platform library</a></li>
+<li><a href="#_building_and_publishing_your_multi_platform_library">Building and publishing your multi-platform library</a></li>
+<li><a href="#_whats_next">What&#8217;s next ?</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div id="content">
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>In some specific cases the common code cannot be shared, often due to platform&#8217;s internal infrastructure or definition.</p>
+</div>
+<div class="paragraph">
+<p>Take dates, for example. Their definition is not the same on <strong><em>JVM</em></strong>, <strong><em>iOS</em></strong> or <strong><em>JavaScript</em></strong>, thus we should be able to provide a sort of bridge for each platform.<br>
+Another example: the coroutines cannot be used in the same way on <strong><em>Android</em></strong> and <strong><em>iOS</em></strong>, as <strong><em>Kotlin/Native</em></strong> does not allow (yet) multithreading in a coroutine context.<br>
+So we should be able to work with every specifics of each platform in our common code.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_what_is_expected_must_actualy_exist"><a class="anchor" href="#_what_is_expected_must_actualy_exist"></a>What is <code>expect</code>ed must <code>actual</code>y exist</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Kotlin/Multiplatform provides a way to define an <code>expect</code>/<code>actual</code> mechanism.
+In the common code, we define the <code>expect</code>ed behaviors, allowing us to provide the <code>actual</code> behavior in each targeted platform.</p>
+</div>
+<div class="paragraph">
+<p><strong>The expectation [<code>expect</code>] code will be defined in the common module:</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>commonMain</code></p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">expect fun logMessage(message: String)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>And the implementation [<code>actual</code>] will be defined for each targeted platform:</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>jsMain</code></p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">actual fun logMessage(message: String) = console.log(message)</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>iosX64Main</code></p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">actual fun logMessage(message: String) = NSLog(message)</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>jvmMain</code></p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">actual fun logMessage(message: String) = Logger.getLogger("App").log(Level.INFO, message)</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>linuxMain</code></p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">actual fun logMessage(message: String) = printf("%s\n", message)</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_write_your_first_multi_platform_code"><a class="anchor" href="#_write_your_first_multi_platform_code"></a>Write your first multi-platform code!</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In this section we will prepare our common code to be executable and testable for each targeted platform.</p>
+</div>
+<div class="paragraph">
+<p>To show you how it works, and how yo play with the <code>expect</code>/<code>actual</code> mechanism, we will use a simple example.
+For each targeted platform, we will print on the screen/console a message, with a specific part, different for each platform.</p>
+</div>
+<div class="listingblock">
+<div class="title">Example of a platform specific message</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">Hello KotlinConf, Kotlin/Multiplatform is awesome! <i class="conum" data-value="1"></i><b>(1)</b>
+We are running on JVM! <i class="conum" data-value="2"></i><b>(2)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Common message for every platform</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Platform specific message, for the <strong><em>JVM</em></strong> is this case</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><strong>Let&#8217;s code!</strong></p>
+</div>
+<div class="sect2">
+<h3 id="_expect_common_shared_code"><a class="anchor" href="#_expect_common_shared_code"></a>[expect] common shared code</h3>
+<div class="paragraph">
+<p>This is where you will write most of your code in a Kotlin/Multiplatform project. The goal is to put a maximum effort in here, to avoid code duplication.</p>
+</div>
+<div class="paragraph">
+<p>First, create a new file <code>src/commonMain/kotlin/com.mybusiness/showMessage.kt</code>, and add the following code:</p>
+</div>
+<div class="listingblock">
+<div class="title">commonMain &gt; kotlin &gt; com.mybusiness/showMessage.kt</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">package com.mybusiness
+
+fun sayHelloKotlinConf() =
+    """
+    Hello KotlinConf, Kotlin/Multiplatform is awesome!
+    We are running on ${ platformName() }
+    """.trimIndent()
+
+expect fun platformName(): String</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Do you notice something weird ?</p>
+</div>
+<div class="paragraph">
+<p>Indeed, IntelliJ will show you some errors on the <code>platformName()</code> function.
+This is because we&#8217;ve used the <code>expect</code> keyword without defining any <code>actual</code> behavior yet.</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>If you put your cursor on the function name you&#8217;ll see the following tooltip</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="images/res/3-1.png" alt="expect/actual error"></span></p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>To fix this error we will need to provide an <code>actual</code> implementation for the  <code>platformName()</code> function, for every targeted platform.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_actual_platform_specific_code"><a class="anchor" href="#_actual_platform_specific_code"></a>[actual] platform specific code</h3>
+<div class="paragraph">
+<p>Following the previous section you&#8217;ll have to provide an <code>actual</code> function <code>platformName()</code> for each platform you are targeting.
+Meaning, you&#8217;ll have to create a new kotlin file for each platform:</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>You must define your <code>actual</code> members into the same package as the <code>expect</code>ed behavior</p>
+</li>
+<li>
+<p>Your <code>actual</code> members should not be in a file with the same name as your <code>expect</code> members, otherwise your could have conflicts at build time.</p>
+</li>
+</ol>
+</div>
+<table class="tableblock frame-none grid-none stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><span class="image"><img src="images/res/ok.png" alt="OK"></span></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><span class="image"><img src="images/res/nok.png" alt="NOT OK"></span></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>src/commonMain/kotlin/com.mybusiness/showMessage.kt</code>
+<code>src/jvmMain/kotlin/com.mybusiness/showMessageJvm.kt</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>src/commonMain/kotlin/com.mybusiness/showMessage.kt</code>
+<code>src/jvmMain/kotlin/com.mybusiness/showMessage.kt</code></p></td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+By convention, the naming of the files that contains <code>actual</code> definition is <code>[expect filename][platform].kt</code>
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="title">jvmMain &gt; kotlin &gt; com.mybusiness/showMessageJvm.kt</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">package com.mybusiness
+actual fun platformName(): String = "JVM"</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">jsMain &gt; kotlin &gt; com.mybusiness/showMessageJs.kt</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">package com.mybusiness
+actual fun platformName(): String = "JavaScript"</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">linuxMain &gt; kotlin &gt; com.mybusiness/showMessageLinux.kt</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">package com.mybusiness
+actual fun platformName(): String = "Linux"</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">iosX64Main &gt; kotlin &gt; com.mybusiness/showMessageIos.kt</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">package com.mybusiness
+actual fun platformName(): String = "iOS"</code></pre>
+</div>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>You can use the <strong>Context Actions</strong> in IntelliJ (Linux/Windows <code>Alt + Return</code> - MacOS <code>Option + Return</code>)</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="images/res/3-2.png" alt="expect/actual context actions"></span></p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Now, you should have the following source map</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="images/res/3-5.png" alt="source map"></span></p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>In IntelliJ you can quickly spot <code>expect</code>/<code>actual</code> members with the gutter icons</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="images/res/3-3.png" alt="expect gutter icon"></span></p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="images/res/3-4.png" alt="actual gutter icon"></span></p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_testing_your_multi_platform_library"><a class="anchor" href="#_testing_your_multi_platform_library"></a>Testing your multi-platform library</h3>
+<div class="paragraph">
+<p>To empower our example, we should provide some tests for each of the targeted platform.
+Our test environment is already configured, so we just have to write a test for our <code>sayHelloKotlinConf()</code>
+function, on every platform.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Reminder: Every source set is divide into two parts, <strong><em>Main</em></strong> and <strong><em>Test</em></strong>.</p>
+</div>
+<div class="paragraph">
+<p>Here we will work on the <strong><em>Test</em></strong> part</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_testing_the_common_code"><a class="anchor" href="#_testing_the_common_code"></a>Testing the common code</h4>
+<div class="paragraph">
+<p>Add a class <code>SayHelloKotlinConfTest</code> for the common <strong><em>Test</em></strong> module.</p>
+</div>
+<div class="listingblock">
+<div class="title">commonTest &gt; kotlin &gt; SayHelloKotlinConfTest.kt</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">import com.mybusiness.sayHelloKotlinConf
+import kotlin.test.*
+
+class SayHelloKotlinConfTest {
+    @Test
+    fun testSayHelloCommon() {
+        assertEquals(
+            "Hello KotlinConf, Kotlin/Multiplatform is awesome!",
+            sayHelloKotlinConf().lines().first()
+        )
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_testing_the_platform_specific_code"><a class="anchor" href="#_testing_the_platform_specific_code"></a>Testing the platform specific code</h4>
+<div class="paragraph">
+<p>Add a test class <code>SayHelloKotlinConfTest</code> for each platform specific <strong><em>Test</em></strong> module.</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>As for the <code>expect</code>/<code>actual</code> files, your platform specific test classes cannot be named as the common test class.</p>
+</div>
+<table class="tableblock frame-none grid-none stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><span class="image"><img src="images/res/ok.png" alt="OK"></span></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><span class="image"><img src="images/res/nok.png" alt="NOT OK"></span></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>src/commonTest/kotlin/SayHelloKotlinConfTest.kt</code>
+<code>src/jvmTest/kotlin/SayHelloKotlinConfJvmTest.kt</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>src/commonTest/kotlin/SayHelloKotlinConfTest.kt</code>
+<code>src/jvmTest/kotlin/SayHelloKotlinConfTest.kt</code></p></td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="title">jvmTest &gt; kotlin &gt; SayHelloKotlinConfJvmTest.kt</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">import com.mybusiness.sayHelloKotlinConf
+import kotlin.test.*
+
+class SayHelloKotlinConfJvmTest {
+    @Test
+    fun testSayHelloJvm() {
+        assertEquals(
+            "We are running on JVM",
+            sayHelloKotlinConf().lines().last()
+        )
+    }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">jsTest &gt; kotlin &gt; SayHelloKotlinConfJsTest.kt</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">import com.mybusiness.sayHelloKotlinConf
+import kotlin.test.*
+
+class SayHelloKotlinConfJsTest {
+    @Test
+    fun testSayHelloJs() {
+        assertEquals(
+            "We are running on JavaScript",
+            sayHelloKotlinConf().lines().last()
+        )
+    }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">linuxTest &gt; kotlin &gt; SayHelloKotlinConfLinuxTest.kt</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">import com.mybusiness.sayHelloKotlinConf
+import kotlin.test.*
+
+class SayHelloKotlinConfLinuxTest {
+    @Test
+    fun testSayHelloLinux() {
+        assertEquals(
+            "We are running on Linux",
+            sayHelloKotlinConf().lines().last()
+        )
+    }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">iosX64Test &gt; kotlin &gt; SayHelloKotlinConfIosTest.kt</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">import com.mybusiness.sayHelloKotlinConf
+import kotlin.test.*
+
+class SayHelloKotlinConfIosTest {
+    @Test
+    fun testSayHelloIos() {
+        assertEquals(
+            "We are running on iOS",
+            sayHelloKotlinConf().lines().last()
+        )
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You can now run all your tests with Gradle.</p>
+</div>
+<div class="paragraph">
+<p>In the Gradle pane, double click on <code>Tasks</code> &gt; <code>verification</code> &gt; <code>allTests</code> to run the <code>allTests</code> Gradle task.</p>
+</div>
+<div class="paragraph">
+<p>You should have the following output:</p>
+</div>
+<div class="listingblock">
+<div class="title">Gradle AllTest task</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">...
+SayHelloKotlinConfTest.testSayHelloCommon PASSED
+SayHelloKotlinConfJsTest.testSayHelloJs PASSED
+...
+SayHelloKotlinConfTest &gt; testSayHelloCommon PASSED
+SayHelloKotlinConfJvmTest &gt; testSayHelloJvm PASSED
+...
+SayHelloKotlinConfTest.testSayHelloCommon PASSED
+SayHelloKotlinConfLinuxTest.testSayHelloLinux PASSED
+...</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Cool, right ?</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_the_ios_special_case"><a class="anchor" href="#_the_ios_special_case"></a>The iOS special case</h4>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+This part is for MacOS users that have already installed <a href="https://developer.apple.com/xcode/"><strong><em>Xcode</em></strong></a>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>As we already saw, by default, the Kotlin/Multiplatform does not provide an <code>iosTest</code> task.
+So we need to manually define it with the following block at the end of our Gradle build file.</p>
+</div>
+<div class="listingblock">
+<div class="title">build.gradle.kts</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">val iosTest: Task by tasks.creating { <i class="conum" data-value="1"></i><b>(1)</b>
+    val testExecutable = kotlin.targets
+              .getByName&lt;KotlinNativeTarget&gt;("iosX64").binaries.getTest("DEBUG") <i class="conum" data-value="2"></i><b>(2)</b>
+
+    dependsOn(testExecutable.linkTaskName) <i class="conum" data-value="3"></i><b>(3)</b>
+    group = JavaBasePlugin.VERIFICATION_GROUP
+    description = "Runs tests for target 'ios' on an iOS simulator"
+
+    doLast { <i class="conum" data-value="4"></i><b>(4)</b>
+        exec {
+            val device = project.findProperty("iosDevice")?.toString() ?: "iPhone 8" <i class="conum" data-value="5"></i><b>(5)</b>
+            commandLine( "xcrun", "simctl", "spawn",
+                        "--standalone", device, testExecutable.outputFile.absolutePath) <i class="conum" data-value="6"></i><b>(6)</b>
+        }
+    }
+}
+
+tasks.getByName("allTests").dependsOn(iosTest) <i class="conum" data-value="7"></i><b>(7)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Create a new task named <code>iosTest</code></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Find the compiled executable for the source set <code>iosX64</code> defined earlier</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>The new task <strong>must</strong> depends on the executable compilation task</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>This block is the part of the task that will be executed each time we call <code>iosTest</code></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>Define a targeted iPhone simulator to execute the tests on</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>Execute a command that will spawn the iPhone simulator and run our tests</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="7"></i><b>7</b></td>
+<td>Set the <code>iosTest</code> task as part of the test chain</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Now you can rerun your task <code>allTests</code> and you will see new lines printed.</p>
+</div>
+<div class="listingblock">
+<div class="title">Gradle AllTest task</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs">...
+&gt; Task :iosTest
+...
+[==========] Running 2 tests from 2 test cases.
+[----------] Global test environment set-up.
+[----------] 1 tests from SayHelloKotlinConfTest
+[ RUN      ] SayHelloKotlinConfTest.testSayHelloCommon
+[       OK ] SayHelloKotlinConfTest.testSayHelloCommon (0 ms)
+[----------] 1 tests from SayHelloKotlinConfTest (0 ms total)
+[----------] 1 tests from SayHelloKotlinConfIosTest
+[ RUN      ] SayHelloKotlinConfIosTest.testSayHelloIos
+[       OK ] SayHelloKotlinConfIosTest.testSayHelloIos (0 ms)
+[----------] 1 tests from SayHelloKotlinConfIosTest (0 ms total)
+[----------] Global test environment tear-down
+[==========] 2 tests from 2 test cases ran. (0 ms total)
+[  PASSED  ] 2 tests.
+...</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_building_and_publishing_your_multi_platform_library"><a class="anchor" href="#_building_and_publishing_your_multi_platform_library"></a>Building and publishing your multi-platform library</h3>
+<div class="paragraph">
+<p>Before going further, we need to prepare our multi-platform library by building and publishing it with Gradle.</p>
+</div>
+<div class="paragraph">
+<p>In your Gradle build file <code>build.gradle.kts</code> add the plugin <code>maven-publish</code> and change the version of your library, <code>1.0.0</code> to be proud :)</p>
+</div>
+<div class="listingblock">
+<div class="title">build.gradle.kts &gt; plugin</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">plugins {
+    //...
+    `maven-publish` <i class="conum" data-value="1"></i><b>(1)</b>
+}
+//...
+version = "1.0.0"</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Notice the use back ticks <code>`</code></td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>In the Gradle pane, you should see a new task group, named <code>publishing</code> (hit the refresh button if you don&#8217;t).</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="images/res/3-6.png" alt="gradle publishing"></span></p>
+</div>
+<div class="paragraph">
+<p>Then, in <code>Tasks</code> &gt; <code>publishing</code>, double click on <code>publishToMavenLocal</code> to run this Gradle task.</p>
+</div>
+<div class="listingblock">
+<div class="title">If your open a terminal and run the following command you could see that your library has been published locally.</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-none hljs"> $ ls ~/.m2/repository/com/mybusiness/
+business-library-iosx64 <i class="conum" data-value="1"></i><b>(1)</b>
+business-library-js
+business-library-jvm
+business-library-linux <i class="conum" data-value="2"></i><b>(2)</b>
+business-library-metadata
+
+ $ ls .m2/repository/com/mybusiness/business-library-jvm
+1.0.0
+maven-metadata-local.xml
+
+ $ ls .m2/repository/com/mybusiness/business-library-jvm/1.0.0
+business-library-jvm-1.0.0-sources.jar
+business-library-jvm-1.0.0.jar
+business-library-jvm-1.0.0.pom</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>if you are targetting iOS</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>or macos, or mingw</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+On a real world project, you may publish your library to a remote repository (Maven / Bintray / etc).
+</td>
+</tr>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_the_ios_special_case_2"><a class="anchor" href="#_the_ios_special_case_2"></a>The iOS special case</h4>
+<div class="paragraph">
+<p>Building libraries for <strong><em>iOS</em></strong> is also a special case in our build script.
+In fact, to be able to use our common library in <strong><em>Xcode</em></strong>, we need to build a <strong><em>framework</em></strong> directory.</p>
+</div>
+<div class="paragraph">
+<p>First, in the <code>target</code> definition for <strong><em>iOS</em></strong> we need to add the following block of code:</p>
+</div>
+<div class="listingblock">
+<div class="title">build.gradle.kts</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">kotlin {
+    //...
+    iosX64 {
+        binaries {
+            framework { <i class="conum" data-value="1"></i><b>(1)</b>
+                baseName = "businessLibrary" <i class="conum" data-value="2"></i><b>(2)</b>
+            }
+        }
+    }
+    //...
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>define that the output binaries must be a <strong><em>framework</em></strong> file&#8230;&#8203;</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>&#8230;&#8203;with the name <code>businessLibrary</code></td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>If you run the Gradle task <code>build</code> you&#8217;ll find <code>businessLibrary.framework</code> in your build directory</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="images/res/3-7.png" alt="build directory"></span></p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>To use this newly generated <strong><em>framework</em></strong> directory in <strong><em>Xcode</em></strong> we need to provide a new Gradle task to copy
+it into a shared place.</p>
+</div>
+<div class="paragraph">
+<p>Add the following block at the end of your Gradle build file:</p>
+</div>
+<div class="listingblock">
+<div class="title">build.gradle.kts</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">//...
+val packForXcode by tasks.creating(Sync::class) { <i class="conum" data-value="1"></i><b>(1)</b>
+    val mode = System.getenv("CONFIGURATION") ?: "DEBUG" <i class="conum" data-value="2"></i><b>(2)</b>
+    val framework = kotlin.targets
+        .getByName&lt;KotlinNativeTarget&gt;("iosX64")
+        .binaries.getFramework(mode)
+    inputs.property("mode", mode)
+
+    dependsOn(framework.linkTask) <i class="conum" data-value="3"></i><b>(3)</b>
+
+    val targetDir = File(buildDir, "xcode-frameworks")
+    from({ framework.outputDirectory }) <i class="conum" data-value="4"></i><b>(4)</b>
+    into(targetDir) <i class="conum" data-value="5"></i><b>(5)</b>
+}
+
+tasks.getByName("build").dependsOn(packForXcode) <i class="conum" data-value="6"></i><b>(6)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Create a new task to make the framework available for <strong><em>Xcode</em></strong></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Selecting the right configuration depending on the environment variables set by Xcode build</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>The new task depends on the fact that the framework has been built</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Move the built framework from the build directory</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>To a new location (could/should be a remote path)</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>Set the <code>packForXcode</code> task as part of the <code>build</code> task</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Now after running the Gradle task <code>build</code>, by double clicking on <code>Tasks</code> &gt; <code>build</code> &gt; <code>build</code>, you should see the following build tree:</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="images/res/3-8.png" alt="build directory"></span></p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_whats_next"><a class="anchor" href="#_whats_next"></a>What&#8217;s next ?</h3>
+<div class="paragraph">
+<p>In the next section, we will see how to use our multi-platform library on the various platforms we are targetting, namely <strong><em>Android</em></strong>, <strong><em>iOS</em></strong> and <strong><em>JavaScript</em></strong>.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<link rel="stylesheet" href="highlightjs/styles/idea.min.css">
+<script src="highlightjs/highlight.min.js"></script>
+<script>hljs.initHighlighting()</script>
+</body>
+</html>

@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 2.0.10">
+<title>Using your multi-platform library on the Web</title>
+<link rel="stylesheet" href="./golo.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<body class="article">
+<div id="header">
+<h1>Using your multi-platform library on the Web</h1>
+<div class="details">
+<span id="revnumber">version 1.0</span>
+</div>
+<div id="toc" class="toc">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#_project_creation_wizard">Project Creation Wizard</a></li>
+<li><a href="#_running_a_simple_web_page">Running a simple web page</a></li>
+<li><a href="#_integrating_your_kotlin_multi_platform_library">Integrating your Kotlin multi-platform library</a>
+<ul class="sectlevel2">
+<li><a href="#_add_the_javascript_modules">Add the JavaScript modules</a></li>
+<li><a href="#_use_your_kotlin_multi_platform_code">Use your Kotlin multi-platform code</a></li>
+</ul>
+</li>
+<li><a href="#_whats_next">What&#8217;s next ?</a></li>
+</ul>
+</div>
+</div>
+<div id="content">
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>Finally, after running our Kotlin multi-platform library on <strong><em>Android</em></strong> and <strong><em>iOS</em></strong>, we only have to make it work on the Web.</p>
+</div>
+<div class="paragraph">
+<p>To do so, we will create a simple web page project, to run our Kotlin multi-platform library with <strong><em>JavaScript</em></strong>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_project_creation_wizard"><a class="anchor" href="#_project_creation_wizard"></a>Project Creation Wizard</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>For the simplicity of this workshop, we will use <strong><em>IntelliJ IDEA Community/Ultimate</em></strong> to create our project.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+The IntelliJ Ultimate Edition have more facilities to create project, so we will see both usage.
+</td>
+</tr>
+</table>
+</div>
+<table class="tableblock frame-none grid-none stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><em>Community Edition</em></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><em>Ultimate Edition</em></p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="images/res/6-1.png" alt="create project community edition"></span></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="images/res/6-2.png" alt="create project ultimate edition"></span></p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p>Create a new <em>Empty Project</em></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p>Create a new <em>Static Web</em> project</p>
+</div></div></td>
+</tr>
+</tbody>
+</table>
+<table class="tableblock frame-none grid-none stretch">
+<colgroup>
+<col style="width: 65%;">
+<col style="width: 35%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><span class="image"><img src="images/res/6-3.png" alt="project name"></span></p></td>
+<td class="tableblock halign-left valign-middle"><div class="content"><div class="paragraph">
+<p>Set name and location for your project</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><em>Community Edition</em></p></td>
+<td class="tableblock halign-left valign-middle"><div class="content"></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><span class="image"><img src="images/res/6-4.png" alt="project name"></span></p></td>
+<td class="tableblock halign-left valign-middle"><div class="content"><div class="paragraph">
+<p><em>Press the <strong>OK</strong> button to create an empty project</em></p>
+</div></div></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>Then, you will have a shiny project ready to build your web application :).</p>
+</div>
+<table class="tableblock frame-none grid-none stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><em>Community Edition</em></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><em>Ultimate Edition</em></p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="images/res/6-5.png" alt="project community edition"></span></p>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="images/res/6-6.png" alt="project ultimate edition"></span></p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-center valign-top"><div class="content"><div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>In <em>Community Edition</em>, you should switch from <strong>Project</strong> view to <strong>Project Files</strong> view by using the above menu</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="images/res/6-7.png" alt="6 7" width="175"></span></p>
+</div>
+</td>
+</tr>
+</table>
+</div></div></td>
+<td class="tableblock halign-center valign-top"><div class="content"></div></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_running_a_simple_web_page"><a class="anchor" href="#_running_a_simple_web_page"></a>Running a simple web page</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Before reaching our goal to use Kotlin multi-platform code with <strong><em>JavaScript</em></strong>,
+we will build a simple web page and see how to display it into our browser.</p>
+</div>
+<div class="paragraph">
+<p>To do so, we will create a new <strong><em>HTML</em></strong> file in our project, and add some <strong><em>HTML</em></strong> to it.</p>
+</div>
+<table class="tableblock frame-none grid-none stretch">
+<colgroup>
+<col style="width: 65%;">
+<col style="width: 35%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><span class="image"><img src="images/res/6-8.png" alt="add html file"></span></p></td>
+<td class="tableblock halign-left valign-middle"><div class="content"><div class="paragraph">
+<p><strong>Right-click</strong> on the project/path, then click on <strong>New</strong> &gt; <strong>HTML File</strong></p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><span class="image"><img src="images/res/6-9.png" alt="name html file"></span></p></td>
+<td class="tableblock halign-left valign-middle"><div class="content"><div class="paragraph">
+<p>Name your file: <strong>index.html</strong></p>
+</div></div></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>Finally, add the following code to your <strong>index.html</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">index.html</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="html" class="language-html hljs">&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;title&gt;Kotlin MPP with JS&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;h1 id="kotlin_mpp_message"&gt;
+        Hello multi-platform workshopers!
+    &lt;/h1&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+</div>
+</div>
+<table class="tableblock frame-none grid-none stretch">
+<colgroup>
+<col style="width: 65%;">
+<col style="width: 35%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><span class="image"><img src="images/res/6-10.png" alt="name html file"></span></p></td>
+<td class="tableblock halign-left valign-middle"><div class="content"><div class="paragraph">
+<p>Run the page in a browser by clicking on the tooltip bar
+in the top right corner of the editor <span class="image"><img src="images/res/6-11.png" alt="tooltip" width="100"></span></p>
+</div></div></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>Now we can see our web page.
+<span class="image"><img src="images/res/6-12.png" alt="web page" width="720"></span></p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_integrating_your_kotlin_multi_platform_library"><a class="anchor" href="#_integrating_your_kotlin_multi_platform_library"></a>Integrating your Kotlin multi-platform library</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_add_the_javascript_modules"><a class="anchor" href="#_add_the_javascript_modules"></a>Add the JavaScript modules</h3>
+<div class="paragraph">
+<p>Remember, in the Kotlin multi-platform library chapter we have built our project to generate binaries for all our targets, including <strong><em>JavaScript</em></strong>.
+If you go back to this project, and browse the <code>/build</code> directory you will find a <code>js</code> sub-directory.</p>
+</div>
+<table class="tableblock frame-none grid-none stretch">
+<colgroup>
+<col style="width: 35%;">
+<col style="width: 65%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><span class="image"><img src="images/res/6-13.png" alt="build js"></span></p></td>
+<td class="tableblock halign-left valign-middle"><div class="content"><div class="paragraph">
+<p>The files that will need our attention are <code>business-library.js</code> and <code>kotlin.js</code>.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>kotlin.js</code> contains the Kotlin standard library for the <strong><em>JavaScript</em></strong> platform</p>
+</li>
+<li>
+<p><code>business-library.js</code> is our Kotlin multi-platform library, it rely on <code>kotlin.js</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>So, we will need to import both modules in our project.</p>
+</div></div></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>To import the libraries into our project we can use the command line to copy them, depending on where you have set your projects location.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>On <strong><em>Linux</em></strong> / <strong><em>MacOS</em></strong>, open a terminal and run the following command.</p>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+do not forget to change the path of your projects if needed
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="title">Create a <code>/libraries</code> directory for your web application project.</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="shell script" class="language-shell script hljs">mkdir workspace/kotlinconf/webapp/libraries</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Copy the <code>kotlin.js</code> file, from the <code>/build</code> directory of the <code>business-library</code> project to the <code>/libraries</code> directory of your web application project.</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="shell script" class="language-shell script hljs">cp workspace/kotlinconf/business-library/build/js/packages_imported/kotlin/1.3.50/kotlin.js workspace/kotlinconf/webapp/libraries</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Copy the <code>business-library.js</code> file.</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="shell script" class="language-shell script hljs">cp workspace/kotlinconf/business-library/build/js/packages/business-library/kotlin/business-library.js workspace/kotlinconf/webapp/libraries</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>On Windows, open a terminal and run the following command.</p>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+do not forget to change the path of your projects if needed
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="title">Create a <code>/libraries</code> directory for your web application project.</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="shell script" class="language-shell script hljs">mkdir C:\workspace\kotlinconf\webapp\libraries</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Copy the <code>kotlin.js</code> file, from the <code>/build</code> directory of the <code>business-library</code> project to the <code>/libraries</code> directory of your web application project.</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="shell script" class="language-shell script hljs">copy C:\workspace\kotlinconf\business-library\build\js\packages_imported\kotlin\1.3.50\kotlin.js C:\workspace\kotlinconf\webapp\libraries</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Copy the <code>business-library.js</code> file.</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="shell script" class="language-shell script hljs">copy C:\workspace\kotlinconf\business-library\build\js\packages\business-library\kotlin\business-library.js C:\workspace\kotlinconf\webapp\libraries</code></pre>
+</div>
+</div>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>You should now see the libraries in your project&#8217;s hierarchy:</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="images/res/6-14.png" alt="project hierarchy" width="300"></span></p>
+</div>
+<div class="sect3">
+<h4 id="_whats_does_our_module_contain"><a class="anchor" href="#_whats_does_our_module_contain"></a>What&#8217;s does our module contain?</h4>
+<div class="paragraph">
+<p>If you have been curious, you may have opened <code>business-library.js</code> to see what is in it.</p>
+</div>
+<div class="listingblock">
+<div class="title">libraries/business-library.js</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="javascript" class="language-javascript hljs">(function (root, factory) {
+    // ...
+    if (typeof kotlin === 'undefined') { <i class="conum" data-value="1"></i><b>(1)</b>
+      throw new Error("Error loading module 'business-library'. Its dependency 'kotlin' was not found. Please, check whether 'kotlin' is loaded prior to 'business-library'.");
+    }
+    root['business-library'] = factory(typeof this['business-library'] === 'undefined' ? {} : this['business-library'], kotlin); <i class="conum" data-value="2"></i><b>(2)</b>
+}(this, function (_, Kotlin) {
+  'use strict';
+  var trimIndent = Kotlin.kotlin.text.trimIndent_pdl1vz$;
+  function sayHelloKotlinConf() { <i class="conum" data-value="3"></i><b>(3)</b>
+    return trimIndent('\n' + '    Hello KotlinConf, Kotlin/Multiplatform is awesome!' + '\n' + '    We are running on ' + platformName() + '\n' + '    ');
+  }
+  function platformName() { <i class="conum" data-value="4"></i><b>(4)</b>
+    return 'JavaScript';
+  }
+  var package$com = _.com || (_.com = {}); <i class="conum" data-value="5"></i><b>(5)</b>
+  var package$mybusiness = package$com.mybusiness || (package$com.mybusiness = {});
+  package$mybusiness.sayHelloKotlinConf = sayHelloKotlinConf;
+  package$mybusiness.platformName = platformName;
+  Kotlin.defineModule('business-library', _);
+  return _;
+}));</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Checks if the module <code>kotlin.js</code> is present.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Set the module accessible with <code>this['business-library']</code> from any <strong><em>JavaScript</em></strong> code.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Our previously created common function <code>sayHelloKotlinConf()</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>The <strong><em>JavaScript</em></strong>  expect function for <code>platformName()</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>Managing packages, thus we will need to call the full qualified name to reach the module members.</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_use_your_kotlin_multi_platform_code"><a class="anchor" href="#_use_your_kotlin_multi_platform_code"></a>Use your Kotlin multi-platform code</h3>
+<div class="paragraph">
+<p>To use our Kotlin multi-platform library in our <strong><em>HTML</em></strong> project we need to reference them. Go to the <code>index.html</code> file and add the following script in the <code>head</code> of the web page.</p>
+</div>
+<div class="listingblock">
+<div class="title">index.html</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="html" class="language-html hljs">&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+&lt;!-- ... --&gt;
+    &lt;script type="text/javascript" src="libraries/kotlin.js`"&gt;&lt;/script&gt;
+    &lt;script type="text/javascript" src="libraries/business-library.js"&gt;&lt;/script&gt;
+&lt;/head&gt;
+&lt;!-- ... --&gt;
+&lt;/html&gt;</code></pre>
+</div>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+The order of the script references really matters. As the module <code>kotlin.js</code> is referenced in <code>business-library.js</code>, it must be declared first.
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Your web page should work, but nothing will change. However, to see if there is some ongoing issues you can check the console of the developer console of your browser by clicking on the <code>F12</code> key on your keyboard.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Now, you can change the <code>body</code> of your web page to use the Kotlin multi-platform library.</p>
+</div>
+<div class="listingblock">
+<div class="title">index.html</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="html" class="language-html hljs">&lt;body&gt;
+&lt;!-- ... --&gt;
+    &lt;h1 id="kotlin_mpp_message"&gt;
+        Hello multi-platform workshopers !
+    &lt;/h1&gt;
+
+    &lt;script type="text/javascript"&gt; <i class="conum" data-value="1"></i><b>(1)</b>
+        document.getElementById('kotlin_mpp_message').innerText = <i class="conum" data-value="2"></i><b>(2)</b>
+        this['business-library'].com.mybusiness.sayHelloKotlinConf() <i class="conum" data-value="3"></i><b>(3)</b>
+    &lt;/script&gt;
+&lt;!-- ... --&gt;
+&lt;/body&gt;</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Defining a <strong><em>JavaScript</em></strong> based script.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Accessing the <strong>h1</strong> <code>kotlin_mpp_message</code> to be able to set its <em>inner text</em>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Calling our <code>sayHelloKotlinConf()</code> function from the module <code>business-library</code>, with its full qualified name.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Now rerun the page in a browser by clicking on the tooltip bar
+in the top right corner of the editor <span class="image"><img src="images/res/6-11.png" alt="tooltip" width="100"></span>, or by reloading the page that you have already opened in your browser.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="images/res/6-15.png" alt="final web page" width="720"></span></p>
+</div>
+<div class="paragraph">
+<p>Nice! We can see, displayed on the screen:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>the common message: <code>Hello KotlinConf, Kotlin/Multiplatform is awesome!</code></p>
+</li>
+<li>
+<p>the <strong><em>JavaScript</em></strong> specific message: <code>We are running on JavaScript</code></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_whats_next"><a class="anchor" href="#_whats_next"></a>What&#8217;s next ?</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Now that you know how to work with <strong><em>Kotlin/Multiplatform</em></strong> we will go further, by building a real case application.</p>
+</div>
+</div>
+</div>
+</div>
+<link rel="stylesheet" href="highlightjs/styles/idea.min.css">
+<script src="highlightjs/highlight.min.js"></script>
+<script>hljs.initHighlighting()</script>
+</body>
+</html>

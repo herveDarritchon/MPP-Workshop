@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 2.0.10">
+<title>Write your first test</title>
+<link rel="stylesheet" href="./golo.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<body class="article">
+<div id="header">
+<h1>Write your first test</h1>
+<div class="details">
+<span id="revnumber">version 1.0</span>
+</div>
+<div id="toc" class="toc">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#_writing_it">Writing it</a></li>
+<li><a href="#_running_it">Running it</a></li>
+</ul>
+</div>
+</div>
+<div id="content">
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>One of the core benefits of Kotlin/Multiplatform is the ability to test once and gain confidence in your code on all platforms at once.</p>
+</div>
+<div class="paragraph">
+<p>To demonstrate that, let&#8217;s design our first unit test.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_writing_it"><a class="anchor" href="#_writing_it"></a>Writing it</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To start, we&#8217;ll write some code that is common to all platforms.</p>
+</div>
+<div class="paragraph">
+<p>First, in <code>commonMain/kotlin</code>, let&#8217;s create a package and a kotlin source file:</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="images/res/2-1.png" alt="source directory structure"></span></p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>At the moment, if you want to create a package, you need to manually create the directory structure.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="images/res/2-2.png" alt="new directory"></span></p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Let&#8217;s write our first multiplatform function:</p>
+</div>
+<div class="listingblock">
+<div class="title">functions.kt</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">package com.mybusiness
+
+fun addition(left: Int, right: Int): Int {
+    return left + right
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Now that we have our first function, we can test it.
+Let&#8217;s create the appropriate test file:</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="images/res/2-3.png" alt="test file"></span></p>
+</div>
+<div class="listingblock">
+<div class="title">functionsTest.kt</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">import com.mybusiness.*
+import kotlin.test.*
+
+class AdditionTests {
+    @Test
+    fun testSimpleAddition() {
+        assertEquals(5, addition(2, 3))
+    }
+
+    @Test
+    fun testNegativeAddition() {
+        assertEquals(-1, addition(2, -3))
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>As you can see, testing works much like JUnit.
+Nothing new under the sun!</p>
+</div>
+<div class="paragraph">
+<p>Now, all that remain is to run our tests.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_running_it"><a class="anchor" href="#_running_it"></a>Running it</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In the Gradle pane, open <code>Tasks</code> &gt; <code>verification</code> and double click ont <code>allTests</code> to run the <code>allTests</code> Gradle task.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="images/res/2-4.png" alt="allTests gradle task"></span></p>
+</div>
+<div class="paragraph">
+<p>Look at the command line result, you should find that gradle has run some tasks, more importantly you should see the following ones: <code>jsTest</code>, <code>jvmTest</code> &amp; <code>linuxTest</code> (or <code>macosTest</code>, or <code>mingwTest</code>).
+This means that the tests were compiled by the three different compilers and run on three different targets.</p>
+</div>
+<div class="paragraph">
+<p>In fact, let&#8217;s see all testing in action.
+Add this at the end of your Gradle build file:</p>
+</div>
+<div class="listingblock">
+<div class="title">build.gradle.kts</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">afterEvaluate {
+    tasks.withType&lt;AbstractTestTask&gt;().forEach {
+        it.testLogging {
+            events("passed", "skipped", "failed")
+        }
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Rerun the <code>allTests</code> task and&#8230;&#8203; nothing happens.
+Everything is "up to date": because the code has not change, Gradle does not rerun the tests.
+You first need to run the <code>clean</code> task (in the <code>build</code> group), then rerun the <code>allTests</code> task.</p>
+</div>
+<div class="paragraph">
+<p>Lo and behold:</p>
+</div>
+<div class="listingblock">
+<div class="title">allTests result</div>
+<div class="content">
+<pre>...
+&gt; Task :jsBrowserTest
+AdditionTests.testSimpleAddition PASSED
+AdditionTests.testNegativeAddition PASSED
+...
+&gt; Task :jvmTest
+AdditionTests &gt; testSimpleAddition PASSED
+AdditionTests &gt; testNegativeAddition PASSED
+...
+&gt; Task :linuxTest
+AdditionTests.testSimpleAddition PASSED
+AdditionTests.testNegativeAddition PASSED</pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+You may have noticed that even if you defined an iOS target there is nothing showed here.
+      This is because Kotlin/Multiplatform plugin does not support running tests on other platform than the host platforms.
+      We will see how to go around this in a following chapter.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Now try to change one of the two tests to fail, and see what happens when you run them.
+Unsurprisingly, all three test task fail.</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+Gradle generated an HTML report with a link at the end.
+     Open it in a browser to see what went wrong ;)
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+As you can see, when running the <code>allTests</code> task runs, well, all tests.
+     The Kotlin/JVM is the fastest and most reliable compiler so, most of the time, running the <code>jvmTest</code> task will be faster and give results easier to understand.
+     Only once all tests have been proven correct in the JVM, you should start running <code>allTests</code> to proof your code on each other targeted platform.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<link rel="stylesheet" href="highlightjs/styles/idea.min.css">
+<script src="highlightjs/highlight.min.js"></script>
+<script>hljs.initHighlighting()</script>
+</body>
+</html>

@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 2.0.10">
+<title>Using your Kotlin multi-platform library on iOS</title>
+<link rel="stylesheet" href="./golo.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<body class="article">
+<div id="header">
+<h1>Using your Kotlin multi-platform library on iOS</h1>
+<div class="details">
+<span id="revnumber">version 1.0</span>
+</div>
+<div id="toc" class="toc">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#_project_creation_wizard">Project Creation Wizard</a></li>
+<li><a href="#_adding_your_kotlin_multi_platform_library_to_xcode">Adding your Kotlin multi-platform library to Xcode</a></li>
+<li><a href="#_using_your_kotlin_multi_platform_library_in_swift">Using your Kotlin multi-platform library in Swift</a>
+<ul class="sectlevel2">
+<li><a href="#_modifying_the_code">Modifying the code</a></li>
+<li><a href="#_running_the_app">Running the app</a></li>
+</ul>
+</li>
+<li><a href="#_whats_next">What&#8217;s next ?</a></li>
+</ul>
+</div>
+</div>
+<div id="content">
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>Now that we have a working <strong><em>Android</em></strong> application, we will try, and succeed, to use our Kotlin multi-platform library on <strong><em>iOS</em></strong>.</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+You will be able to fulfill this part only if you have a MacOS computer.
+           Otherwise, consider either following up with your neighbor, or skipping this chapter.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_project_creation_wizard"><a class="anchor" href="#_project_creation_wizard"></a>Project Creation Wizard</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>By now you should have installed <a href="https://developer.apple.com/xcode/">Xcode</a>.
+Open it and create a new project:</p>
+</div>
+<table class="tableblock frame-none grid-none stretch">
+<colgroup>
+<col style="width: 65%;">
+<col style="width: 35%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="image"><img src="images/res/5-1.png" alt="create project"></span></p></td>
+<td class="tableblock halign-left valign-middle"><div class="content"><div class="paragraph">
+<p><strong>Create a new Xcode project</strong> &#8230;&#8203;</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="image"><img src="images/res/5-2.png" alt="project template"></span></p></td>
+<td class="tableblock halign-left valign-middle"><div class="content"><div class="paragraph">
+<p>Choose the project template:</p>
+</div>
+<div class="paragraph">
+<p><strong>Single View App</strong></p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="image"><img src="images/res/5-3.png" alt="project details"></span></p></td>
+<td class="tableblock halign-left valign-middle"><div class="content"><div class="paragraph">
+<p>Enter the details of your application:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Product Name: <code>iOS Application</code></p>
+</li>
+<li>
+<p>Organization identifier: <code>com.mybusiness.ios</code></p>
+</li>
+<li>
+<p>Language: <strong><em>Swift</em></strong></p>
+</li>
+<li>
+<p>User Interface: <strong><em>SwiftUI</em></strong></p>
+</li>
+</ul>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="image"><img src="images/res/5-4.png" alt="project location"></span></p></td>
+<td class="tableblock halign-left valign-middle"><div class="content"><div class="paragraph">
+<p>Choose the location of your <strong><em>iOS</em></strong> project</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="image"><img src="images/res/5-5.png" alt="generated project"></span></p></td>
+<td class="tableblock halign-left valign-middle"><div class="content"><div class="paragraph">
+<p>Check the good configuration by clicking on <span class="image"><img src="images/res/run-ios.png" alt="run ios" width="32"></span> to run the app</p>
+</div></div></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>Your <strong><em>Xcode</em></strong> environment is ready!</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_adding_your_kotlin_multi_platform_library_to_xcode"><a class="anchor" href="#_adding_your_kotlin_multi_platform_library_to_xcode"></a>Adding your Kotlin multi-platform library to Xcode</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Remember, while we were building our Kotlin multi-platform library, we added a build step named <code>packForXcode</code>.
+This task should have built and published the <code>framework</code> needed by <strong><em>Xcode</em></strong> to consume our library with <strong><em>iOS</em></strong> in a specific directory.</p>
+</div>
+<div class="paragraph">
+<div class="title">Kotlin multi-platform library build directory.</div>
+<p><span class="image"><img src="images/res/3-8.png" alt="build directory"></span></p>
+</div>
+<div class="paragraph">
+<p>To be able to use your newly generated <code>framework</code> you need to get you <strong><em>Xcode</em></strong> instance, and manually add it to the configuration.</p>
+</div>
+<table class="tableblock frame-none grid-none stretch">
+<colgroup>
+<col style="width: 65%;">
+<col style="width: 35%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="image"><img src="images/res/5-6.png" alt="project settings"></span></p></td>
+<td class="tableblock halign-left valign-middle"><div class="content"><div class="paragraph">
+<p>Open your project settings, on the <strong>General</strong> tab. Then, in <strong>Framework, Libraries and Embedded Content</strong> click the <code>+</code> button</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="image"><img src="images/res/5-7.png" alt="add framework"></span></p></td>
+<td class="tableblock halign-left valign-middle"><div class="content"><div class="paragraph">
+<p>We need to find our <code>framework</code>, so click on <strong>Add Other&#8230;&#8203;</strong>, then <strong>Add Files&#8230;&#8203;</strong></p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="image"><img src="images/res/5-8.png" alt="broswe files"></span></p></td>
+<td class="tableblock halign-left valign-middle"><div class="content"><div class="paragraph">
+<p>Browse to your <code>framework</code> and click <strong>Open</strong></p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="image"><img src="images/res/5-9.png" alt="add framework result"></span></p></td>
+<td class="tableblock halign-left valign-middle"><div class="content"><div class="paragraph">
+<p>You now see your <code>framework</code>, added to the configuration</p>
+</div></div></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>Right now, if you try to build your application, it will fail. You also need to tell to <strong><em>Xcode</em></strong> where to look for the <code>framework</code>.</p>
+</div>
+<table class="tableblock frame-none grid-none stretch">
+<colgroup>
+<col style="width: 100%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Open your project settings, on the <strong>Build Settings</strong> tab, with the filters <strong>All</strong> and <strong>Combined</strong> activated.</p>
+<p class="tableblock">Then find the <strong>Search Paths</strong> section</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="image"><img src="images/res/5-10.png" alt="project build settings"></span></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Add the directory that contains your built <code>framework</code> to <strong>Framework Search Paths</strong>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="image"><img src="images/res/5-11.png" alt="add search path"></span></p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>Now that we have configured our project we will be able to use our Kotlin multi-platform library in Swift.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_using_your_kotlin_multi_platform_library_in_swift"><a class="anchor" href="#_using_your_kotlin_multi_platform_library_in_swift"></a>Using your Kotlin multi-platform library in Swift</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_modifying_the_code"><a class="anchor" href="#_modifying_the_code"></a>Modifying the code</h3>
+<div class="paragraph">
+<p>By using <strong><em>SwiftUI</em></strong> we do not need to change the view through an <strong><em>XML</em></strong>, or whatever view configuration files <strong><em>Xcode</em></strong> can work with.</p>
+</div>
+<div class="paragraph">
+<p>Here we will only change one file, <code>ContentView.swift</code> to import our common code, and display our specific message to the screen.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<div class="title">Reminder</div>
+<p>In our Kotlin multi-platform library we have defined the iOS target to be built as a <code>framework</code> named <strong><em>businessLibrary</em></strong></p>
+</div>
+<div class="listingblock">
+<div class="title">build.gradle.kts</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">kotlin {
+    iosX64 {
+        binaries {
+            framework {
+                baseName = "businessLibrary"
+            }
+        }
+    }
+}</code></pre>
+</div>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="title">iOS Application &gt; ContentView.swift</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="swift" class="language-swift hljs">import SwiftUI
+import businessLibrary <i class="conum" data-value="1"></i><b>(1)</b>
+
+struct ContentView: View {
+    var body: some View {
+        Text(ShowMessageKt.sayHelloKotlinConf()) <i class="conum" data-value="2"></i><b>(2)</b>
+            .font(.system(size: 40))
+            .multilineTextAlignment(.center)
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>import the Kotlin multi-platform library package named as <strong><em>businessLibrary</em></strong>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>call the <code>sayHelloKotlinConf()</code> function defined in the <code>ShowMessageKt</code> class.</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_running_the_app"><a class="anchor" href="#_running_the_app"></a>Running the app</h3>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Contrary to <strong>Android Studio</strong> there is no need to manually configure an <strong><em>iOS</em></strong> simulator.
+      <strong>Xcode</strong> already provides simulators.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Run the <strong><em>iOS</em></strong> application by clicking on the <span class="image"><img src="images/res/run-ios.png" alt="run ios" width="32"></span> button.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="images/res/5-12.png" alt="final result"></span></p>
+</div>
+<div class="paragraph">
+<p>Here we are ! We can see, displayed on the screen:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>the common message: <code>Hello KotlinConf, Kotlin/Multiplatform is awesome!</code></p>
+</li>
+<li>
+<p>the <strong><em>iOS</em></strong> specific message: <code>We are running on iOS</code></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_whats_next"><a class="anchor" href="#_whats_next"></a>What&#8217;s next ?</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In the next step we will see how to use our Kotlin multi-platform library on the Web, with <strong><em>JavaScript</em></strong>.</p>
+</div>
+</div>
+</div>
+</div>
+<link rel="stylesheet" href="highlightjs/styles/idea.min.css">
+<script src="highlightjs/highlight.min.js"></script>
+<script>hljs.initHighlighting()</script>
+</body>
+</html>

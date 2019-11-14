@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 2.0.10">
+<title>Introduction</title>
+<link rel="stylesheet" href="./golo.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<body class="article">
+<div id="header">
+<h1>Introduction</h1>
+<div class="details">
+<span id="revnumber">version 1.0</span>
+</div>
+<div id="toc" class="toc">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#_definition">Definition</a>
+<ul class="sectlevel2">
+<li><a href="#_goals">Goals</a></li>
+<li><a href="#_pre_requisites">Pre-requisites</a></li>
+<li><a href="#_admonitions">Admonitions</a></li>
+</ul>
+</li>
+<li><a href="#_what_how">What? How?</a></li>
+<li><a href="#_install">Install</a></li>
+</ul>
+</div>
+</div>
+<div id="content">
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>Welcome to the Mobile Multiplatform Kotlin Workshop.</p>
+</div>
+<div class="paragraph">
+<p>Learning to develop with Kotlin multiplatform is exactly like learning for any other technology: it is a set of skills that can be divided into three categories:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>The technology: how it works.</p>
+</li>
+<li>
+<p>The architectures and best practices: how to take the most advantage of it.</p>
+</li>
+<li>
+<p>The ecosystem: how to focus on your business</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>This workshop proposes to learn the technology &amp; the associated best practices intertwined.
+The ecosystem discovery, however, is treated in its own set of chapters, at the end of this workshop.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_definition"><a class="anchor" href="#_definition"></a>Definition</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_goals"><a class="anchor" href="#_goals"></a>Goals</h3>
+<div class="paragraph">
+<p>The goals of this workshop are:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>to make you understand how the Kotlin/Multiplatform infrastructure works,</p>
+</li>
+<li>
+<p>to make you able to easily create a mobile Kotlin/Multiplatform project,</p>
+</li>
+<li>
+<p>to give you the tools to write multi-platform code that can be deployed on different platforms,</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Android, iOS and the Web</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>to make you able to deploy it on at least one platform,</p>
+</li>
+<li>
+<p>and of course, to test it all once!</p>
+</li>
+</ul>
+</div>
+<div class="admonitionblock caution">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-caution" title="Caution"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>It is important to understand what this workshop is NOT:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>It is not</strong> meant to teach you the Kotlin language.</p>
+</li>
+<li>
+<p><strong>It is not</strong> meant to teach in depth the three mobile platforms that we are targeting.</p>
+</li>
+</ul>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_pre_requisites"><a class="anchor" href="#_pre_requisites"></a>Pre-requisites</h3>
+<div class="paragraph">
+<p>The only pre-requisite for this workshop is <strong>basic Knowledge and experience of regular Kotlin</strong>, whatever the target (yes, server side kotlin does count!).</p>
+</div>
+<div class="paragraph">
+<p>Basic understanding of at least one of the mobile targets (Android, iOS, Web) is better, though not formally required.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_admonitions"><a class="anchor" href="#_admonitions"></a>Admonitions</h3>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+This is a note that gives <strong>more information</strong> or context on what is being developed.
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+This is a <strong>complimentary tip</strong>.
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock caution">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-caution" title="Caution"></i>
+</td>
+<td class="content">
+Act carefully, this <strong>could</strong> result into <strong>unwanted behaviour</strong>.
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+Warning! This <strong>could</strong> lead to <strong>runtime crash</strong>.
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+This is important: if not taken care of, it <strong>will</strong> result into <strong>unwanted behaviour or runtime crash</strong>.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_what_how"><a class="anchor" href="#_what_how"></a>What? How?</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>During this workshop, we are going to build a multi-platform <strong>kAddress Book</strong>.</p>
+</div>
+<div class="paragraph">
+<p>By the end of the day, <em>if everything goes well</em>, you <strong>may</strong> have:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>a multi-platform library, handling any business behavior of your application</p>
+</li>
+<li>
+<p>a native Android application, with only UI code, business will be delegated to the library</p>
+</li>
+<li>
+<p>a native iOS application, with only UI code, business will be delegated to the library</p>
+</li>
+<li>
+<p>a Web application, with only UI code, business will be delegated to the library</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_install"><a class="anchor" href="#_install"></a>Install</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Do you have what it takes to develop with Kotlin/Multiplatform?</p>
+</div>
+<div class="paragraph">
+<p>Before starting this workshop, you need:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>a <strong>JDK</strong> installed (no vendor required, 1.8 minimum)</p>
+</li>
+<li>
+<p><a href="https://www.jetbrains.com/idea/">IntelliJ IDEA</a>, either Community or Ultimate (We recommend installing it via <a href="https://www.jetbrains.com/toolbox-app/">Jetbrains Toolbox</a>).</p>
+</li>
+<li>
+<p>If you intend to target Android: <a href="https://developer.android.com/studio">Android Studio</a> (which you can also install via <a href="https://www.jetbrains.com/toolbox-app/">Jetbrains Toolbox</a>) with the Android SDK &amp; emulator installed.</p>
+</li>
+<li>
+<p>If you intend to target iOS: <a href="https://developer.apple.com/xcode/">Xcode</a> with the iOS SDK &amp; simulator installed.</p>
+</li>
+</ul>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>If you are using a Linux or MacOS X computer you&#8217;ll need extra installation to work with the <strong>Kotlin/Native</strong> compiler</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>For MacOS: the installation of <a href="https://developer.apple.com/xcode/">Xcode</a> is necessary</p>
+</li>
+<li>
+<p>For Linux: You&#8217;ll need to install the <code>ncurses</code> package</p>
+<div class="ulist">
+<ul>
+<li>
+<p>on Fedora 26+ <code>yum install ncurses-compat-libs</code></p>
+</li>
+<li>
+<p>on recent Ubuntu <code>apt install libncurses5</code></p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+You can only compile Kotlin/Native code for iOS on a MacOS X computer.
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+You can develop on a non-Mac computer and just compile for iOS on a Mac.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<link rel="stylesheet" href="highlightjs/styles/idea.min.css">
+<script src="highlightjs/highlight.min.js"></script>
+<script>hljs.initHighlighting()</script>
+</body>
+</html>
