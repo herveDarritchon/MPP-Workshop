@@ -1,5 +1,4 @@
 = Create a project
-Salomon BRYS & Romain BOISSELLE
 :toc:
 :icons: font
 

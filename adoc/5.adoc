@@ -1,5 +1,4 @@
 = Using your Kotlin multi-platform library on iOS
-Salomon BRYS & Romain BOISSELLE
 :toc:
 :icons: font
 

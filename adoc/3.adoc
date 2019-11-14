@@ -1,5 +1,4 @@
 = Platform specific behaviors
-Salomon BRYS & Romain BOISSELLE
 :toc:
 :icons: font
 

@@ -1,5 +1,4 @@
-= Using you multi-platform library on the Web
-Salomon BRYS & Romain BOISSELLE
+= Using your multi-platform library on the Web
 :toc:
 :icons: font
 
