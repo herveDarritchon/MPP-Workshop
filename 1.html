@@ -286,9 +286,52 @@ If you are not using linux, then you have created instead either <code>macosMain
 </tr>
 </table>
 </div>
-<div class="imageblock">
+<div class="listingblock">
 <div class="content">
-<img src="images/source-sets-1.png" alt="source sets 1" width="320" height="629">
+<pre>Failed to generate image: Could not find the 'dot' executable in PATH; add it to the PATH or specify its location using the 'graphvizdot' document attribute
+digraph G {
+    rankdir = LR
+
+    node [shape = box]
+
+    commonTest, jvmTest, jsTest, linuxTest, iosX64Test [style = filled, color = "#c0ffc5"]
+
+    {rank = same commonMain commonTest}
+
+    commonMain -&gt; commonTest
+
+    subgraph cluster_jvm {
+        color = red
+        {rank = same jvmMain jvmTest}
+        jvmMain -&gt; jvmTest
+    }
+    commonMain -&gt; jvmMain
+    commonTest -&gt; jvmTest
+
+    subgraph cluster_js {
+        color = red
+        {rank = same jsMain jsTest}
+        jsMain -&gt; jsTest
+    }
+    commonMain -&gt; jsMain
+    commonTest -&gt; jsTest
+
+    subgraph cluster_linux {
+        color = red
+        {rank = same linuxMain linuxTest}
+        linuxMain -&gt; linuxTest
+    }
+    commonMain -&gt; linuxMain
+    commonTest -&gt; linuxTest
+
+    subgraph cluster_iosX64 {
+        color = red
+        {rank = same iosX64Main iosX64Test}
+        iosX64Main -&gt; iosX64Test
+    }
+    commonMain -&gt; iosX64Main
+    commonTest -&gt; iosX64Test
+}</pre>
 </div>
 </div>
 </div>

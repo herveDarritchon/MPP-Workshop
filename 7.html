@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 2.0.10">
+<title>Building a real case application</title>
+<link rel="stylesheet" href="./golo.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<body class="article">
+<div id="header">
+<h1>Building a real case application</h1>
+<div class="details">
+<span id="revnumber">version 1.0</span>
+</div>
+<div id="toc" class="toc">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#_what_are_we_going_to_build">What are we going to build ?</a></li>
+<li><a href="#_requirements">Requirements</a></li>
+</ul>
+</div>
+</div>
+<div id="content">
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>In the first part of this workshop you have played with <strong><em>Kotlin/Multiplatform</em></strong> with simple examples.
+You already have encountered the main pitfalls in a Kotlin Mobile Multi-Platform project.</p>
+</div>
+<div class="paragraph">
+<p>So, now we will rely on these newly acquired knowledge and try, before succeeding,
+to build a real case application with <strong><em>Kotlin/Multiplatform</em></strong>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_what_are_we_going_to_build"><a class="anchor" href="#_what_are_we_going_to_build"></a>What are we going to build ?</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>For the exercice you will build an <strong>Address Book</strong>, to manage contacts. Of course, this application should be made of:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>A <strong>common library</strong> that will embed the business logic and behaviors with the MVP pattern</p>
+</li>
+<li>
+<p>An <strong>Android application</strong> that will allow users to read/create/update contacts through the <strong>common library</strong></p>
+</li>
+<li>
+<p>An <strong>iOS application</strong> that will allow users to read/create/update contacts through the <strong>common library</strong></p>
+</li>
+<li>
+<p>A <strong>Web application</strong> that will allow users to read/create/update contacts through the <strong>common library</strong></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>To help you achieve your application you will clone a backend application from Github.
+This backend application, developed with <strong><em>Ktor</em></strong> and an embedded database, will provide REST endpoints to read, create and update contacts.</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre> // TODO
+* Kotlin/Multiplatform Library
+    - Data classes
+    - Abstracted behavior with MVP
+    - Using MPP libraries
+    - networking with ktor-client
+    - read JSON with kotlinx-serialization
+    - Kodein ? Korlibs ?
+* Unit Tests</pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_requirements"><a class="anchor" href="#_requirements"></a>Requirements</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Before going into the code, and to be efficient, we need to set up our environment.
+Mostly, to be able to do network calls and consume data you need a server application.</p>
+</div>
+<div class="paragraph">
+<p>We already have developed the backend application that you will use to build your <strong>Address Book</strong> application.</p>
+</div>
+<div class="paragraph">
+<p><strong><em>Open a terminal and follow the steps below</em></strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>On <strong>Linux</strong> / <strong>MacOS</strong>.</p>
+<div class="listingblock">
+<div class="title">Clone the <a href="https://github.com/SalomonBrys/MPP-Workshop-Server">Github repository</a>.</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="shell script" class="language-shell script hljs">git clone https://github.com/SalomonBrys/MPP-Workshop-Server.git</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Run the application.</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="shell script" class="language-shell script hljs">cd MPP-Workshop-Server/ <i class="conum" data-value="1"></i><b>(1)</b>
+./gradlew run <i class="conum" data-value="2"></i><b>(2)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Get into the backend application directory</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Run the app</td>
+</tr>
+</table>
+</div>
+</li>
+<li>
+<p>On <strong>Windows</strong>.</p>
+<div class="listingblock">
+<div class="title">Clone the <a href="https://github.com/SalomonBrys/MPP-Workshop-Server">Github repository</a>.</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="shell script" class="language-shell script hljs">git clone https://github.com/SalomonBrys/MPP-Workshop-Server.git</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Run the application on <strong>Windows</strong></div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="shell script" class="language-shell script hljs">cd MPP-Workshop-Server <i class="conum" data-value="1"></i><b>(1)</b>
+gradlew.bat run <i class="conum" data-value="2"></i><b>(2)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Get into the backend application directory</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Run the app</td>
+</tr>
+</table>
+</div>
+</li>
+</ul>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+Do not close your terminal, otherwise the application will be terminated
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>You might find in the stacktrace something like:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>[main] INFO ktor.application - Responding at http://0.0.0.0:8042</pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Your application is now running on your machine (<em>localhost</em>) on the port 8042.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>You can test the REST APIs:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>By opening a terminal and run the following command, if you have already installed <strong><em>curl</em></strong></p>
+</li>
+<li>
+<p>By copy/pasting the following command into a UI tool such as <a href="https://insomnia.rest/">Insomnia</a> or <a href="https://www.getpostman.com/">Postman</a>.</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="title">Get all the contacts from the server.</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="shell script" class="language-shell script hljs">curl --request GET --url http://127.0.0.1:8042/api/contacts</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Ready to code your first Kotlin multi-platform application ? Let&#8217;s go to the next step.</p>
+</div>
+</div>
+</div>
+</div>
+<link rel="stylesheet" href="highlightjs/styles/idea.min.css">
+<script src="highlightjs/highlight.min.js"></script>
+<script>hljs.initHighlighting()</script>
+</body>
+</html>

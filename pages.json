@@ -5,5 +5,7 @@
     "Platform specific behaviors",
     "Using your Kotlin multi-platform library on Android",
     "Using your Kotlin multi-platform library on iOS",
-    "Using your multi-platform library on the Web"
+    "Using your multi-platform library on the Web",
+    "Building a real case application",
+    "[AddressBook] Building the common library"
 ]
