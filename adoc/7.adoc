@@ -1,0 +1,95 @@
+= Building a real case application
+:toc:
+:icons: font
+
+In the first part of this workshop you have played with *_Kotlin/Multiplatform_* with simple examples.
+You already have encountered the main pitfalls in a Kotlin Mobile Multi-Platform project.
+
+So, now we will rely on these newly acquired knowledge and try, before succeeding,
+to build a real case application with *_Kotlin/Multiplatform_*.
+
+== What are we going to build ?
+
+For the exercice you will build an *Address Book*, to manage contacts. Of course, this application should be made of:
+
+- A *common library* that will embed the business logic and behaviors with the MVP pattern
+- An *Android application* that will allow users to read/create/update contacts through the *common library*
+- An *iOS application* that will allow users to read/create/update contacts through the *common library*
+- A *Web application* that will allow users to read/create/update contacts through the *common library*
+
+To help you achieve your application you will clone a backend application from Github.
+This backend application, developed with *_Ktor_* and an embedded database, will provide REST endpoints to read, create and update contacts.
+
+ // TODO
+* Kotlin/Multiplatform Library
+    - Data classes
+    - Abstracted behavior with MVP
+    - Using MPP libraries
+    - networking with ktor-client
+    - read JSON with kotlinx-serialization
+    - Kodein ? Korlibs ?
+* Unit Tests
+
+== Requirements
+
+Before going into the code, and to be efficient, we need to set up our environment.
+Mostly, to be able to do network calls and consume data you need a server application.
+
+We already have developed the backend application that you will use to build your *Address Book* application.
+
+*_Open a terminal and follow the steps below_*
+
+- On *Linux* / *MacOS*.
++
+.Clone the https://github.com/SalomonBrys/MPP-Workshop-Server[Github repository].
+[source,shell script]
+----
+git clone https://github.com/SalomonBrys/MPP-Workshop-Server.git
+----
++
+.Run the application.
+[source,shell script]
+----
+cd MPP-Workshop-Server/ #<1>
+./gradlew run #<2>
+----
+<1> Get into the backend application directory
+<2> Run the app
+
+- On *Windows*.
++
+.Clone the https://github.com/SalomonBrys/MPP-Workshop-Server[Github repository].
+[source,shell script]
+----
+git clone https://github.com/SalomonBrys/MPP-Workshop-Server.git
+----
++
+.Run the application on *Windows*
+[source,shell script]
+----
+cd MPP-Workshop-Server #<1>
+gradlew.bat run #<2>
+----
+<1> Get into the backend application directory
+<2> Run the app
+
+WARNING: Do not close your terminal, otherwise the application will be terminated
+
+You might find in the stacktrace something like:
+
+ [main] INFO ktor.application - Responding at http://0.0.0.0:8042
+
+NOTE: Your application is now running on your machine (_localhost_) on the port 8042.
+
+You can test the REST APIs:
+
+- By opening a terminal and run the following command, if you have already installed *_curl_*
+- By copy/pasting the following command into a UI tool such as https://insomnia.rest/[Insomnia] or https://www.getpostman.com/[Postman].
+
+.Get all the contacts from the server.
+[source,shell script]
+----
+curl --request GET --url http://127.0.0.1:8042/api/contacts
+----
+
+Ready to code your first Kotlin multi-platform application ? Let's go to the next step.
