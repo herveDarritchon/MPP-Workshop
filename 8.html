@@ -33,283 +33,519 @@
 </div>
 </div>
 <div id="content">
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>As in the first part of this workshop, we will start by building our common library.
+This one will be more complete, as we would like that it handles as much logic as we can.</p>
+</div>
+<div class="paragraph">
+<p>Thus, after creating the project, we will put in it the following parts:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>The Gradle configuration for every targeted platform.</p>
+</li>
+<li>
+<p>The business domain objects</p>
+</li>
+<li>
+<p>The backend API interfaces</p>
+</li>
+<li>
+<p>The MVP pattern, to handle API calls and view updates.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Each of those steps we be in the common code, and shared between every targeted platform!</p>
+</div>
+</div>
+</div>
 <div class="sect1">
 <h2 id="_project_creation"><a class="anchor" href="#_project_creation"></a>Project creation</h2>
 <div class="sectionbody">
-
+<div class="paragraph">
+<p>Open IntelliJ IDEA and create a new project:</p>
+</div>
+<table class="tableblock frame-none grid-none stretch">
+<colgroup>
+<col style="width: 65%;">
+<col style="width: 35%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="image"><img src="images/res/8-1.png" alt="create project"></span></p></td>
+<td class="tableblock halign-left valign-middle"><div class="content"><div class="paragraph">
+<p><strong>Create a new Gradle project</strong></p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="image"><img src="images/res/8-2.png" alt="project details"></span></p></td>
+<td class="tableblock halign-left valign-middle"><div class="content"><div class="paragraph">
+<p><strong>Fulfill your project details:</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Name: <code>adressbook-common</code></p>
+</li>
+<li>
+<p>Group ID: <code>com.mybusiness</code></p>
+</li>
+<li>
+<p>Artifact ID: <code>adressbook-common</code></p>
+</li>
+</ul>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="image"><img src="images/res/8-3.png" alt="project ready"></span></p></td>
+<td class="tableblock halign-left valign-middle"><div class="content"><div class="paragraph">
+<p><strong>Your project is ready!</strong></p>
+</div></div></td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 <div class="sect1">
 <h2 id="_gradle_configuration"><a class="anchor" href="#_gradle_configuration"></a>Gradle configuration</h2>
 <div class="sectionbody">
+<div class="paragraph">
+<p>We will take some times to explain the gradle configuration, as we will see a new way to use plugins.</p>
+</div>
 <div class="sect2">
 <h3 id="_plugins"><a class="anchor" href="#_plugins"></a>Plugins</h3>
-<div class="listingblock">
-<div class="title">build.gradle.kts</div>
-<div class="content">
-<pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">plugins {
-    id("org.jetbrains.kotlin.multiplatform")
-    id("org.jetbrains.kotlin.plugin.serialization")
-    `maven-publish`
-}
-
-repositories {
-    jcenter()
-    google()
-    maven(url = "https://kotlin.bintray.com/kotlinx")
-    maven(url = "https://dl.bintray.com/jetbrains/kotlin-native-dependencies")
-}
-
-group = "com.mybusiness"
-version = "1.0-SNAPSHOT"</code></pre>
+<div class="paragraph">
+<p>As we saw earlier, we will need multiple Gradle plugins to achieve our Kotlin multi-platform project.</p>
 </div>
+<div class="paragraph">
+<p>We already saw that in order to create a Kotlin multi-platform project we have to use the plugin <code>org.jetbrains.kotlin.multiplatform</code>.</p>
+</div>
+<div class="paragraph">
+<p>Our multi-platform application will need to call a backend API, thus should be able to serialize and deserialize data, so we will use <code>kotlinx.serialization</code> with the <code>serialization</code> plugin.</p>
+</div>
+<div class="paragraph">
+<p>Finally, as in the previous exercice, we will need the <code>maven-publish</code> plugin to be able to publish our library to Maven.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Note that we won&#8217;t cover how to deploy binaries for <strong>Native</strong> or <strong><em>JavaScript</em></strong> targets.
+</td>
+</tr>
+</table>
 </div>
 <div class="sect3">
 <h4 id="_plugin_management"><a class="anchor" href="#_plugin_management"></a>Plugin management</h4>
+<div class="paragraph">
+<p>Before configuring our plugins, we will configure the plugin management that will allow us to define plugins,
+without taking care of the version, or where should Gradle get the plugins.</p>
+</div>
+<div class="paragraph">
+<p>Go to the <code>.settings.gradle.kts</code> file and add the following lines:</p>
+</div>
 <div class="listingblock">
 <div class="title">settings.gradle.kts</div>
 <div class="content">
-<pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">val kotlinVersion = "1.3.50"
+<pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">val kotlinVersion = "1.3.50" <i class="conum" data-value="1"></i><b>(1)</b>
 
 pluginManagement {
     resolutionStrategy {
         eachPlugin {
             when (requested.id.id) {
-                "org.jetbrains.kotlin.multiplatform" -&gt; useModule("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion")
-                "org.jetbrains.kotlin.plugin.serialization" -&gt; useModule("org.jetbrains.kotlin:kotlin-serialization:$kotlinVersion")
+                "org.jetbrains.kotlin.multiplatform"
+                  -&gt; useModule("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion") <i class="conum" data-value="2"></i><b>(2)</b>
+                "org.jetbrains.kotlin.plugin.serialization"
+                  -&gt; useModule("org.jetbrains.kotlin:kotlin-serialization:$kotlinVersion") <i class="conum" data-value="3"></i><b>(3)</b>
             }
         }
     }
-
-    repositories {
-        jcenter()
-        google()
-    }
 }
 
-enableFeaturePreview("GRADLE_METADATA")</code></pre>
+enableFeaturePreview("GRADLE_METADATA") <i class="conum" data-value="4"></i><b>(4)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Set the targeted Kotlin version for your project.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>While using the Kotlin <code>multiplatform</code> plugin, say where to get it</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>While using the Kotlin <code>serialization</code> plugin, say where to get it</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Enables the <code>GRADLE_METADATA</code> feature, to be able to depends on <code>Kotlin/Native</code> libraries</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Go to the <code>build.gradle.kts</code> file and replace the <code>plugins</code> and <code>repositories</code> sections by the following lines:</p>
+</div>
+<div class="listingblock">
+<div class="title">build.gradle.kts</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">plugins {
+    id("org.jetbrains.kotlin.multiplatform") <i class="conum" data-value="1"></i><b>(1)</b>
+    id("org.jetbrains.kotlin.plugin.serialization") <i class="conum" data-value="2"></i><b>(2)</b>
+    `maven-publish` <i class="conum" data-value="3"></i><b>(3)</b>
+}
+
+group = "com.mybusiness"
+version = "1.0-SNAPSHOT"
+
+repositories {
+    jcenter()
+}</code></pre>
 </div>
 </div>
 </div>
 </div>
 <div class="sect2">
 <h3 id="_targets"><a class="anchor" href="#_targets"></a>Targets</h3>
+<div class="paragraph">
+<p>As before, we will target the 3 environments that are the <strong><em>JVM</em></strong>, <strong><em>iOS</em></strong> and the <strong><em>Web</em></strong>.</p>
+</div>
+<div class="paragraph">
+<p>Open the <code>.build.gradle.kts</code> file and add the following code into the <code>kotlin</code> block:</p>
+</div>
 <div class="listingblock">
 <div class="title">build.gradle.kts</div>
 <div class="content">
 <pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">kotlin {
-    jvm("android") {
-        tasks.withType&lt;org.jetbrains.kotlin.gradle.tasks.KotlinCompile&gt; {
-            kotlinOptions {
-                jvmTarget = "1.8"
-            }
-        }
-    }
+    jvm("android") <i class="conum" data-value="1"></i><b>(1)</b>
 
-    js { browser() }
-
-    //select iOS target platform depending on the Xcode environment variables
-    val iOSTarget: (String, org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget.() -&gt; Unit) -&gt; org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget =
-        if (System.getenv("SDK_NAME")?.startsWith("iphoneos") == true)
-            ::iosArm64
-        else
-            ::iosX64
-
-    iOSTarget("ios") {
+    iosX64("ios") { <i class="conum" data-value="2"></i><b>(2)</b>
         binaries {
-            framework {
-                baseName = "AddressBookCommon"
+            framework { <i class="conum" data-value="3"></i><b>(3)</b>
+                baseName = "AddressBookCommon" <i class="conum" data-value="4"></i><b>(4)</b>
             }
         }
     }
 
-    sourceSets {
-        // Versions
-        val coroutinesVersion = "1.3.1"
-        val ktorVersion = "1.2.4"
-        val serializationVersion = "0.13.0"
-        val mockkVersion = "1.9.3"
-
-        // Shortcuts
-        fun kotlinx(module: String, version: String) = "org.jetbrains.kotlinx:kotlinx-$module:$version"
-        fun coroutines(module: String = "") = kotlinx("coroutines-core$module", coroutinesVersion)
-        fun serialization(module: String = "") = kotlinx("serialization-runtime$module", serializationVersion)
-        fun ktorClient(module: String, version: String = ktorVersion) = "io.ktor:ktor-client-$module:$version"
-
-        val commonMain by getting {
-            dependencies {
-                implementation("org.jetbrains.kotlin:kotlin-stdlib-common")
-                implementation(coroutines("-common"))
-                implementation(serialization("-common"))
-
-                implementation(ktorClient("core"))
-                implementation(ktorClient("json"))
-                implementation(ktorClient("serialization"))
-            }
-        }
-        val commonTest by getting {
-            dependencies {
-                implementation(kotlin("test-common"))
-                implementation(kotlin("test-annotations-common"))
-                implementation("io.mockk:mockk:$mockkVersion")
-            }
-        }
-
-        val androidMain by getting {
-            dependencies {
-                implementation("org.jetbrains.kotlin:kotlin-stdlib")
-                implementation(coroutines())
-                implementation(serialization())
-
-                implementation(ktorClient("core-jvm"))
-                implementation(ktorClient("json-jvm"))
-                implementation(ktorClient("serialization-jvm"))
-                implementation(ktorClient("apache"))
-            }
-        }
-
-        val androidTest by getting {
-            dependencies {
-                implementation(kotlin("test"))
-                implementation(kotlin("test-junit"))
-                implementation("io.mockk:mockk:$mockkVersion")
-            }
-        }
-
-        val iosMain by getting {
-            dependencies {
-                implementation(coroutines("-native"))
-                implementation(serialization("-native"))
-
-                implementation(ktorClient("core-native"))
-                implementation(ktorClient("ios"))
-                implementation(ktorClient("json-native"))
-                implementation(ktorClient("serialization-native"))
-            }
-        }
-
-        val jsMain by getting {
-            dependencies {
-                implementation(coroutines("-js"))
-                implementation(serialization("-js"))
-
-                implementation(ktorClient("core-js"))
-                implementation(ktorClient("js"))
-                implementation(ktorClient("json-js"))
-                implementation(ktorClient("serialization-js"))
-            }
-        }
-    }
+    js { browser() } <i class="conum" data-value="5"></i><b>(5)</b>
 }</code></pre>
 </div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Set the <strong><em>JVM</em></strong> target, named <strong>android</strong> as we will build an <strong><em>Android</em></strong> afterwards.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Set the <strong><em>iOS</em></strong> target, named <strong>ios</strong> to simplify usage of the target</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Define that the output binaries must be a <strong><em>framework</em></strong> file&#8230;&#8203;</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>&#8230;&#8203;with the name <code>AddressBookCommon</code></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>Set the <strong><em>JavaScript</em></strong> target</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<strong><em>Android</em></strong> is running on a JVM, so it&#8217;s just a JVM target. As we could have different JVM target we can specify it,
+and as we know for sure that we want to target <strong><em>Android</em></strong>, we will name it in the target declaration <strong>android</strong>.
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<strong><em>iOS</em></strong> can have multiple target, depending on your Xcode environment.
+So we could write some logic to select the right target, but we will focus on <code>iosX64</code> as it is taking into account every <strong>iOS</strong> devices from the <em>iPhone 4/iPad 2</em>.
+</td>
+</tr>
+</table>
 </div>
 </div>
 <div class="sect2">
 <h3 id="_source_sets_and_dependencies"><a class="anchor" href="#_source_sets_and_dependencies"></a>Source sets and dependencies</h3>
+<div class="paragraph">
+<p>In this section we will define all de dependencies needed for our Kotlin multi-platform common code.</p>
+</div>
+<div class="paragraph">
+<p>There are 3 main dependencies that we will need to develop and use the Kotlin multi-platform library:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Ktor client</strong></p>
+<div class="paragraph">
+<p>Like for our backend API, we will use <strong>Ktor</strong> to empower our HTTP calls on the client side.
+We will have to use multiple implementation to be able to make some HTTP calls, as:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>an HTTP engine (<em>Apache</em> for the <strong><em>JVM</em></strong> / <em>NSURLSession</em> for the <strong><em>iOS</em></strong> / <em>Fetch</em> for the <strong><em>JavaScript</em></strong>)</p>
+</li>
+<li>
+<p>a JSON implementation to be able to serialize and de-serialize the requests/responses payloads.</p>
+</li>
+<li>
+<p>a serialization interface to render JSON into domain objects (using <em>Kotlinx Serialization</em>)</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><strong>Kotlinx.Serialization</strong></p>
+<div class="paragraph">
+<p>To serialize and de-serialize our HTTP calls content, we will use a Kotlin multi-platform library, develop by JetBrains, <strong>Kotlinx.Serialization</strong>.</p>
+</div>
+</li>
+<li>
+<p><strong>Kotlinx.Coroutines</strong></p>
+<div class="paragraph">
+<p>As <strong>Ktor</strong> is an asynchronous framework, and it is based on coroutines, we need to use coroutines context to wrap our HTTP calls.</p>
+</div>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>To avoid code redondance. we will prepare some shortcuts to declare the dependencies:</p>
+</div>
 <div class="listingblock">
-<div class="title">build.gradle.kts</div>
+<div class="title">build.gradle.kts - source sets code block</div>
 <div class="content">
 <pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">kotlin {
-    sourceSets {
+// ...
+        sourceSets {
         // Versions
-        val coroutinesVersion = "1.3.1"
-        val ktorVersion = "1.2.4"
+        val ktorVersion = "1.2.5"
+        val coroutinesVersion = "1.3.2"
         val serializationVersion = "0.13.0"
-        val mockkVersion = "1.9.3"
-
         // Shortcuts
-        fun kotlinx(module: String, version: String) = "org.jetbrains.kotlinx:kotlinx-$module:$version"
-        fun coroutines(module: String = "") = kotlinx("coroutines-core$module", coroutinesVersion)
-        fun serialization(module: String = "") = kotlinx("serialization-runtime$module", serializationVersion)
-        fun ktorClient(module: String, version: String = ktorVersion) = "io.ktor:ktor-client-$module:$version"
-
-        val commonMain by getting {
-            dependencies {
-                implementation("org.jetbrains.kotlin:kotlin-stdlib-common")
-                implementation(coroutines("-common"))
-                implementation(serialization("-common"))
-
-                implementation(ktorClient("core"))
-                implementation(ktorClient("json"))
-                implementation(ktorClient("serialization"))
-            }
-        }
-        val commonTest by getting {
-            dependencies {
-                implementation(kotlin("test-common"))
-                implementation(kotlin("test-annotations-common"))
-                implementation("io.mockk:mockk:$mockkVersion")
-            }
-        }
-
-        val androidMain by getting {
-            dependencies {
-                implementation("org.jetbrains.kotlin:kotlin-stdlib")
-                implementation(coroutines())
-                implementation(serialization())
-
-                implementation(ktorClient("core-jvm"))
-                implementation(ktorClient("json-jvm"))
-                implementation(ktorClient("serialization-jvm"))
-                implementation(ktorClient("apache"))
-            }
-        }
-
-        val androidTest by getting {
-            dependencies {
-                implementation(kotlin("test"))
-                implementation(kotlin("test-junit"))
-                implementation("io.mockk:mockk:$mockkVersion")
-            }
-        }
-
-        val iosMain by getting {
-            dependencies {
-                implementation(coroutines("-native"))
-                implementation(serialization("-native"))
-
-                implementation(ktorClient("core-native"))
-                implementation(ktorClient("ios"))
-                implementation(ktorClient("json-native"))
-                implementation(ktorClient("serialization-native"))
-            }
-        }
-
-        val jsMain by getting {
-            dependencies {
-                implementation(coroutines("-js"))
-                implementation(serialization("-js"))
-
-                implementation(ktorClient("core-js"))
-                implementation(ktorClient("js"))
-                implementation(ktorClient("json-js"))
-                implementation(ktorClient("serialization-js"))
-            }
-        }
-        val jsTest by getting {
-            dependencies {
-                implementation(kotlin("test-js"))
-            }
-        }
+        fun kotlinx(module: String, version: String)
+            = "org.jetbrains.kotlinx:kotlinx-$module:$version" <i class="conum" data-value="1"></i><b>(1)</b>
+        fun coroutines(module: String = "")
+            = kotlinx("coroutines-core$module", coroutinesVersion) <i class="conum" data-value="2"></i><b>(2)</b>
+        fun serialization(module: String = "")
+            = kotlinx("serialization-runtime$module", serializationVersion) <i class="conum" data-value="3"></i><b>(3)</b>
+        fun ktorClient(module: String, version: String
+            = ktorVersion) = "io.ktor:ktor-client-$module:$version" <i class="conum" data-value="4"></i><b>(4)</b>
     }
 }</code></pre>
 </div>
 </div>
-<div class="sect3">
-<h4 id="_common"><a class="anchor" href="#_common"></a>Common</h4>
-
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Build the dependency name for any <strong>kotlinx</strong> module with its version</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Build the dependency name for any <strong>coroutines-core</strong> module</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Build the dependency name for any <strong>serialization-runtime</strong> module</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Build the dependency name for any <strong>ktor-client</strong> module</td>
+</tr>
+</table>
 </div>
 <div class="sect3">
-<h4 id="_android"><a class="anchor" href="#_android"></a>Android</h4>
-
+<h4 id="_common"><a class="anchor" href="#_common"></a><strong><em>Common</em></strong></h4>
+<div class="listingblock">
+<div class="title">build.gradle.kts - source sets code block</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">kotlin {
+// ...
+        sourceSets {
+        // ...
+        val commonMain by getting {
+            dependencies {
+                // Kotlin
+                implementation(kotlin("stdlib-common")) <i class="conum" data-value="1"></i><b>(1)</b>
+                // Kotlinx
+                implementation(coroutines("-common")) <i class="conum" data-value="2"></i><b>(2)</b>
+                implementation(serialization("-common")) <i class="conum" data-value="3"></i><b>(3)</b>
+                // Ktor client
+                implementation(ktorClient("core")) <i class="conum" data-value="4"></i><b>(4)</b>
+                implementation(ktorClient("json")) <i class="conum" data-value="5"></i><b>(5)</b>
+                implementation(ktorClient("serialization")) <i class="conum" data-value="6"></i><b>(6)</b>
+            }
+        }
+        // ...
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Kotlin Standard Library for Kotlin multi-platform common projects.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Kotlinx.Coroutines API for Kotlin multi-platform common library.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Kotlinx.Serialization API for Kotlin multi-platform common library.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Common API to use Ktor client on Kotlin multi-platform projects.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>Common API to use Json Serializers on Kotlin multi-platform projects.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>Common API to use Kotlinx.Serialization with Ktor client on Kotlin multi-platform projects.</td>
+</tr>
+</table>
+</div>
 </div>
 <div class="sect3">
-<h4 id="_ios"><a class="anchor" href="#_ios"></a>iOS</h4>
-
+<h4 id="_targeted_platform"><a class="anchor" href="#_targeted_platform"></a>Targeted platform</h4>
+<div class="paragraph">
+<p>Now that we have defined our common dependencies, we need to define the dependencies for each targeted platform of our Kotlin multi-platform library.</p>
 </div>
-<div class="sect3">
-<h4 id="_javascript"><a class="anchor" href="#_javascript"></a>JavaScript</h4>
+<div class="paragraph">
+<p>In fact, in our case, it is very simple as each platform need to import the coresponding implementation of each API dependencies defined in the common module.</p>
+</div>
+<div class="listingblock">
+<div class="title">build.gradle.kts - source sets code block</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">kotlin {
+// ...
+        sourceSets {
+        // ...
+         val androidMain by getting {
+            dependencies {
+                // Kotlin
+                implementation(kotlin("stdlib")) <i class="conum" data-value="1"></i><b>(1)</b>
+                // Kotlinx
+                implementation(coroutines()) <i class="conum" data-value="2"></i><b>(2)</b>
+                implementation(serialization()) <i class="conum" data-value="3"></i><b>(3)</b>
+                // Ktor client
+                implementation(ktorClient("core-jvm")) <i class="conum" data-value="4"></i><b>(4)</b>
+                implementation(ktorClient("json-jvm")) <i class="conum" data-value="5"></i><b>(5)</b>
+                implementation(ktorClient("serialization-jvm")) <i class="conum" data-value="6"></i><b>(6)</b>
+                implementation(ktorClient("apache")) <i class="conum" data-value="7"></i><b>(7)</b>
+            }
+        }
 
+         val iosMain by getting {
+            dependencies {
+                // Kotlinx
+                implementation(coroutines("-native")) <i class="conum" data-value="2"></i><b>(2)</b>
+                implementation(serialization("-native")) <i class="conum" data-value="3"></i><b>(3)</b>
+                // Ktor client
+                implementation(ktorClient("core-native")) <i class="conum" data-value="4"></i><b>(4)</b>
+                implementation(ktorClient("json-native")) <i class="conum" data-value="5"></i><b>(5)</b>
+                implementation(ktorClient("serialization-native")) <i class="conum" data-value="6"></i><b>(6)</b>
+                implementation(ktorClient("ios")) <i class="conum" data-value="7"></i><b>(7)</b>
+            }
+        }
+
+         val jsMain by getting {
+            dependencies {
+                // Kotlin
+                implementation(kotlin("stdlib-js")) <i class="conum" data-value="1"></i><b>(1)</b>
+                // Kotlinx
+                implementation(coroutines("-js")) <i class="conum" data-value="2"></i><b>(2)</b>
+                implementation(serialization("-js")) <i class="conum" data-value="3"></i><b>(3)</b>
+                // Ktor client
+                implementation(ktorClient("core-js")) <i class="conum" data-value="4"></i><b>(4)</b>
+                implementation(ktorClient("json-js")) <i class="conum" data-value="5"></i><b>(5)</b>
+                implementation(ktorClient("serialization-js")) <i class="conum" data-value="6"></i><b>(6)</b>
+                implementation(ktorClient("js")) <i class="conum" data-value="7"></i><b>(7)</b>
+            }
+        }
+        // ...
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Kotlin Standard Library for the targeted platform.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Kotlinx.Coroutines implementation for the targeted platform.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Kotlinx.Serialization implementation for the targeted platform.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Implementation of Ktor client for the targeted platform.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>Implementation of Json Serializers for the targeted platform.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>Implementation of Kotlinx.Serialization with Ktor client for the targeted platform.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="7"></i><b>7</b></td>
+<td>Specific HTTP client engine for the targeted platform, used by Ktor for making HTTP calls.</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Remember, we do not need to declare the Kotlin Standard Library for native project, as it is included by the native compiler.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Let&#8217;s keep the configuration aside and start coding :)</p>
+</div>
 </div>
 </div>
 </div>
