@@ -1,4 +1,4 @@
-= [AddressBook] Building the common library
+= AddressBook - Building the common library
 :toc:
 :icons: font
 
