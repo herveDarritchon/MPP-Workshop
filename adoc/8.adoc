@@ -2,265 +2,298 @@
 :toc:
 :icons: font
 
+As in the first part of this workshop, we will start by building our common library.
+This one will be more complete, as we would like that it handles as much logic as we can.
+
+Thus, after creating the project, we will put in it the following parts:
+
+- The Gradle configuration for every targeted platform.
+- The business domain objects
+- The backend API interfaces
+- The MVP pattern, to handle API calls and view updates.
+
+Each of those steps we be in the common code, and shared between every targeted platform!
+
 == Project creation
+
+Open IntelliJ IDEA and create a new project:
+
+[cols="65%,<.^35%a",grid="none",frame="none"]
+|===
+|image:res/8-1.png[create project]
+|*Create a new Gradle project*
+|image:res/8-2.png[project details]
+|
+*Fulfill your project details:*
+
+- Name: `adressbook-common`
+- Group ID: `com.mybusiness`
+- Artifact ID: `adressbook-common`
+|image:res/8-3.png[project ready]
+|*Your project is ready!*
+|===
 
 == Gradle configuration
 
+We will take some times to explain the gradle configuration, as we will see a new way to use plugins.
+
+//NOTE: In our sight, the Gradle configuration is the hardest part in Kotlin multi-platform projects.
+
 === Plugins
 
-.build.gradle.kts
-[source,kotlin]
-----
-plugins {
-    id("org.jetbrains.kotlin.multiplatform")
-    id("org.jetbrains.kotlin.plugin.serialization")
-    `maven-publish`
-}
+As we saw earlier, we will need multiple Gradle plugins to achieve our Kotlin multi-platform project.
 
-repositories {
-    jcenter()
-    google()
-    maven(url = "https://kotlin.bintray.com/kotlinx")
-    maven(url = "https://dl.bintray.com/jetbrains/kotlin-native-dependencies")
-}
+We already saw that in order to create a Kotlin multi-platform project we have to use the plugin `org.jetbrains.kotlin.multiplatform`.
 
-group = "com.mybusiness"
-version = "1.0-SNAPSHOT"
+Our multi-platform application will need to call a backend API, thus should be able to serialize and deserialize data, so we will use `kotlinx.serialization` with the `serialization` plugin.
 
-----
+Finally, as in the previous exercice, we will need the `maven-publish` plugin to be able to publish our library to Maven.
+
+NOTE: Note that we won't cover how to deploy binaries for *Native* or *_JavaScript_* targets.
 
 ==== Plugin management
+
+Before configuring our plugins, we will configure the plugin management that will allow us to define plugins,
+without taking care of the version, or where should Gradle get the plugins.
+
+Go to the `.settings.gradle.kts` file and add the following lines:
 
 .settings.gradle.kts
 [source,kotlin]
 ----
-val kotlinVersion = "1.3.50"
+val kotlinVersion = "1.3.50" // <1>
 
 pluginManagement {
     resolutionStrategy {
         eachPlugin {
             when (requested.id.id) {
-                "org.jetbrains.kotlin.multiplatform" -> useModule("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion")
-                "org.jetbrains.kotlin.plugin.serialization" -> useModule("org.jetbrains.kotlin:kotlin-serialization:$kotlinVersion")
+                "org.jetbrains.kotlin.multiplatform"
+                  -> useModule("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion") // <2>
+                "org.jetbrains.kotlin.plugin.serialization"
+                  -> useModule("org.jetbrains.kotlin:kotlin-serialization:$kotlinVersion") // <3>
             }
         }
     }
-
-    repositories {
-        jcenter()
-        google()
-    }
 }
 
-enableFeaturePreview("GRADLE_METADATA")
+enableFeaturePreview("GRADLE_METADATA") // <4>
+----
+<1> Set the targeted Kotlin version for your project.
+<2> While using the Kotlin `multiplatform` plugin, say where to get it
+<3> While using the Kotlin `serialization` plugin, say where to get it
+<4> Enables the `GRADLE_METADATA` feature, to be able to depends on `Kotlin/Native` libraries
+
+Go to the `build.gradle.kts` file and replace the `plugins` and `repositories` sections by the following lines:
+
+.build.gradle.kts
+[source,kotlin]
+----
+plugins {
+    id("org.jetbrains.kotlin.multiplatform") // <1>
+    id("org.jetbrains.kotlin.plugin.serialization") // <2>
+    `maven-publish` // <3>
+}
+
+group = "com.mybusiness"
+version = "1.0-SNAPSHOT"
+
+repositories {
+    jcenter()
+}
 ----
 
 === Targets
 
+As before, we will target the 3 environments that are the *_JVM_*, *_iOS_* and the *_Web_*.
+
+Open the `.build.gradle.kts` file and add the following code into the `kotlin` block:
+
 .build.gradle.kts
 [source,kotlin]
 ----
 kotlin {
-    jvm("android") {
-        tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-            kotlinOptions {
-                jvmTarget = "1.8"
-            }
-        }
-    }
+    jvm("android") // <1>
 
-    js { browser() }
-
-    //select iOS target platform depending on the Xcode environment variables
-    val iOSTarget: (String, org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget.() -> Unit) -> org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget =
-        if (System.getenv("SDK_NAME")?.startsWith("iphoneos") == true)
-            ::iosArm64
-        else
-            ::iosX64
-
-    iOSTarget("ios") {
+    iosX64("ios") { // <2>
         binaries {
-            framework {
-                baseName = "AddressBookCommon"
+            framework { // <3>
+                baseName = "AddressBookCommon" // <4>
             }
         }
     }
 
-    sourceSets {
-        // Versions
-        val coroutinesVersion = "1.3.1"
-        val ktorVersion = "1.2.4"
-        val serializationVersion = "0.13.0"
-        val mockkVersion = "1.9.3"
-
-        // Shortcuts
-        fun kotlinx(module: String, version: String) = "org.jetbrains.kotlinx:kotlinx-$module:$version"
-        fun coroutines(module: String = "") = kotlinx("coroutines-core$module", coroutinesVersion)
-        fun serialization(module: String = "") = kotlinx("serialization-runtime$module", serializationVersion)
-        fun ktorClient(module: String, version: String = ktorVersion) = "io.ktor:ktor-client-$module:$version"
-
-        val commonMain by getting {
-            dependencies {
-                implementation("org.jetbrains.kotlin:kotlin-stdlib-common")
-                implementation(coroutines("-common"))
-                implementation(serialization("-common"))
-
-                implementation(ktorClient("core"))
-                implementation(ktorClient("json"))
-                implementation(ktorClient("serialization"))
-            }
-        }
-        val commonTest by getting {
-            dependencies {
-                implementation(kotlin("test-common"))
-                implementation(kotlin("test-annotations-common"))
-                implementation("io.mockk:mockk:$mockkVersion")
-            }
-        }
-
-        val androidMain by getting {
-            dependencies {
-                implementation("org.jetbrains.kotlin:kotlin-stdlib")
-                implementation(coroutines())
-                implementation(serialization())
-
-                implementation(ktorClient("core-jvm"))
-                implementation(ktorClient("json-jvm"))
-                implementation(ktorClient("serialization-jvm"))
-                implementation(ktorClient("apache"))
-            }
-        }
-
-        val androidTest by getting {
-            dependencies {
-                implementation(kotlin("test"))
-                implementation(kotlin("test-junit"))
-                implementation("io.mockk:mockk:$mockkVersion")
-            }
-        }
-
-        val iosMain by getting {
-            dependencies {
-                implementation(coroutines("-native"))
-                implementation(serialization("-native"))
-
-                implementation(ktorClient("core-native"))
-                implementation(ktorClient("ios"))
-                implementation(ktorClient("json-native"))
-                implementation(ktorClient("serialization-native"))
-            }
-        }
-
-        val jsMain by getting {
-            dependencies {
-                implementation(coroutines("-js"))
-                implementation(serialization("-js"))
-
-                implementation(ktorClient("core-js"))
-                implementation(ktorClient("js"))
-                implementation(ktorClient("json-js"))
-                implementation(ktorClient("serialization-js"))
-            }
-        }
-    }
+    js { browser() } // <5>
 }
 ----
+<1> Set the *_JVM_* target, named *android* as we will build an *_Android_* afterwards.
+<2> Set the *_iOS_* target, named *ios* to simplify usage of the target
+<3> Define that the output binaries must be a *_framework_* file...
+<4> ...with the name `AddressBookCommon`
+<5> Set the *_JavaScript_* target
+
+NOTE: *_Android_* is running on a JVM, so it's just a JVM target. As we could have different JVM target we can specify it,
+and as we know for sure that we want to target *_Android_*, we will name it in the target declaration *android*.
+
+NOTE: *_iOS_* can have multiple target, depending on your Xcode environment.
+So we could write some logic to select the right target, but we will focus on `iosX64` as it is taking into account every *iOS* devices from the _iPhone 4/iPad 2_.
 
 === Source sets and dependencies
 
-.build.gradle.kts
+In this section we will define all de dependencies needed for our Kotlin multi-platform common code.
+
+There are 3 main dependencies that we will need to develop and use the Kotlin multi-platform library:
+
+* *Ktor client*
++
+Like for our backend API, we will use *Ktor* to empower our HTTP calls on the client side.
+We will have to use multiple implementation to be able to make some HTTP calls, as:
++
+- an HTTP engine (_Apache_ for the *_JVM_* / _NSURLSession_ for the *_iOS_* / _Fetch_ for the *_JavaScript_*)
+- a JSON implementation to be able to serialize and de-serialize the requests/responses payloads.
+- a serialization interface to render JSON into domain objects (using _Kotlinx Serialization_)
+
+* *Kotlinx.Serialization*
++
+To serialize and de-serialize our HTTP calls content, we will use a Kotlin multi-platform library, develop by JetBrains, *Kotlinx.Serialization*.
+
+* *Kotlinx.Coroutines*
++
+As *Ktor* is an asynchronous framework, and it is based on coroutines, we need to use coroutines context to wrap our HTTP calls.
+
+To avoid code redondance. we will prepare some shortcuts to declare the dependencies:
+
+.build.gradle.kts - source sets code block
 [source,kotlin]
 ----
 kotlin {
-    sourceSets {
+// ...
+        sourceSets {
         // Versions
-        val coroutinesVersion = "1.3.1"
-        val ktorVersion = "1.2.4"
+        val ktorVersion = "1.2.5"
+        val coroutinesVersion = "1.3.2"
         val serializationVersion = "0.13.0"
-        val mockkVersion = "1.9.3"
-
         // Shortcuts
-        fun kotlinx(module: String, version: String) = "org.jetbrains.kotlinx:kotlinx-$module:$version"
-        fun coroutines(module: String = "") = kotlinx("coroutines-core$module", coroutinesVersion)
-        fun serialization(module: String = "") = kotlinx("serialization-runtime$module", serializationVersion)
-        fun ktorClient(module: String, version: String = ktorVersion) = "io.ktor:ktor-client-$module:$version"
-
-        val commonMain by getting {
-            dependencies {
-                implementation("org.jetbrains.kotlin:kotlin-stdlib-common")
-                implementation(coroutines("-common"))
-                implementation(serialization("-common"))
-
-                implementation(ktorClient("core"))
-                implementation(ktorClient("json"))
-                implementation(ktorClient("serialization"))
-            }
-        }
-        val commonTest by getting {
-            dependencies {
-                implementation(kotlin("test-common"))
-                implementation(kotlin("test-annotations-common"))
-                implementation("io.mockk:mockk:$mockkVersion")
-            }
-        }
-
-        val androidMain by getting {
-            dependencies {
-                implementation("org.jetbrains.kotlin:kotlin-stdlib")
-                implementation(coroutines())
-                implementation(serialization())
-
-                implementation(ktorClient("core-jvm"))
-                implementation(ktorClient("json-jvm"))
-                implementation(ktorClient("serialization-jvm"))
-                implementation(ktorClient("apache"))
-            }
-        }
-
-        val androidTest by getting {
-            dependencies {
-                implementation(kotlin("test"))
-                implementation(kotlin("test-junit"))
-                implementation("io.mockk:mockk:$mockkVersion")
-            }
-        }
-
-        val iosMain by getting {
-            dependencies {
-                implementation(coroutines("-native"))
-                implementation(serialization("-native"))
-
-                implementation(ktorClient("core-native"))
-                implementation(ktorClient("ios"))
-                implementation(ktorClient("json-native"))
-                implementation(ktorClient("serialization-native"))
-            }
-        }
-
-        val jsMain by getting {
-            dependencies {
-                implementation(coroutines("-js"))
-                implementation(serialization("-js"))
-
-                implementation(ktorClient("core-js"))
-                implementation(ktorClient("js"))
-                implementation(ktorClient("json-js"))
-                implementation(ktorClient("serialization-js"))
-            }
-        }
-        val jsTest by getting {
-            dependencies {
-                implementation(kotlin("test-js"))
-            }
-        }
+        fun kotlinx(module: String, version: String)
+            = "org.jetbrains.kotlinx:kotlinx-$module:$version" // <1>
+        fun coroutines(module: String = "")
+            = kotlinx("coroutines-core$module", coroutinesVersion) // <2>
+        fun serialization(module: String = "")
+            = kotlinx("serialization-runtime$module", serializationVersion) // <3>
+        fun ktorClient(module: String, version: String
+            = ktorVersion) = "io.ktor:ktor-client-$module:$version" // <4>
     }
 }
 ----
+<1> Build the dependency name for any *kotlinx* module with its version
+<2> Build the dependency name for any *coroutines-core* module
+<3> Build the dependency name for any *serialization-runtime* module
+<4> Build the dependency name for any *ktor-client* module
 
-==== Common
-==== Android
-==== iOS
-==== JavaScript
+==== *_Common_*
+
+// TODO
+
+.build.gradle.kts - source sets code block
+[source,kotlin]
+----
+kotlin {
+// ...
+        sourceSets {
+        // ...
+        val commonMain by getting {
+            dependencies {
+                // Kotlin
+                implementation(kotlin("stdlib-common")) // <1>
+                // Kotlinx
+                implementation(coroutines("-common")) // <2>
+                implementation(serialization("-common")) // <3>
+                // Ktor client
+                implementation(ktorClient("core")) // <4>
+                implementation(ktorClient("json")) // <5>
+                implementation(ktorClient("serialization")) // <6>
+            }
+        }
+        // ...
+    }
+}
+----
+<1> Kotlin Standard Library for Kotlin multi-platform common projects.
+<2> Kotlinx.Coroutines API for Kotlin multi-platform common library.
+<3> Kotlinx.Serialization API for Kotlin multi-platform common library.
+<4> Common API to use Ktor client on Kotlin multi-platform projects.
+<5> Common API to use Json Serializers on Kotlin multi-platform projects.
+<6> Common API to use Kotlinx.Serialization with Ktor client on Kotlin multi-platform projects.
+
+==== Targeted platform
+
+Now that we have defined our common dependencies, we need to define the dependencies for each targeted platform of our Kotlin multi-platform library.
+
+In fact, in our case, it is very simple as each platform need to import the coresponding implementation of each API dependencies defined in the common module.
+
+.build.gradle.kts - source sets code block
+[source,kotlin]
+----
+kotlin {
+// ...
+        sourceSets {
+        // ...
+         val androidMain by getting {
+            dependencies {
+                // Kotlin
+                implementation(kotlin("stdlib")) // <1>
+                // Kotlinx
+                implementation(coroutines()) // <2>
+                implementation(serialization()) // <3>
+                // Ktor client
+                implementation(ktorClient("core-jvm")) // <4>
+                implementation(ktorClient("json-jvm")) // <5>
+                implementation(ktorClient("serialization-jvm")) // <6>
+                implementation(ktorClient("apache")) // <7>
+            }
+        }
+
+         val iosMain by getting {
+            dependencies {
+                // Kotlinx
+                implementation(coroutines("-native")) // <2>
+                implementation(serialization("-native")) // <3>
+                // Ktor client
+                implementation(ktorClient("core-native")) // <4>
+                implementation(ktorClient("json-native")) // <5>
+                implementation(ktorClient("serialization-native")) // <6>
+                implementation(ktorClient("ios")) // <7>
+            }
+        }
+
+         val jsMain by getting {
+            dependencies {
+                // Kotlin
+                implementation(kotlin("stdlib-js")) // <1>
+                // Kotlinx
+                implementation(coroutines("-js")) // <2>
+                implementation(serialization("-js")) // <3>
+                // Ktor client
+                implementation(ktorClient("core-js")) // <4>
+                implementation(ktorClient("json-js")) // <5>
+                implementation(ktorClient("serialization-js")) // <6>
+                implementation(ktorClient("js")) // <7>
+            }
+        }
+        // ...
+    }
+}
+----
+<1> Kotlin Standard Library for the targeted platform.
+<2> Kotlinx.Coroutines implementation for the targeted platform.
+<3> Kotlinx.Serialization implementation for the targeted platform.
+<4> Implementation of Ktor client for the targeted platform.
+<5> Implementation of Json Serializers for the targeted platform.
+<6> Implementation of Kotlinx.Serialization with Ktor client for the targeted platform.
+<7> Specific HTTP client engine for the targeted platform, used by Ktor for making HTTP calls.
+
+NOTE: Remember, we do not need to declare the Kotlin Standard Library for native project, as it is included by the native compiler.
+
+Let's keep the configuration aside and start coding :)
 
 == Defining the domain objects
 == Reaching the backend API
