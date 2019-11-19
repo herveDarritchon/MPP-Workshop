@@ -5,13 +5,13 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="generator" content="Asciidoctor 2.0.10">
-<title>AddressBook - Building the common library</title>
+<title>Address book - Building the common library</title>
 <link rel="stylesheet" href="./golo.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 <body class="article">
 <div id="header">
-<h1>AddressBook - Building the common library</h1>
+<h1>Address book - Building the common library</h1>
 <div class="details">
 <span id="revnumber">version 1.0</span>
 </div>
@@ -37,7 +37,7 @@
 <div class="sectionbody">
 <div class="paragraph">
 <p>As in the first part of this workshop, we will start by building our common library.
-This one will be more complete, as we would like that it handles as much logic as we can.</p>
+This one will be more complete, as we would like it to handle as much logic as possible.</p>
 </div>
 <div class="paragraph">
 <p>Thus, after creating the project, we will put in it the following parts:</p>
@@ -45,7 +45,7 @@ This one will be more complete, as we would like that it handles as much logic a
 <div class="ulist">
 <ul>
 <li>
-<p>The Gradle configuration for every targeted platform.</p>
+<p>The Gradle configuration for every targeted platform (<em>JVM</em> for <strong><em>Android</em></strong>, <em>Native</em> for <strong><em>iOS</em></strong> and <strong><em>JavaScript</em></strong>).</p>
 </li>
 <li>
 <p>The business domain objects</p>
@@ -59,7 +59,7 @@ This one will be more complete, as we would like that it handles as much logic a
 </ul>
 </div>
 <div class="paragraph">
-<p>Each of those steps we be in the common code, and shared between every targeted platform!</p>
+<p>Each of those steps will be defined in the common code, and shared between every targeted platform!</p>
 </div>
 </div>
 </div>
@@ -114,7 +114,8 @@ This one will be more complete, as we would like that it handles as much logic a
 <h2 id="_gradle_configuration"><a class="anchor" href="#_gradle_configuration"></a>Gradle configuration</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>We will take some times to explain the gradle configuration, as we will see a new way to use plugins.</p>
+<p>Now, we will take some time to explain the gradle configuration, as it is the heavy part of Kotlin multi-platform projects.
+Also, we will see a new way to define Gradle plugins.</p>
 </div>
 <div class="sect2">
 <h3 id="_plugins"><a class="anchor" href="#_plugins"></a>Plugins</h3>
@@ -125,10 +126,11 @@ This one will be more complete, as we would like that it handles as much logic a
 <p>We already saw that in order to create a Kotlin multi-platform project we have to use the plugin <code>org.jetbrains.kotlin.multiplatform</code>.</p>
 </div>
 <div class="paragraph">
-<p>Our multi-platform application will need to call a backend API, thus should be able to serialize and deserialize data, so we will use <code>kotlinx.serialization</code> with the <code>serialization</code> plugin.</p>
+<p>Our multi-platform application will need to call a backend API, thus should be able to serialize and de-serialize data.
+So, we also have to use <strong>Kotlinx.Serialization</strong> with the <code>serialization</code> plugin.</p>
 </div>
 <div class="paragraph">
-<p>Finally, as in the previous exercice, we will need the <code>maven-publish</code> plugin to be able to publish our library to Maven.</p>
+<p>Finally, as in the previous exercise, we will need the <code>maven-publish</code> plugin to be able to publish locally our library.</p>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -146,10 +148,10 @@ Note that we won&#8217;t cover how to deploy binaries for <strong>Native</strong
 <h4 id="_plugin_management"><a class="anchor" href="#_plugin_management"></a>Plugin management</h4>
 <div class="paragraph">
 <p>Before configuring our plugins, we will configure the plugin management that will allow us to define plugins,
-without taking care of the version, or where should Gradle get the plugins.</p>
+without taking care of the version, or where should Gradle get the plugins while using them.</p>
 </div>
 <div class="paragraph">
-<p>Go to the <code>.settings.gradle.kts</code> file and add the following lines:</p>
+<p>Go to the <code>settings.gradle.kts</code> file and add the following lines:</p>
 </div>
 <div class="listingblock">
 <div class="title">settings.gradle.kts</div>
@@ -193,7 +195,7 @@ enableFeaturePreview("GRADLE_METADATA") <i class="conum" data-value="4"></i><b>(
 </table>
 </div>
 <div class="paragraph">
-<p>Go to the <code>build.gradle.kts</code> file and replace the <code>plugins</code> and <code>repositories</code> sections by the following lines:</p>
+<p>Now, go to the <code>build.gradle.kts</code> file and replace the <code>plugins</code> and <code>repositories</code> sections by the following lines:</p>
 </div>
 <div class="listingblock">
 <div class="title">build.gradle.kts</div>
@@ -201,7 +203,7 @@ enableFeaturePreview("GRADLE_METADATA") <i class="conum" data-value="4"></i><b>(
 <pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">plugins {
     id("org.jetbrains.kotlin.multiplatform") <i class="conum" data-value="1"></i><b>(1)</b>
     id("org.jetbrains.kotlin.plugin.serialization") <i class="conum" data-value="2"></i><b>(2)</b>
-    `maven-publish` <i class="conum" data-value="3"></i><b>(3)</b>
+    `maven-publish`
 }
 
 group = "com.mybusiness"
@@ -209,8 +211,30 @@ version = "1.0-SNAPSHOT"
 
 repositories {
     jcenter()
+    maven(url = "https://kotlin.bintray.com/kotlinx") <i class="conum" data-value="3"></i><b>(3)</b>
+    maven(url = "https://dl.bintray.com/jetbrains/kotlin-native-dependencies") <i class="conum" data-value="4"></i><b>(4)</b>
 }</code></pre>
 </div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Use the <strong>Kotlin/Multiplatform</strong> plugin</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Use the <strong>Kotlinx.Serialization</strong> plugin</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Needed to resolve Kotlinx dependencies (e.g. Coroutines &amp; Serialization)</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Needed to resolve Native dependencies</td>
+</tr>
+</table>
 </div>
 </div>
 </div>
@@ -220,7 +244,7 @@ repositories {
 <p>As before, we will target the 3 environments that are the <strong><em>JVM</em></strong>, <strong><em>iOS</em></strong> and the <strong><em>Web</em></strong>.</p>
 </div>
 <div class="paragraph">
-<p>Open the <code>.build.gradle.kts</code> file and add the following code into the <code>kotlin</code> block:</p>
+<p>Open the <code>build.gradle.kts</code> file and add the following code into the <code>kotlin</code> block:</p>
 </div>
 <div class="listingblock">
 <div class="title">build.gradle.kts</div>
@@ -228,13 +252,22 @@ repositories {
 <pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">kotlin {
     jvm("android") <i class="conum" data-value="1"></i><b>(1)</b>
 
-    iosX64("ios") { <i class="conum" data-value="2"></i><b>(2)</b>
+    //select iOS target platform depending on the Xcode environment variables
+    val iOSTarget: (String, org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget.() -&gt; Unit)
+            -&gt; org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget =
+        if (System.getenv("SDK_NAME")?.startsWith("iphoneos") == true)
+            ::iosArm64
+        else
+            ::iosX64
+
+    iOSTarget("ios") { <i class="conum" data-value="2"></i><b>(2)</b>
         binaries {
             framework { <i class="conum" data-value="3"></i><b>(3)</b>
                 baseName = "AddressBookCommon" <i class="conum" data-value="4"></i><b>(4)</b>
             }
         }
     }
+
 
     js { browser() } <i class="conum" data-value="5"></i><b>(5)</b>
 }</code></pre>
@@ -252,7 +285,7 @@ repositories {
 </tr>
 <tr>
 <td><i class="conum" data-value="3"></i><b>3</b></td>
-<td>Define that the output binaries must be a <strong><em>framework</em></strong> file&#8230;&#8203;</td>
+<td>Define that the output binaries for <strong><em>iOS</em></strong>, must be a <strong><em>framework</em></strong> file&#8230;&#8203;</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="4"></i><b>4</b></td>
@@ -260,7 +293,7 @@ repositories {
 </tr>
 <tr>
 <td><i class="conum" data-value="5"></i><b>5</b></td>
-<td>Set the <strong><em>JavaScript</em></strong> target</td>
+<td>Set the <strong><em>JavaScript</em></strong> target, packaged for a browser usage.</td>
 </tr>
 </table>
 </div>
@@ -271,8 +304,22 @@ repositories {
 <i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
-<strong><em>Android</em></strong> is running on a JVM, so it&#8217;s just a JVM target. As we could have different JVM target we can specify it,
-and as we know for sure that we want to target <strong><em>Android</em></strong>, we will name it in the target declaration <strong>android</strong>.
+<div class="paragraph">
+<p><strong><em>Android</em></strong> is running on a JVM, so it&#8217;s just a JVM target. As we could have different JVM target we can specify it,
+and as we know for sure that we want to target <strong><em>Android</em></strong>, we will name it in the target declaration <strong>android</strong>.</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+Since Kotlin 1.3.60, there is new targets for <strong><em>Android</em></strong> native.
+</td>
+</tr>
+</table>
+</div>
 </td>
 </tr>
 </table>
@@ -284,8 +331,7 @@ and as we know for sure that we want to target <strong><em>Android</em></strong>
 <i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
-<strong><em>iOS</em></strong> can have multiple target, depending on your Xcode environment.
-So we could write some logic to select the right target, but we will focus on <code>iosX64</code> as it is taking into account every <strong>iOS</strong> devices from the <em>iPhone 4/iPad 2</em>.
+<strong><em>iOS</em></strong> can have multiple target, depending on your Xcode environment. Here <code>iosArm64</code> is for <strong>iphonesimulator</strong>.
 </td>
 </tr>
 </table>
@@ -305,7 +351,7 @@ So we could write some logic to select the right target, but we will focus on <c
 <p><strong>Ktor client</strong></p>
 <div class="paragraph">
 <p>Like for our backend API, we will use <strong>Ktor</strong> to empower our HTTP calls on the client side.
-We will have to use multiple implementation to be able to make some HTTP calls, as:</p>
+We will have to use multiple implementations to be able to make some HTTP calls, as:</p>
 </div>
 <div class="ulist">
 <ul>
@@ -316,7 +362,7 @@ We will have to use multiple implementation to be able to make some HTTP calls, 
 <p>a JSON implementation to be able to serialize and de-serialize the requests/responses payloads.</p>
 </li>
 <li>
-<p>a serialization interface to render JSON into domain objects (using <em>Kotlinx Serialization</em>)</p>
+<p>a serialization interface to render JSON into domain objects (using <strong>Kotlinx.Serialization</strong>)</p>
 </li>
 </ul>
 </div>
@@ -383,8 +429,14 @@ We will have to use multiple implementation to be able to make some HTTP calls, 
 </div>
 <div class="sect3">
 <h4 id="_common"><a class="anchor" href="#_common"></a><strong><em>Common</em></strong></h4>
+<div class="paragraph">
+<p>In this part, we will declare the transverse dependencies for all of our targeted platforms.</p>
+</div>
+<div class="paragraph">
+<p>Add the following lines to the <code>build.gradle.kts</code> file, in the <code>kotlin &gt; sourceSets</code> block:</p>
+</div>
 <div class="listingblock">
-<div class="title">build.gradle.kts - source sets code block</div>
+<div class="title">build.gradle.kts</div>
 <div class="content">
 <pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">kotlin {
 // ...
@@ -443,10 +495,13 @@ We will have to use multiple implementation to be able to make some HTTP calls, 
 <p>Now that we have defined our common dependencies, we need to define the dependencies for each targeted platform of our Kotlin multi-platform library.</p>
 </div>
 <div class="paragraph">
-<p>In fact, in our case, it is very simple as each platform need to import the coresponding implementation of each API dependencies defined in the common module.</p>
+<p>In fact, in our case, it is very simple as each platform need to import the corresponding implementation of each API dependencies defined in the common module.</p>
+</div>
+<div class="paragraph">
+<p>Add the following lines to the <code>build.gradle.kts</code> file, in the <code>kotlin &gt; sourceSets</code> block:</p>
 </div>
 <div class="listingblock">
-<div class="title">build.gradle.kts - source sets code block</div>
+<div class="title">build.gradle.kts</div>
 <div class="content">
 <pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">kotlin {
 // ...
@@ -553,7 +608,101 @@ Remember, we do not need to declare the Kotlin Standard Library for native proje
 <div class="sect1">
 <h2 id="_defining_the_domain_objects"><a class="anchor" href="#_defining_the_domain_objects"></a>Defining the domain objects</h2>
 <div class="sectionbody">
+<div class="paragraph">
+<p>First thing, we will create the domain objects needed to manage an address book.
+Here is a class diagram of our data model:</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="images/res/8-4.png" alt="class diagram" width="350"></span></p>
+</div>
+<div class="paragraph">
+<p>Those data classes will be used to send/receive data to/from the backend API.
+To be able to do so, we should defined them as serializable, using <strong>Kotlinx.Serialization</strong>.</p>
+</div>
+<div class="paragraph">
+<p>In <code>commonMain/kotlin</code>, create the package <code>com.mybusiness.model</code> and the Kotlin source file <code>Contact.kt</code>:</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="images/res/8-5.png" alt="source directory structure" width="300"></span></p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<table class="tableblock frame-none grid-none stretch">
+<colgroup>
+<col style="width: 40%;">
+<col style="width: 60%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="image"><img src="images/res/8-6.png" alt="new directory"></span></p></td>
+<td class="tableblock halign-left valign-middle"><div class="content"><div class="paragraph">
+<p>At the moment, if you want to create a package, you need to manually create the directory structure.</p>
+</div></div></td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Then add the following data classes with the right import.</p>
+</div>
+<div class="listingblock">
+<div class="title">Contact.kt</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">import kotlinx.serialization.Serializable
 
+@Serializable <i class="conum" data-value="1"></i><b>(1)</b>
+data class Contact(
+    val id: String,
+    val name: Name,
+    val addresses: List&lt;Address&gt; = mutableListOf(),
+    val phones: List&lt;Phone&gt; = mutableListOf()
+) {
+    val fullName: String
+        get() = "${name.lastName} ${name.firstName}"
+}
+
+@Serializable <i class="conum" data-value="1"></i><b>(1)</b>
+data class Name(
+    val firstName: String,
+    val lastName: String
+)
+
+@Serializable <i class="conum" data-value="1"></i><b>(1)</b>
+data class Address(
+    val type: Type,
+    val street: String,
+    val postalCode: String,
+    val city: String,
+    val country: String
+) {
+    enum class Type { HOME, WORK, OTHER }
+}
+
+@Serializable <i class="conum" data-value="1"></i><b>(1)</b>
+data class Phone(
+    val type: Type,
+    val number: String
+) {
+    enum class Type { HOME, WORK, MOBILE, OTHER }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Make the data classes serializable</td>
+</tr>
+</table>
+</div>
 </div>
 </div>
 <div class="sect1">
