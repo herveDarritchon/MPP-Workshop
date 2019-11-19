@@ -1,18 +1,18 @@
-= AddressBook - Building the common library
+= Address book - Building the common library
 :toc:
 :icons: font
 
 As in the first part of this workshop, we will start by building our common library.
-This one will be more complete, as we would like that it handles as much logic as we can.
+This one will be more complete, as we would like it to handle as much logic as possible.
 
 Thus, after creating the project, we will put in it the following parts:
 
-- The Gradle configuration for every targeted platform.
+- The Gradle configuration for every targeted platform (_JVM_ for *_Android_*, _Native_ for *_iOS_* and *_JavaScript_*).
 - The business domain objects
 - The backend API interfaces
 - The MVP pattern, to handle API calls and view updates.
 
-Each of those steps we be in the common code, and shared between every targeted platform!
+Each of those steps will be defined in the common code, and shared between every targeted platform!
 
 == Project creation
 
@@ -35,9 +35,8 @@ Open IntelliJ IDEA and create a new project:
 
 == Gradle configuration
 
-We will take some times to explain the gradle configuration, as we will see a new way to use plugins.
-
-//NOTE: In our sight, the Gradle configuration is the hardest part in Kotlin multi-platform projects.
+Now, we will take some time to explain the gradle configuration, as it is the heavy part of Kotlin multi-platform projects.
+Also, we will see a new way to define Gradle plugins.
 
 === Plugins
 
@@ -45,18 +44,19 @@ As we saw earlier, we will need multiple Gradle plugins to achieve our Kotlin mu
 
 We already saw that in order to create a Kotlin multi-platform project we have to use the plugin `org.jetbrains.kotlin.multiplatform`.
 
-Our multi-platform application will need to call a backend API, thus should be able to serialize and deserialize data, so we will use `kotlinx.serialization` with the `serialization` plugin.
+Our multi-platform application will need to call a backend API, thus should be able to serialize and de-serialize data.
+So, we also have to use *Kotlinx.Serialization* with the `serialization` plugin.
 
-Finally, as in the previous exercice, we will need the `maven-publish` plugin to be able to publish our library to Maven.
+Finally, as in the previous exercise, we will need the `maven-publish` plugin to be able to publish locally our library.
 
 NOTE: Note that we won't cover how to deploy binaries for *Native* or *_JavaScript_* targets.
 
 ==== Plugin management
 
 Before configuring our plugins, we will configure the plugin management that will allow us to define plugins,
-without taking care of the version, or where should Gradle get the plugins.
+without taking care of the version, or where should Gradle get the plugins while using them.
 
-Go to the `.settings.gradle.kts` file and add the following lines:
+Go to the `settings.gradle.kts` file and add the following lines:
 
 .settings.gradle.kts
 [source,kotlin]
@@ -83,7 +83,7 @@ enableFeaturePreview("GRADLE_METADATA") // <4>
 <3> While using the Kotlin `serialization` plugin, say where to get it
 <4> Enables the `GRADLE_METADATA` feature, to be able to depends on `Kotlin/Native` libraries
 
-Go to the `build.gradle.kts` file and replace the `plugins` and `repositories` sections by the following lines:
+Now, go to the `build.gradle.kts` file and replace the `plugins` and `repositories` sections by the following lines:
 
 .build.gradle.kts
 [source,kotlin]
@@ -91,7 +91,7 @@ Go to the `build.gradle.kts` file and replace the `plugins` and `repositories` s
 plugins {
     id("org.jetbrains.kotlin.multiplatform") // <1>
     id("org.jetbrains.kotlin.plugin.serialization") // <2>
-    `maven-publish` // <3>
+    `maven-publish`
 }
 
 group = "com.mybusiness"
@@ -99,14 +99,20 @@ version = "1.0-SNAPSHOT"
 
 repositories {
     jcenter()
+    maven(url = "https://kotlin.bintray.com/kotlinx") // <3>
+    maven(url = "https://dl.bintray.com/jetbrains/kotlin-native-dependencies") // <4>
 }
 ----
+<1> Use the *Kotlin/Multiplatform* plugin
+<2> Use the *Kotlinx.Serialization* plugin
+<3> Needed to resolve Kotlinx dependencies (e.g. Coroutines & Serialization)
+<4> Needed to resolve Native dependencies
 
 === Targets
 
 As before, we will target the 3 environments that are the *_JVM_*, *_iOS_* and the *_Web_*.
 
-Open the `.build.gradle.kts` file and add the following code into the `kotlin` block:
+Open the `build.gradle.kts` file and add the following code into the `kotlin` block:
 
 .build.gradle.kts
 [source,kotlin]
@@ -114,7 +120,15 @@ Open the `.build.gradle.kts` file and add the following code into the `kotlin` b
 kotlin {
     jvm("android") // <1>
 
-    iosX64("ios") { // <2>
+    //select iOS target platform depending on the Xcode environment variables
+    val iOSTarget: (String, org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget.() -> Unit)
+            -> org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget =
+        if (System.getenv("SDK_NAME")?.startsWith("iphoneos") == true)
+            ::iosArm64
+        else
+            ::iosX64
+
+    iOSTarget("ios") { // <2>
         binaries {
             framework { // <3>
                 baseName = "AddressBookCommon" // <4>
@@ -122,20 +136,25 @@ kotlin {
         }
     }
 
+
     js { browser() } // <5>
 }
 ----
 <1> Set the *_JVM_* target, named *android* as we will build an *_Android_* afterwards.
 <2> Set the *_iOS_* target, named *ios* to simplify usage of the target
-<3> Define that the output binaries must be a *_framework_* file...
+<3> Define that the output binaries for *_iOS_*, must be a *_framework_* file...
 <4> ...with the name `AddressBookCommon`
-<5> Set the *_JavaScript_* target
+<5> Set the *_JavaScript_* target, packaged for a browser usage.
 
-NOTE: *_Android_* is running on a JVM, so it's just a JVM target. As we could have different JVM target we can specify it,
+[NOTE]
+====
+*_Android_* is running on a JVM, so it's just a JVM target. As we could have different JVM target we can specify it,
 and as we know for sure that we want to target *_Android_*, we will name it in the target declaration *android*.
 
-NOTE: *_iOS_* can have multiple target, depending on your Xcode environment.
-So we could write some logic to select the right target, but we will focus on `iosX64` as it is taking into account every *iOS* devices from the _iPhone 4/iPad 2_.
+TIP: Since Kotlin 1.3.60, there is new targets for *_Android_* native.
+====
+
+NOTE: *_iOS_* can have multiple target, depending on your Xcode environment. Here `iosArm64` is for *iphonesimulator*.
 
 === Source sets and dependencies
 
@@ -146,11 +165,11 @@ There are 3 main dependencies that we will need to develop and use the Kotlin mu
 * *Ktor client*
 +
 Like for our backend API, we will use *Ktor* to empower our HTTP calls on the client side.
-We will have to use multiple implementation to be able to make some HTTP calls, as:
+We will have to use multiple implementations to be able to make some HTTP calls, as:
 +
 - an HTTP engine (_Apache_ for the *_JVM_* / _NSURLSession_ for the *_iOS_* / _Fetch_ for the *_JavaScript_*)
 - a JSON implementation to be able to serialize and de-serialize the requests/responses payloads.
-- a serialization interface to render JSON into domain objects (using _Kotlinx Serialization_)
+- a serialization interface to render JSON into domain objects (using *Kotlinx.Serialization*)
 
 * *Kotlinx.Serialization*
 +
@@ -191,9 +210,11 @@ kotlin {
 
 ==== *_Common_*
 
-// TODO
+In this part, we will declare the transverse dependencies for all of our targeted platforms.
 
-.build.gradle.kts - source sets code block
+Add the following lines to the `build.gradle.kts` file, in the `kotlin > sourceSets` block:
+
+.build.gradle.kts
 [source,kotlin]
 ----
 kotlin {
@@ -228,9 +249,11 @@ kotlin {
 
 Now that we have defined our common dependencies, we need to define the dependencies for each targeted platform of our Kotlin multi-platform library.
 
-In fact, in our case, it is very simple as each platform need to import the coresponding implementation of each API dependencies defined in the common module.
+In fact, in our case, it is very simple as each platform need to import the corresponding implementation of each API dependencies defined in the common module.
 
-.build.gradle.kts - source sets code block
+Add the following lines to the `build.gradle.kts` file, in the `kotlin > sourceSets` block:
+
+.build.gradle.kts
 [source,kotlin]
 ----
 kotlin {
@@ -291,10 +314,92 @@ kotlin {
 <6> Implementation of Kotlinx.Serialization with Ktor client for the targeted platform.
 <7> Specific HTTP client engine for the targeted platform, used by Ktor for making HTTP calls.
 
-NOTE: Remember, we do not need to declare the Kotlin Standard Library for native project, as it is included by the native compiler.
+[NOTE]
+====
+Remember:
+
+* the names of the source sets depends on the targets, thus
+- `android` target will have the source sets `androidMain` and `andrdoidTest`.
+- `ios` target will have the source sets `iosMain` and `iosTest`.
+- `js` target will have the source sets `jsMain` and `jsTest`.
+* we do not need to declare the Kotlin Standard Library for native project, as it is included by the native compiler.
+====
 
 Let's keep the configuration aside and start coding :)
 
 == Defining the domain objects
+
+First thing, we will create the domain objects needed to manage an address book.
+Here is a class diagram of our data model:
+
+// TODO use graphviz
+image:res/8-4.png[class diagram,350]
+
+Those data classes will be used to send/receive data to/from the backend API.
+To be able to do so, we should defined them as serializable, using *Kotlinx.Serialization*.
+
+In `commonMain/kotlin`, create the package `com.mybusiness.model` and the Kotlin source file `Contact.kt`:
+
+image:res/8-5.png[source directory structure,300]
+
+[TIP]
+====
+[cols="40%,<.^60%a",grid="none",frame="none"]
+|===
+|image:res/8-6.png[new directory]
+|At the moment, if you want to create a package, you need to manually create the directory structure.
+|===
+====
+
+Then add the following data classes with the right import.
+
+.Contact.kt
+[source,kotlin]
+----
+import kotlinx.serialization.Serializable
+
+@Serializable // <1>
+data class Contact(
+    val id: String,
+    val name: Name,
+    val addresses: List<Address> = mutableListOf(),
+    val phones: List<Phone> = mutableListOf()
+) {
+    val fullName: String
+        get() = "${name.lastName} ${name.firstName}"
+}
+
+@Serializable // <1>
+data class Name(
+    val firstName: String,
+    val lastName: String
+)
+
+@Serializable // <1>
+data class Address(
+    val type: Type,
+    val street: String,
+    val postalCode: String,
+    val city: String,
+    val country: String
+) {
+    enum class Type { HOME, WORK, OTHER }
+}
+
+@Serializable // <1>
+data class Phone(
+    val type: Type,
+    val number: String
+) {
+    enum class Type { HOME, WORK, MOBILE, OTHER }
+}
+----
+<1> Make the data classes serializable
+
+WARNING: the collections must be initialized, otherwise you could get some serialization exceptions.
+
 == Reaching the backend API
+
+
+
 == Implementing the MVP pattern
