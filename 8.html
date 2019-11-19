@@ -27,8 +27,20 @@
 </ul>
 </li>
 <li><a href="#_defining_the_domain_objects">Defining the domain objects</a></li>
-<li><a href="#_reaching_the_backend_api">Reaching the backend API</a></li>
+<li><a href="#_reaching_the_backend_api">Reaching the backend API</a>
+<ul class="sectlevel2">
+<li><a href="#_creating_the_http_client">Creating the HTTP client</a></li>
+<li><a href="#_creating_the_apis_interfaces">Creating the APIs interfaces</a></li>
+</ul>
+</li>
+<li><a href="#_going_further_with_the_mvp_pattern">Going further with the MVP pattern</a>
+<ul class="sectlevel2">
+<li><a href="#_what_is_the_mvp_pattern">What is the MVP pattern ?</a></li>
 <li><a href="#_implementing_the_mvp_pattern">Implementing the MVP pattern</a></li>
+<li><a href="#_defining_some_helpers">Defining some helpers</a></li>
+</ul>
+</li>
+<li><a href="#_whats_next">What&#8217;s next ?</a></li>
 </ul>
 </div>
 </div>
@@ -593,7 +605,32 @@ We will have to use multiple implementations to be able to make some HTTP calls,
 <i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
-Remember, we do not need to declare the Kotlin Standard Library for native project, as it is included by the native compiler.
+<div class="paragraph">
+<p>Remember:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>the names of the source sets depends on the targets, thus</p>
+<div class="ulist">
+<ul>
+<li>
+<p><code>android</code> target will have the source sets <code>androidMain</code> and <code>andrdoidTest</code>.</p>
+</li>
+<li>
+<p><code>ios</code> target will have the source sets <code>iosMain</code> and <code>iosTest</code>.</p>
+</li>
+<li>
+<p><code>js</code> target will have the source sets <code>jsMain</code> and <code>jsTest</code>.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>we do not need to declare the Kotlin Standard Library for native project, as it is included by the native compiler.</p>
+</li>
+</ul>
+</div>
 </td>
 </tr>
 </table>
@@ -703,18 +740,448 @@ data class Phone(
 </tr>
 </table>
 </div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+the collections must be initialized, otherwise you could get some serialization exceptions.
+</td>
+</tr>
+</table>
+</div>
 </div>
 </div>
 <div class="sect1">
 <h2 id="_reaching_the_backend_api"><a class="anchor" href="#_reaching_the_backend_api"></a>Reaching the backend API</h2>
 <div class="sectionbody">
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+In this section you will learn how to use the <strong>Ktor client</strong> API and how to serialize and de-serialize data with <strong>Kotlinx.Serialization</strong>.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Now that our data model is ready, we can implement the interface between the client and the backend API to retrieve data.</p>
+</div>
+<div class="paragraph">
+<p>Let&#8217;s start by creating a new package <code>api</code> and a Kotlin source file <code>ContactApi</code>, still in <code>commonMain/kotlin</code>:</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="images/res/8-7.png" alt="source directory structure" width="300"></span></p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<table class="tableblock frame-none grid-none stretch">
+<colgroup>
+<col style="width: 40%;">
+<col style="width: 60%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="image"><img src="images/res/8-8.png" alt="new directory"></span></p></td>
+<td class="tableblock halign-left valign-middle"><div class="content"><div class="paragraph">
+<p>To create a package aside of an existing one, you need to create with its full path</p>
+</div></div></td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+</table>
+</div>
+<div class="sect2">
+<h3 id="_creating_the_http_client"><a class="anchor" href="#_creating_the_http_client"></a>Creating the HTTP client</h3>
+<div class="paragraph">
+<p>First, to reach our API we have to declare an HTTP client:</p>
+</div>
+<div class="listingblock">
+<div class="title">ContactApi.kt</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">const val LOCALHOST = "127.0.0.1" <i class="conum" data-value="1"></i><b>(1)</b>
+expect fun apiBaseUrl(): String <i class="conum" data-value="2"></i><b>(2)</b>
 
+class ContactApi {
+    private val client = HttpClient { <i class="conum" data-value="3"></i><b>(3)</b>
+        install(JsonFeature) { <i class="conum" data-value="4"></i><b>(4)</b>
+            serializer = KotlinxSerializer() <i class="conum" data-value="5"></i><b>(5)</b>
+        }
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Declare a constant for the API host IP (localhost, as our backend API is running on our local machine)</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>An <code>expect</code> function will help define specific host IP (e.g. Android Simulator reach the local machine through <code>10.0.2.2</code>)</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Create the <strong>Ktor</strong> HTTP client.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Define that the HTTP client will work with JSON.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>Register <strong>Kotlinx.Serialization</strong> to serialize and de-serialize JSON</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+Every import in <code>ContactApi.kt</code> should come from <code>io.ktor.client</code> or <code>kotlinx.serialization`</code>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_creating_the_apis_interfaces"><a class="anchor" href="#_creating_the_apis_interfaces"></a>Creating the APIs interfaces</h3>
+<div class="paragraph">
+<p>Before writing our interfaces to reach each endpoints on the backend API,
+we will declare an Extension Function to wrap the API url definition.</p>
+</div>
+<div class="listingblock">
+<div class="title">ContactApi.kt</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">class ContactApi {
+  //...
+  private fun HttpRequestBuilder.apiUrl(path: String = "/") {
+        url {
+            host = apiBaseUrl() <i class="conum" data-value="1"></i><b>(1)</b>
+            port = 8042 <i class="conum" data-value="2"></i><b>(2)</b>
+            protocol = URLProtocol.HTTP
+            encodedPath = "/api/contacts$path" <i class="conum" data-value="3"></i><b>(3)</b>
+        }
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Calling the <code>expect</code> function to get the right IP address to reach the backend API</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Port of our backend API</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Dynamic endpoint path, starting from "/api/contacts"</td>
+</tr>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_get_retrieve_the_contacts_from_the_backend_api"><a class="anchor" href="#_get_retrieve_the_contacts_from_the_backend_api"></a>GET - Retrieve the contacts from the backend API</h4>
+<div class="paragraph">
+<p>If you remember the previous section, we have ran a <strong>Ktor</strong> server. This server defines 4 endpoints:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><em>GET</em> <code>/api/contacts</code>: Retrieve a list of all the contacts</p>
+</li>
+<li>
+<p><em>GET</em> <code>/api/contacts/{id}</code>: Retrieve a contact, identified by its Id</p>
+</li>
+<li>
+<p><em>PUT</em> <code>/api/contacts</code>: Create a new contact</p>
+</li>
+<li>
+<p><em>POST</em> <code>/api/contacts/{id}</code>: Update a contact, identified by its Id</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>So, we will provide interfaces for each one of those 4 endpoints, thus we will see how to send/receive data classes through an HTTP client.</p>
+</div>
+<div class="sect4">
+<h5 id="_get_a_list_of_contacts"><a class="anchor" href="#_get_a_list_of_contacts"></a>Get a list of contacts</h5>
+<div class="paragraph">
+<p>Let&#8217;s start with the simplest case, retrieving a list of <code>Contact</code>. Create a <code>getAllContacts</code> function that returns a <code>List&lt;Contact&gt;</code>.
+As the <strong>Ktor</strong> <code>HttpClient</code> works asynchronously with Kotlin coroutines, we need to define our function as <code>suspend</code>able.</p>
+</div>
+<div class="listingblock">
+<div class="title">ContactApi.kt</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">class ContactApi {
+    //...
+    suspend fun getAllContacts(): List&lt;Contact&gt; { <i class="conum" data-value="1"></i><b>(1)</b>
+        return Json.parse( <i class="conum" data-value="2"></i><b>(2)</b>
+            Contact.serializer().list, <i class="conum" data-value="3"></i><b>(3)</b>
+            client.get { <i class="conum" data-value="4"></i><b>(4)</b>
+                apiUrl() <i class="conum" data-value="5"></i><b>(5)</b>
+            }
+        )
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Define a <code>suspend</code> function that returns a <code>List&lt;Contact&gt;</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Use the <code>Json.parse</code> function from <strong>Kotlinx.Serialization</strong> to transfrom Json to <code>Contact</code> data class.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Register the serializer generated on <code>Contact</code> by the <code>kotlinx.serialization</code> plugin.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Call the backend API&#8230;&#8203;
+&lt;5&gt;&#8230;&#8203; on the path <code>/api/contacts/</code>.</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_get_a_specific_contact_by_its_id"><a class="anchor" href="#_get_a_specific_contact_by_its_id"></a>Get a specific contact by its Id</h5>
+<div class="paragraph">
+<p>Getting the list of all the contacts available on the backend just give us the <code>id</code>, <code>firstname</code> and <code>lastname</code> of the contacts.
+So, we should be able to get the detailed information for a contact giving its <code>id</code>.</p>
+</div>
+<div class="listingblock">
+<div class="title">ContactApi.kt</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">class ContactApi {
+  //...
+  suspend fun getContactById(contactId: String): Contact { <i class="conum" data-value="1"></i><b>(1)</b>
+        return Json.parse( <i class="conum" data-value="2"></i><b>(2)</b>
+            Contact.serializer(), <i class="conum" data-value="3"></i><b>(3)</b>
+            client.get { <i class="conum" data-value="4"></i><b>(4)</b>
+                apiUrl("/$contactId") <i class="conum" data-value="5"></i><b>(5)</b>
+            }
+        )
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Define a <code>suspend</code> function that wait for a <code>String</code> as parameter and returns a <code>Contact</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Use the <code>Json.parse</code> function from <strong>Kotlinx.Serialization</strong> to transfrom Json to <code>Contact</code> data class.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Register the serializer generated on <code>Contact</code> by the <code>kotlinx.serialization</code> plugin.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Call the backend API&#8230;&#8203;
+&lt;5&gt;&#8230;&#8203; on the path <code>/api/contacts/{id}</code>, by passing the <code>contactId</code> received by the current function.</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_put_create_contacts_on_the_backend_api"><a class="anchor" href="#_put_create_contacts_on_the_backend_api"></a>PUT - Create contacts on the backend API</h4>
+<div class="paragraph">
+<p>Now that we can retrieve data from the backend API, we should be able to create some contacts.
+The backend API as an endpoint for that. We have to call the path <code>/api/contacts/</code> on the HTTP verb <em>PUT</em>,
+with a body containing a <code>Contact</code> transformed into JSON.</p>
+</div>
+<div class="paragraph">
+<p>Here is how to do it:</p>
+</div>
+<div class="listingblock">
+<div class="title">ContactApi.kt</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">class ContactApi {
+    //...
+    suspend fun putContact(contactEntity: Contact): String { <i class="conum" data-value="1"></i><b>(1)</b>
+        return Json.parse( <i class="conum" data-value="2"></i><b>(2)</b>
+            (StringSerializer to StringSerializer).map, <i class="conum" data-value="3"></i><b>(3)</b>
+            client.put { <i class="conum" data-value="4"></i><b>(4)</b>
+                apiUrl() <i class="conum" data-value="5"></i><b>(5)</b>
+                method = HttpMethod.Put <i class="conum" data-value="6"></i><b>(6)</b>
+                body = TextContent(Json.stringify(Contact.serializer(), contactEntity), <i class="conum" data-value="7"></i><b>(7)</b>
+                    contentType = ContentType.Application.Json)
+            }
+        ).values.first()
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Define a <code>suspend</code> function that wait for a <code>Contact</code> as parameter and returns a <code>String</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Use the <code>Json.parse</code> function from <strong>Kotlinx.Serialization</strong> to transfrom Json to a <code>Map&lt;String, String&gt;</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Register an existing serializer from <strong>Kotlinx.Serialization</strong> to get a <code>Map&lt;String, String&gt;</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Call the backend API&#8230;&#8203;</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>&#8230;&#8203; on the path <code>/api/contacts/</code>&#8230;&#8203;</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>&#8230;&#8203; with the HTTP verb <em>PUT</em>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="7"></i><b>7</b></td>
+<td>Set the <code>contactEntity</code> in the body of the HTTP Request, using the serializer generated on <code>Contact</code> by the <code>kotlinx.serialization</code> plugin.</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_post_update_contacts_on_the_backend_api"><a class="anchor" href="#_post_update_contacts_on_the_backend_api"></a>POST - Update contacts on the backend API</h4>
+<div class="paragraph">
+<p>Finally, we have to be able to update an existing contact on the backend. Of course, their is an endpoint for that.
+We can update a contact by calling the bakend API on <code>/api/contacts/{id}</code>,
+where <code>id</code> is a dynamic parameter that depends on the contact that we want to update.
+Plus, we must pass the new data of the <code>Contact</code> to update, in a JSON shape.</p>
+</div>
+<div class="paragraph">
+<p>Here is how to do it:</p>
+</div>
+<div class="listingblock">
+<div class="title">ContactApi.kt</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">class ContactApi {
+    //...
+    suspend fun postContact(contactEntity: Contact): Boolean { <i class="conum" data-value="1"></i><b>(1)</b>
+        val response = client.call { <i class="conum" data-value="2"></i><b>(2)</b>
+            apiUrl("/${contactEntity.id}") <i class="conum" data-value="3"></i><b>(3)</b>
+            method = HttpMethod.Post <i class="conum" data-value="4"></i><b>(4)</b>
+            body = TextContent(Json.stringify(Contact.serializer(), contactEntity), <i class="conum" data-value="5"></i><b>(5)</b>
+                contentType = ContentType.Application.Json)
+        }.response <i class="conum" data-value="6"></i><b>(6)</b>
+
+        return response.status == HttpStatusCode.OK
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Define a <code>suspend</code> function that wait for a <code>Contact</code> as parameter and returns a <code>String</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Declare a HTTP client call</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Set the URL for the client call to <code>/api/contacts/{id}</code>, by passing the <code>Contact::id</code>, from the <code>Contact</code> received by the current function.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Set the HTTP verb to be used as <em>POST</em>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>Set the <code>contactEntity</code> in the body of the HTTP Request, using the serializer generated on <code>Contact</code> by the <code>kotlinx.serialization</code> plugin.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>Trigger the HTTP request and wait for the response.</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_implementing_the_mvp_pattern"><a class="anchor" href="#_implementing_the_mvp_pattern"></a>Implementing the MVP pattern</h2>
+<h2 id="_going_further_with_the_mvp_pattern"><a class="anchor" href="#_going_further_with_the_mvp_pattern"></a>Going further with the MVP pattern</h2>
 <div class="sectionbody">
+<div class="paragraph">
+<p>Do you remember that we are working on a Kotlin multi-platform project ? Right!</p>
+</div>
+<div class="paragraph">
+<p>By now, we should be able to use our business logic on every targeted platform, and make some HTTP calls to render our data.
+Not so fast! Before that, we will add some more logic in ou Kotlin multi-platform library, with the <em>MVP pattern</em>,</p>
+</div>
+<div class="sect2">
+<h3 id="_what_is_the_mvp_pattern"><a class="anchor" href="#_what_is_the_mvp_pattern"></a>What is the MVP pattern ?</h3>
 
+</div>
+<div class="sect2">
+<h3 id="_implementing_the_mvp_pattern"><a class="anchor" href="#_implementing_the_mvp_pattern"></a>Implementing the MVP pattern</h3>
+<div class="sect3">
+<h4 id="_use_case_1_retrieving_a_list_of_contacts"><a class="anchor" href="#_use_case_1_retrieving_a_list_of_contacts"></a>Use case 1: retrieving a list of contacts</h4>
+
+</div>
+<div class="sect3">
+<h4 id="_use_case_2_getting_the_detail_of_a_contact"><a class="anchor" href="#_use_case_2_getting_the_detail_of_a_contact"></a>Use case 2: getting the detail of a contact</h4>
+
+</div>
+<div class="sect3">
+<h4 id="_use_case_3_creating_or_updating_a_contact"><a class="anchor" href="#_use_case_3_creating_or_updating_a_contact"></a>Use case 3: creating or updating a contact</h4>
+
+</div>
+</div>
+<div class="sect2">
+<h3 id="_defining_some_helpers"><a class="anchor" href="#_defining_some_helpers"></a>Defining some helpers</h3>
+<div class="sect3">
+<h4 id="_a_little_bit_of_manual_dependency_injection"><a class="anchor" href="#_a_little_bit_of_manual_dependency_injection"></a>A little bit of manual Dependency Injection</h4>
+
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_whats_next"><a class="anchor" href="#_whats_next"></a>What&#8217;s next ?</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Now your Kotlin multi-platform library is all set up.
+In the next chapters we will see how to enjoy our common code across the different platform that we are targeting.</p>
+</div>
+<div class="paragraph">
+<p>Let&#8217;s start with <strong><em>Android</em></strong>!</p>
+</div>
 </div>
 </div>
 </div>
