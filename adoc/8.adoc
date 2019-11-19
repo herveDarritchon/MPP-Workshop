@@ -597,4 +597,30 @@ class ContactApi {
 <5> Set the `contactEntity` in the body of the HTTP Request, using the serializer generated on `Contact` by the `kotlinx.serialization` plugin.
 <6> Trigger the HTTP request and wait for the response.
 
-== Implementing the MVP pattern
+== Going further with the MVP pattern
+
+Do you remember that we are working on a Kotlin multi-platform project ? Right!
+
+By now, we should be able to use our business logic on every targeted platform, and make some HTTP calls to render our data.
+Not so fast! Before that, we will add some more logic in ou Kotlin multi-platform library, with the _MVP pattern_,
+
+=== What is the MVP pattern ?
+
+=== Implementing the MVP pattern
+
+==== Use case 1: retrieving a list of contacts
+
+==== Use case 2: getting the detail of a contact
+
+==== Use case 3: creating or updating a contact
+
+=== Defining some helpers
+
+==== A little bit of manual Dependency Injection
+
+== What's next ?
+
+Now your Kotlin multi-platform library is all set up.
+In the next chapters we will see how to enjoy our common code across the different platform that we are targeting.
+
+Let's start with *_Android_*!
