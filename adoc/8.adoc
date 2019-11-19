@@ -400,6 +400,201 @@ WARNING: the collections must be initialized, otherwise you could get some seria
 
 == Reaching the backend API
 
+NOTE: In this section you will learn how to use the *Ktor client* API and how to serialize and de-serialize data with *Kotlinx.Serialization*.
 
+Now that our data model is ready, we can implement the interface between the client and the backend API to retrieve data.
+
+Let's start by creating a new package `api` and a Kotlin source file `ContactApi`, still in `commonMain/kotlin`:
+
+image:res/8-7.png[source directory structure,300]
+
+[TIP]
+====
+[cols="40%,<.^60%a",grid="none",frame="none"]
+|===
+|image:res/8-8.png[new directory]
+|To create a package aside of an existing one, you need to create with its full path
+|===
+====
+
+=== Creating the HTTP client
+
+First, to reach our API we have to declare an HTTP client:
+
+.ContactApi.kt
+[source,kotlin]
+----
+const val LOCALHOST = "127.0.0.1" // <1>
+expect fun apiBaseUrl(): String // <2>
+
+class ContactApi {
+    private val client = HttpClient { // <3>
+        install(JsonFeature) { // <4>
+            serializer = KotlinxSerializer() // <5>
+        }
+    }
+}
+----
+<1> Declare a constant for the API host IP (localhost, as our backend API is running on our local machine)
+<2> An `expect` function will help define specific host IP (e.g. Android Simulator reach the local machine through `10.0.2.2`)
+<3> Create the *Ktor* HTTP client.
+<4> Define that the HTTP client will work with JSON.
+<5> Register *Kotlinx.Serialization* to serialize and de-serialize JSON
+
+TIP: Every import in `ContactApi.kt` should come from `io.ktor.client` or `kotlinx.serialization``
+
+=== Creating the APIs interfaces
+
+Before writing our interfaces to reach each endpoints on the backend API,
+we will declare an Extension Function to wrap the API url definition.
+
+.ContactApi.kt
+[source,kotlin]
+----
+class ContactApi {
+  //...
+  private fun HttpRequestBuilder.apiUrl(path: String = "/") {
+        url {
+            host = apiBaseUrl() // <1>
+            port = 8042 // <2>
+            protocol = URLProtocol.HTTP
+            encodedPath = "/api/contacts$path" // <3>
+        }
+    }
+}
+----
+<1> Calling the `expect` function to get the right IP address to reach the backend API
+<2> Port of our backend API
+<3> Dynamic endpoint path, starting from "/api/contacts"
+
+==== GET - Retrieve the contacts from the backend API
+
+If you remember the previous section, we have ran a *Ktor* server. This server defines 4 endpoints:
+
+- _GET_ `/api/contacts`: Retrieve a list of all the contacts
+- _GET_ `/api/contacts/{id}`: Retrieve a contact, identified by its Id
+- _PUT_ `/api/contacts`: Create a new contact
+- _POST_ `/api/contacts/{id}`: Update a contact, identified by its Id
+
+So, we will provide interfaces for each one of those 4 endpoints, thus we will see how to send/receive data classes through an HTTP client.
+
+===== Get a list of contacts
+
+Let's start with the simplest case, retrieving a list of `Contact`. Create a `getAllContacts` function that returns a `List<Contact>`.
+As the *Ktor* `HttpClient` works asynchronously with Kotlin coroutines, we need to define our function as ``suspend``able.
+
+.ContactApi.kt
+[source,kotlin]
+----
+class ContactApi {
+    //...
+    suspend fun getAllContacts(): List<Contact> { // <1>
+        return Json.parse( // <2>
+            Contact.serializer().list, // <3>
+            client.get { // <4>
+                apiUrl() // <5>
+            }
+        )
+    }
+}
+----
+<1> Define a `suspend` function that returns a `List<Contact>`.
+<2> Use the `Json.parse` function from *Kotlinx.Serialization* to transfrom Json to `Contact` data class.
+<3> Register the serializer generated on `Contact` by the `kotlinx.serialization` plugin.
+<4> Call the backend API...
+<5>... on the path `/api/contacts/`.
+
+===== Get a specific contact by its Id
+
+Getting the list of all the contacts available on the backend just give us the `id`, `firstname` and `lastname` of the contacts.
+So, we should be able to get the detailed information for a contact giving its `id`.
+
+.ContactApi.kt
+[source,kotlin]
+----
+class ContactApi {
+  //...
+  suspend fun getContactById(contactId: String): Contact { // <1>
+        return Json.parse( // <2>
+            Contact.serializer(), // <3>
+            client.get { // <4>
+                apiUrl("/$contactId") // <5>
+            }
+        )
+    }
+}
+----
+<1> Define a `suspend` function that wait for a `String` as parameter and returns a `Contact`.
+<2> Use the `Json.parse` function from *Kotlinx.Serialization* to transfrom Json to `Contact` data class.
+<3> Register the serializer generated on `Contact` by the `kotlinx.serialization` plugin.
+<4> Call the backend API...
+<5>... on the path `/api/contacts/{id}`, by passing the `contactId` received by the current function.
+
+==== PUT - Create contacts on the backend API
+
+Now that we can retrieve data from the backend API, we should be able to create some contacts.
+The backend API as an endpoint for that. We have to call the path `/api/contacts/` on the HTTP verb _PUT_,
+with a body containing a `Contact` transformed into JSON.
+
+Here is how to do it:
+
+.ContactApi.kt
+[source,kotlin]
+----
+class ContactApi {
+    //...
+    suspend fun putContact(contactEntity: Contact): String { // <1>
+        return Json.parse( // <2>
+            (StringSerializer to StringSerializer).map, // <3>
+            client.put { // <4>
+                apiUrl() // <5>
+                method = HttpMethod.Put // <6>
+                body = TextContent(Json.stringify(Contact.serializer(), contactEntity), // <7>
+                    contentType = ContentType.Application.Json)
+            }
+        ).values.first()
+    }
+}
+----
+<1> Define a `suspend` function that wait for a `Contact` as parameter and returns a `String`.
+<2> Use the `Json.parse` function from *Kotlinx.Serialization* to transfrom Json to a `Map<String, String>`.
+<3> Register an existing serializer from *Kotlinx.Serialization* to get a `Map<String, String>`.
+<4> Call the backend API...
+<5> ... on the path `/api/contacts/`...
+<6> ... with the HTTP verb _PUT_.
+<7> Set the `contactEntity` in the body of the HTTP Request, using the serializer generated on `Contact` by the `kotlinx.serialization` plugin.
+
+==== POST - Update contacts on the backend API
+
+Finally, we have to be able to update an existing contact on the backend. Of course, their is an endpoint for that.
+We can update a contact by calling the bakend API on `/api/contacts/{id}`,
+where `id` is a dynamic parameter that depends on the contact that we want to update.
+Plus, we must pass the new data of the `Contact` to update, in a JSON shape.
+
+Here is how to do it:
+
+.ContactApi.kt
+[source,kotlin]
+----
+class ContactApi {
+    //...
+    suspend fun postContact(contactEntity: Contact): Boolean { // <1>
+        val response = client.call { // <2>
+            apiUrl("/${contactEntity.id}") // <3>
+            method = HttpMethod.Post // <4>
+            body = TextContent(Json.stringify(Contact.serializer(), contactEntity), // <5>
+                contentType = ContentType.Application.Json)
+        }.response // <6>
+
+        return response.status == HttpStatusCode.OK
+    }
+}
+----
+<1> Define a `suspend` function that wait for a `Contact` as parameter and returns a `String`.
+<2> Declare a HTTP client call
+<3> Set the URL for the client call to `/api/contacts/{id}`, by passing the `Contact::id`, from the `Contact` received by the current function.
+<4> Set the HTTP verb to be used as _POST_.
+<5> Set the `contactEntity` in the body of the HTTP Request, using the serializer generated on `Contact` by the `kotlinx.serialization` plugin.
+<6> Trigger the HTTP request and wait for the response.
 
 == Implementing the MVP pattern
