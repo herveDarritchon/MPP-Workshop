@@ -1146,28 +1146,585 @@ Not so fast! Before that, we will add some more logic in ou Kotlin multi-platfor
 </div>
 <div class="sect2">
 <h3 id="_what_is_the_mvp_pattern"><a class="anchor" href="#_what_is_the_mvp_pattern"></a>What is the MVP pattern ?</h3>
-
+<div class="paragraph">
+<p><strong>M</strong>odel-<strong>V</strong>iew-<strong>P</strong>resenter is a design pattern that help you decouple the business logic from the view of your application.
+This can be represented by the following schema:</p>
+</div>
+<table class="tableblock frame-none grid-none stretch">
+<colgroup>
+<col style="width: 40%;">
+<col style="width: 60%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><span class="image"><img src="images/res/mvp.png" alt="mvp pattern" width="250"></span></p></td>
+<td class="tableblock halign-left valign-middle"><div class="content"><div class="paragraph">
+<p>The <strong>Model</strong> is responsible for carrying the the data model, and how the data are manipulated/read/stored.</p>
+</div>
+<div class="paragraph">
+<p>The <strong>Presenter</strong> is responsible to:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>access the data from the Model or update them.</p>
+</li>
+<li>
+<p>serve the data to the View (generally the UI), and accept interactions from the View</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The <strong>View</strong> is an interface that needs to be implemented by the UI classes, that interact with the Presenter to update or get new data.</p>
+</div></div></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>Well, we can also implement this pattern in our Kotlin multi-platform library to maximize the code sharing for our project.</p>
+</div>
 </div>
 <div class="sect2">
 <h3 id="_implementing_the_mvp_pattern"><a class="anchor" href="#_implementing_the_mvp_pattern"></a>Implementing the MVP pattern</h3>
+<div class="paragraph">
+<p>Let&#8217;s assume that our different applications would have a Master/Detail flow.
+The master view would show us a list of contacts, and by clicking on a contact, we will display its details on a new view.</p>
+</div>
+<div class="paragraph">
+<p>This give us two use cases to implement; One where we will retrieve the list of contacts from the backend API and display it on the main view.
+And one where we will retrieve a contact with its details from the backend API, according to its Id, and display it on another view.</p>
+</div>
+<div class="paragraph">
+<p>Don&#8217;t forget that we also have to provide a view to create or update an existing contact, and then send the creation/modification to the backend API.
+This is our third use case.</p>
+</div>
+<div class="sect3">
+<h4 id="_architecture_for_the_mvp_pattern"><a class="anchor" href="#_architecture_for_the_mvp_pattern"></a>Architecture for the MVP pattern</h4>
+<div class="paragraph">
+<p>Before we implement our different use cases, we have to take a step back, and prepare the architecture of our MVP implementation.
+Indeed, without spoiling, we can tell that our different *Presenter*s will certainly have the same shape.</p>
+</div>
+<div class="paragraph">
+<p>For example, they all have to attach the view at their initialization and detach the view when this one will be destroyed.
+Also, they all have to call the backend API in the background, and then update the UI in the main thread of the app.
+This where the coroutines step inside our scope. In the same way that presenter needs to be detached from the view while its destroyed,
+the coroutine jobs also needs to be cancelled.</p>
+</div>
+<div class="paragraph">
+<p>That is why we need to define some architectural classes, to make our code clearer and robust.</p>
+</div>
+<div class="paragraph">
+<p>Let&#8217;s create a new package <code>presentation</code> and a Kotlin source file <code>base.kt</code>, still in <code>commonMain/kotlin</code>:</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="images/res/8-9.png" alt="source directory structure" width="300"></span></p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<table class="tableblock frame-none grid-none stretch">
+<colgroup>
+<col style="width: 40%;">
+<col style="width: 60%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="image"><img src="images/res/8-10.png" alt="new directory"></span></p></td>
+<td class="tableblock halign-left valign-middle"><div class="content"><div class="paragraph">
+<p>To create a package aside of an existing one, you need to create with its full path</p>
+</div></div></td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>First of all we will create a <code>CoroutineScope</code> that will be carrying our <code>CoroutineContext</code> and the `Job`to run, or cancel if the view is detached.</p>
+</div>
+<div class="listingblock">
+<div class="title">base.kt</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlin.coroutines.CoroutineContext
+
+class PresenterCoroutineScope(
+    context: CoroutineContext <i class="conum" data-value="1"></i><b>(1)</b>
+) : CoroutineScope { <i class="conum" data-value="2"></i><b>(2)</b>
+
+    private var cancellableJob = Job() <i class="conum" data-value="3"></i><b>(3)</b>
+    override val coroutineContext: CoroutineContext = context + cancellableJob <i class="conum" data-value="4"></i><b>(4)</b>
+
+    fun viewDetached() { <i class="conum" data-value="5"></i><b>(5)</b>
+        cancellableJob.cancel()
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Pass as parameter of the constructor a <code>CoroutineContext</code> (either background or UI context).</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Extend the <code>CoroutineScope</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Create a Job, that will be responsible of the execution code, and is cancellable at any time.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td><em>Override</em> the <code>CoroutineContext</code> by combining the current context and the cancellable job.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>If a view is detached from the <strong>Presenter</strong>, call this to cancel the job, and avoid leaks.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Now we can create the base class for any <strong>Presenter</strong> of our project.</p>
+</div>
+<div class="listingblock">
+<div class="title">base.kt</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">abstract class BasePresenter&lt;T&gt;(private val coroutineContext: CoroutineContext) { <i class="conum" data-value="1"></i><b>(1)</b>
+    protected var view: T? = null <i class="conum" data-value="2"></i><b>(2)</b>
+    protected lateinit var scope: PresenterCoroutineScope <i class="conum" data-value="3"></i><b>(3)</b>
+
+    fun attachView(view: T) { <i class="conum" data-value="4"></i><b>(4)</b>
+        this.view = view
+        scope = PresenterCoroutineScope(coroutineContext)
+    }
+
+    fun detachView() { <i class="conum" data-value="5"></i><b>(5)</b>
+        view = null
+        scope.viewDetached()
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>T</code> represents the type of the <strong>View</strong> that is bind to the <strong>Presenter</strong></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Declare the <strong>View</strong> bind to the <strong>Presenter</strong>. This will be used to send data to the <strong>View</strong> when the <strong>Presenter</strong> needs to send update to the UI.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Declare the <code>CoroutineScope</code> that will manage code execution in the background (calling the backend API for example)</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Use this to attach the view to the <strong>Presenter</strong> and create the <code>CoroutineScope</code></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>Use this when you do not need the <strong>View</strong> anymore, avoiding leaks in your application.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>For each of the use cases, we have to define two interfaces.
+Those interfaces will be the contract that the <strong>View</strong> and the <strong>Presenter</strong> have to respect.
+Also, we will create an implementation for each <strong>Presenter*s' contract that will work with the backend API and interact with the *View</strong>.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_coroutine_contexts_definition"><a class="anchor" href="#_coroutine_contexts_definition"></a>Coroutine contexts definition</h4>
+<div class="paragraph">
+<p>Previously, we have defined that our <strong>Presenter</strong> will execute some business logic into a given <code>CoroutineScope</code>, to avoid blocking the main thread.
+Thus, we should define a coroutine context on which our background processes will be executed, but we should also provide a coroutine context that will allow the <strong>Presenter</strong> to interact with the <strong>View</strong>.</p>
+</div>
+<div class="paragraph">
+<p>In <code>commonMain/kotlin</code>, create a new Kotlin source file <code>dispatchers.kt</code>:</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="images/res/8-11.png" alt="source directory structure" width="300"></span></p>
+</div>
+<div class="paragraph">
+<p>In this source file, we will put two dispatchers, one for background work (<code>ApplicationDispatcher</code>) and one for UI interaction (<code>UIDispatcher</code>).</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>You may know that coroutines does not work in the same way depending on the platform we are running.
+For example, on <strong><em>iOS</em></strong> every coroutines are running on the main thread. This will be fixed in future version.</p>
+</div>
+<div class="paragraph">
+<p>However, for that reason our dispatchers will be defined as <code>expect</code>ed properties, and must be explicitly declare for each platform.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Open the <code>dispatchers.kt</code> file and add the following lines:</p>
+</div>
+<div class="listingblock">
+<div class="title">dispatchers.kt</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">import kotlin.coroutines.CoroutineContext
+
+internal expect val ApplicationDispatcher: CoroutineContext <i class="conum" data-value="1"></i><b>(1)</b>
+internal expect val UIDispatcher: CoroutineContext <i class="conum" data-value="2"></i><b>(2)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>To execute code in the background of the application.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>To execute code in the foreground of the application and interact with the UI.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>That&#8217;s it. You are all set up to implement the MVP pattern for our three use cases.</p>
+</div>
+</div>
 <div class="sect3">
 <h4 id="_use_case_1_retrieving_a_list_of_contacts"><a class="anchor" href="#_use_case_1_retrieving_a_list_of_contacts"></a>Use case 1: retrieving a list of contacts</h4>
-
+<div class="paragraph">
+<p>In the <code>presentation</code> package, create a new Kotlin source file <code>ContactList.kt</code>, still in the <code>commonMain</code> module:</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="images/res/8-12.png" alt="source directory structure" width="300"></span></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>The contract</p>
+<div class="listingblock">
+<div class="title">ContactList.kt</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">class ContactList {
+    interface Presenter {
+        fun getContactList() <i class="conum" data-value="1"></i><b>(1)</b>
+    }
+    interface View {
+        fun displayContactList(contactList: List&lt;Contact&gt;) <i class="conum" data-value="2"></i><b>(2)</b>
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Function called by the <strong>View</strong> to retrieve all the contacts from the backend.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Function called by the <strong>Presenter</strong> when the data are ready to be displayed.</td>
+</tr>
+</table>
+</div>
+</li>
+<li>
+<p>The presenter implementation</p>
+<div class="listingblock">
+<div class="title">ContactList.kt</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">class ContactListPresenter(
+    private val contactApi: ContactApi, <i class="conum" data-value="1"></i><b>(1)</b>
+    coroutineContext: CoroutineContext = ApplicationDispatcher <i class="conum" data-value="2"></i><b>(2)</b>
+) : ContactList.Presenter, BasePresenter&lt;ContactList.View&gt;(coroutineContext) { <i class="conum" data-value="3"></i><b>(3)</b>
+    override fun getContactList() {
+        scope.launch { <i class="conum" data-value="4"></i><b>(4)</b>
+            val contactList = contactApi.getAllContacts()
+            launch(UIDispatcher) { <i class="conum" data-value="5"></i><b>(5)</b>
+                view?.displayContactList(contactList) <i class="conum" data-value="6"></i><b>(6)</b>
+            }
+        }
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>To reach the backend API we need a reference of a <code>ContactApi</code> instance.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>As the <code>ContactApi</code> functions are suspendable, we need a coroutine context to execute them.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>We implement <code>ContactList.Presenter</code> to respect the contract, and extend <code>BasePresenter</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Launch a coroutine on <code>BasePresenter.scope</code> which runs on the coroutine context <code>ApplicationDispatcher</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>After executing the API call we launch another coroutine in which we can interact with the UI, using the result of the API call.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>Update the UI.</td>
+</tr>
+</table>
+</div>
+</li>
+</ul>
+</div>
 </div>
 <div class="sect3">
 <h4 id="_use_case_2_getting_the_detail_of_a_contact"><a class="anchor" href="#_use_case_2_getting_the_detail_of_a_contact"></a>Use case 2: getting the detail of a contact</h4>
-
+<div class="paragraph">
+<p>In the <code>presentation</code> package, create a new Kotlin source file <code>ContactDetail.kt</code>, still in the <code>commonMain</code> module:</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="images/res/8-13.png" alt="source directory structure" width="300"></span></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>The contract</p>
+<div class="listingblock">
+<div class="title">ContactDetail.kt</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">class ContactDetail {
+    interface Presenter {
+        fun getContact(contactId: String) <i class="conum" data-value="1"></i><b>(1)</b>
+    }
+    interface View {
+        fun displayContact(contact: Contact) <i class="conum" data-value="2"></i><b>(2)</b>
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Function called by the <strong>View</strong> to retrieve all the details of a contact, giving its Id.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Function called by the <strong>Presenter</strong> when the data are ready to be displayed.</td>
+</tr>
+</table>
+</div>
+</li>
+<li>
+<p>The presenter implementation</p>
+<div class="listingblock">
+<div class="title">ContactDetail.kt</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">class ContactDetailPresenter(
+    private val contactApi: ContactApi, <i class="conum" data-value="1"></i><b>(1)</b>
+    coroutineContext: CoroutineContext = ApplicationDispatcher <i class="conum" data-value="2"></i><b>(2)</b>
+) : ContactDetail.Presenter, BasePresenter&lt;ContactDetail.View&gt;(coroutineContext) { <i class="conum" data-value="3"></i><b>(3)</b>
+    override fun getContact(contactId: String) {
+        scope.launch { <i class="conum" data-value="4"></i><b>(4)</b>
+            val contact = contactApi.getContactById(contactId)
+            launch(UIDispatcher) { <i class="conum" data-value="5"></i><b>(5)</b>
+                view?.displayContact(contact) <i class="conum" data-value="6"></i><b>(6)</b>
+            }
+        }
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>To reach the backend API we need a reference of a <code>ContactApi</code> instance.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>As the <code>ContactApi</code> functions are suspendable, we need a coroutine context to execute them.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>We implement <code>ContactList.Presenter</code> to respect the contract, and extend <code>BasePresenter</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Launch a coroutine on <code>BasePresenter.scope</code> which runs on the coroutine context <code>ApplicationDispatcher</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>After executing the API call we launch another coroutine in which we can interact with the UI, using the result of the API call.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>Update the UI.</td>
+</tr>
+</table>
+</div>
+</li>
+</ul>
+</div>
 </div>
 <div class="sect3">
 <h4 id="_use_case_3_creating_or_updating_a_contact"><a class="anchor" href="#_use_case_3_creating_or_updating_a_contact"></a>Use case 3: creating or updating a contact</h4>
+<div class="paragraph">
+<p>In the <code>presentation</code> package, create a new Kotlin source file <code>ContactCreateUpdate.kt</code>, still in the <code>commonMain</code> module:</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="images/res/8-14.png" alt="source directory structure" width="300"></span></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>The contract</p>
+<div class="listingblock">
+<div class="title">ContactCreateUpdate.kt</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">class ContactCreationUpdate {
+    interface Presenter {
+        fun updateOrCreateContact(contact: Contact) <i class="conum" data-value="1"></i><b>(1)</b>
+    }
+    interface View {
+        fun updateOrCreationSucceed() <i class="conum" data-value="2"></i><b>(2)</b>
+        fun updateOrCreationFails() <i class="conum" data-value="3"></i><b>(3)</b>
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Function called by the <strong>View</strong> to create or update a contact on the backend.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Function called by the <strong>Presenter</strong> when the data are ready to be displayed.</td>
+</tr>
+</table>
+</div>
+</li>
+<li>
+<p>The presenter implementation</p>
+<div class="listingblock">
+<div class="title">ContactCreateUpdate.kt</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">class ContactCreationUpdatePresenterImpl(
+    private val contactApi: ContactApi, <i class="conum" data-value="1"></i><b>(1)</b>
+    coroutineContext: CoroutineContext = ApplicationDispatcher <i class="conum" data-value="2"></i><b>(2)</b>
+) : ContactCreationUpdate.Presenter, BasePresenter&lt;ContactCreationUpdate.View&gt;(coroutineContext) { <i class="conum" data-value="3"></i><b>(3)</b>
+    override fun updateOrCreateContact(contact: Contact) {
+        scope.launch { <i class="conum" data-value="4"></i><b>(4)</b>
+            try {
+                if (contact.id == "-1") contactApi.putContact(contact) <i class="conum" data-value="5"></i><b>(5)</b>
+                else contactApi.postContact(contact) <i class="conum" data-value="5"></i><b>(5)</b>
 
+                launch(UIDispatcher) { view?.updateOrCreationSucceed() } <i class="conum" data-value="6"></i><b>(6)</b>
+            } catch (e: Exception) {
+                launch(UIDispatcher) { view?.updateOrCreationFails() } <i class="conum" data-value="6"></i><b>(6)</b>
+            }
+        }
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>To reach the backend API we need a reference of a <code>ContactApi</code> instance.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>As the <code>ContactApi</code> functions are suspendable, we need a coroutine context to execute them.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>We implement <code>ContactList.Presenter</code> to respect the contract, and extend <code>BasePresenter</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Launch a coroutine on <code>BasePresenter.scope</code> which runs on the coroutine context <code>ApplicationDispatcher</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>Run the API call. Depending on the contract Id, either we create a contact, either we update a contact.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>Depending on if the API call gone well, or if there has been an exception, we launch a coroutine on the UI dispatcher, and send an update to the UI.</td>
+</tr>
+</table>
+</div>
+</li>
+</ul>
+</div>
 </div>
 </div>
 <div class="sect2">
 <h3 id="_defining_some_helpers"><a class="anchor" href="#_defining_some_helpers"></a>Defining some helpers</h3>
 <div class="sect3">
 <h4 id="_a_little_bit_of_manual_dependency_injection"><a class="anchor" href="#_a_little_bit_of_manual_dependency_injection"></a>A little bit of manual Dependency Injection</h4>
-
+<div class="paragraph">
+<p>To avoid creating our different objects manually, let&#8217;s provide a singleton object, that will serve instances through regular functions.</p>
+</div>
+<div class="paragraph">
+<p>Create a new package <code>di</code> and a Kotlin source file <code>CommonInjector.kt</code>:</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="images/res/8-15.png" alt="source directory structure" width="300"></span></p>
+</div>
+<div class="listingblock">
+<div class="title">CommonInjector.kt</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">@ThreadLocal <i class="conum" data-value="1"></i><b>(1)</b>
+object CommonInjector {
+    //    API
+    private val api: ContactApi by lazy { <i class="conum" data-value="2"></i><b>(2)</b>
+        ContactApi()
+    }
+    //    Presenters
+    fun contactListPresenter() = ContactListPresenter(api) <i class="conum" data-value="3"></i><b>(3)</b>
+    fun contactDetailPresenter() = ContactDetailPresenter(api) <i class="conum" data-value="3"></i><b>(3)</b>
+    fun contactCreationUpdatePresenter() = ContactCreationUpdatePresenter(api) <i class="conum" data-value="3"></i><b>(3)</b>
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Every thread gets its own instance of <code>CommonInjector</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Lazily instantiate a <code>ContactApi</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Instantiating presenters with the <code>ContactApi</code> instance.</td>
+</tr>
+</table>
+</div>
 </div>
 </div>
 </div>
