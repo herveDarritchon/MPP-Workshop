@@ -715,17 +715,224 @@ abstract class BasePresenter<T>(private val coroutineContext: CoroutineContext) 
 <4> Use this to attach the view to the *Presenter* and create the `CoroutineScope`
 <5> Use this when you do not need the *View* anymore, avoiding leaks in your application.
 
+For each of the use cases, we have to define two interfaces.
+Those interfaces will be the contract that the *View* and the *Presenter* have to respect.
+Also, we will create an implementation for each *Presenter*s' contract that will work with the backend API and interact with the *View*.
+
+==== Coroutine contexts definition
+
+Previously, we have defined that our *Presenter* will execute some business logic into a given `CoroutineScope`, to avoid blocking the main thread.
+Thus, we should define a coroutine context on which our background processes will be executed, but we should also provide a coroutine context that will allow the *Presenter* to interact with the *View*.
+
+In `commonMain/kotlin`, create a new Kotlin source file `dispatchers.kt`:
+
+image:res/8-11.png[source directory structure,300]
+
+In this source file, we will put two dispatchers, one for background work (`ApplicationDispatcher`) and one for UI interaction (`UIDispatcher`).
+
+[IMPORTANT]
+====
+You may know that coroutines does not work in the same way depending on the platform we are running.
+For example, on *_iOS_* every coroutines are running on the main thread. This will be fixed in future version.
+
+However, for that reason our dispatchers will be defined as ``expect``ed properties, and must be explicitly declare for each platform.
+====
+
+Open the `dispatchers.kt` file and add the following lines:
+
+.dispatchers.kt
+[source,kotlin]
+----
+import kotlin.coroutines.CoroutineContext
+
+internal expect val ApplicationDispatcher: CoroutineContext // <1>
+internal expect val UIDispatcher: CoroutineContext // <2>
+----
+<1> To execute code in the background of the application.
+<2> To execute code in the foreground of the application and interact with the UI.
+
 That's it. You are all set up to implement the MVP pattern for our three use cases.
 
 ==== Use case 1: retrieving a list of contacts
 
+In the `presentation` package, create a new Kotlin source file `ContactList.kt`, still in the `commonMain` module:
+
+image:res/8-12.png[source directory structure,300]
+
+* The contract
++
+.ContactList.kt
+[source,kotlin]
+----
+class ContactList {
+    interface Presenter {
+        fun getContactList() // <1>
+    }
+    interface View {
+        fun displayContactList(contactList: List<Contact>) // <2>
+    }
+}
+----
+<1> Function called by the *View* to retrieve all the contacts from the backend.
+<2> Function called by the *Presenter* when the data are ready to be displayed.
+
+* The presenter implementation
++
+.ContactList.kt
+[source,kotlin]
+----
+class ContactListPresenter(
+    private val contactApi: ContactApi, // <1>
+    coroutineContext: CoroutineContext = ApplicationDispatcher // <2>
+) : ContactList.Presenter, BasePresenter<ContactList.View>(coroutineContext) { // <3>
+    override fun getContactList() {
+        scope.launch { // <4>
+            val contactList = contactApi.getAllContacts()
+            launch(UIDispatcher) { // <5>
+                view?.displayContactList(contactList) // <6>
+            }
+        }
+    }
+}
+----
+<1> To reach the backend API we need a reference of a `ContactApi` instance.
+<2> As the `ContactApi` functions are suspendable, we need a coroutine context to execute them.
+<3> We implement `ContactList.Presenter` to respect the contract, and extend `BasePresenter`.
+<4> Launch a coroutine on `BasePresenter.scope` which runs on the coroutine context `ApplicationDispatcher`.
+<5> After executing the API call we launch another coroutine in which we can interact with the UI, using the result of the API call.
+<6> Update the UI.
+
 ==== Use case 2: getting the detail of a contact
 
+In the `presentation` package, create a new Kotlin source file `ContactDetail.kt`, still in the `commonMain` module:
+
+image:res/8-13.png[source directory structure,300]
+
+* The contract
++
+.ContactDetail.kt
+[source,kotlin]
+----
+class ContactDetail {
+    interface Presenter {
+        fun getContact(contactId: String) // <1>
+    }
+    interface View {
+        fun displayContact(contact: Contact) // <2>
+    }
+}
+----
+<1> Function called by the *View* to retrieve all the details of a contact, giving its Id.
+<2> Function called by the *Presenter* when the data are ready to be displayed.
+
+* The presenter implementation
++
+.ContactDetail.kt
+[source,kotlin]
+----
+class ContactDetailPresenter(
+    private val contactApi: ContactApi, // <1>
+    coroutineContext: CoroutineContext = ApplicationDispatcher // <2>
+) : ContactDetail.Presenter, BasePresenter<ContactDetail.View>(coroutineContext) { // <3>
+    override fun getContact(contactId: String) {
+        scope.launch { // <4>
+            val contact = contactApi.getContactById(contactId)
+            launch(UIDispatcher) { // <5>
+                view?.displayContact(contact) // <6>
+            }
+        }
+    }
+}
+----
+<1> To reach the backend API we need a reference of a `ContactApi` instance.
+<2> As the `ContactApi` functions are suspendable, we need a coroutine context to execute them.
+<3> We implement `ContactList.Presenter` to respect the contract, and extend `BasePresenter`.
+<4> Launch a coroutine on `BasePresenter.scope` which runs on the coroutine context `ApplicationDispatcher`.
+<5> After executing the API call we launch another coroutine in which we can interact with the UI, using the result of the API call.
+<6> Update the UI.
+
 ==== Use case 3: creating or updating a contact
+
+In the `presentation` package, create a new Kotlin source file `ContactCreateUpdate.kt`, still in the `commonMain` module:
+
+image:res/8-14.png[source directory structure,300]
+
+* The contract
++
+.ContactCreateUpdate.kt
+[source,kotlin]
+----
+class ContactCreationUpdate {
+    interface Presenter {
+        fun updateOrCreateContact(contact: Contact) // <1>
+    }
+    interface View {
+        fun updateOrCreationSucceed() // <2>
+        fun updateOrCreationFails() // <3>
+    }
+}
+----
+<1> Function called by the *View* to create or update a contact on the backend.
+<2> Function called by the *Presenter* when the data are ready to be displayed.
+
+* The presenter implementation
++
+.ContactCreateUpdate.kt
+[source,kotlin]
+----
+class ContactCreationUpdatePresenterImpl(
+    private val contactApi: ContactApi, // <1>
+    coroutineContext: CoroutineContext = ApplicationDispatcher // <2>
+) : ContactCreationUpdate.Presenter, BasePresenter<ContactCreationUpdate.View>(coroutineContext) { // <3>
+    override fun updateOrCreateContact(contact: Contact) {
+        scope.launch { // <4>
+            try {
+                if (contact.id == "-1") contactApi.putContact(contact) // <5>
+                else contactApi.postContact(contact) // <5>
+
+                launch(UIDispatcher) { view?.updateOrCreationSucceed() } // <6>
+            } catch (e: Exception) {
+                launch(UIDispatcher) { view?.updateOrCreationFails() } // <6>
+            }
+        }
+    }
+}
+----
+<1> To reach the backend API we need a reference of a `ContactApi` instance.
+<2> As the `ContactApi` functions are suspendable, we need a coroutine context to execute them.
+<3> We implement `ContactList.Presenter` to respect the contract, and extend `BasePresenter`.
+<4> Launch a coroutine on `BasePresenter.scope` which runs on the coroutine context `ApplicationDispatcher`.
+<5> Run the API call. Depending on the contract Id, either we create a contact, either we update a contact.
+<6> Depending on if the API call gone well, or if there has been an exception, we launch a coroutine on the UI dispatcher, and send an update to the UI.
 
 === Defining some helpers
 
 ==== A little bit of manual Dependency Injection
+
+To avoid creating our different objects manually, let's provide a singleton object, that will serve instances through regular functions.
+
+Create a new package `di` and a Kotlin source file `CommonInjector.kt`:
+
+image:res/8-15.png[source directory structure,300]
+
+.CommonInjector.kt
+[source,kotlin]
+----
+@ThreadLocal // <1>
+object CommonInjector {
+    //    API
+    private val api: ContactApi by lazy { // <2>
+        ContactApi()
+    }
+    //    Presenters
+    fun contactListPresenter() = ContactListPresenter(api) // <3>
+    fun contactDetailPresenter() = ContactDetailPresenter(api) // <3>
+    fun contactCreationUpdatePresenter() = ContactCreationUpdatePresenter(api) // <3>
+}
+----
+<1> Every thread gets its own instance of `CommonInjector`.
+<2> Lazily instantiate a `ContactApi`.
+<3> Instantiating presenters with the `ContactApi` instance.
 
 == What's next ?
 
