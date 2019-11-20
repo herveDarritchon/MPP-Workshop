@@ -74,6 +74,21 @@ Before starting this workshop, you need:
 
 * a *JDK* installed (no vendor required, 1.8 minimum)
 * https://www.jetbrains.com/idea/[IntelliJ IDEA], either Community or Ultimate (We recommend installing it via https://www.jetbrains.com/toolbox-app/[Jetbrains Toolbox]).
++
+Everyone should benefit from the same experience of this workshop. So, you must check if you Kotlin Plugin is up-to-date.
+
+[cols="^65%,<.^35%a",grid="none",frame="none"]
+|===
+|image:res/0-1.png[open IDEA setting]
+| Open the _IntelliJ IDEA_ *preferences* dialog
+|image:res/0-2.png[kotlin plugin config]
+|
+Go to *Languages & Frameworks* > *Kotlin* and check that:
+
+*You have the latest version of the plugin installed*
+
+If not, upgrade it now!
+|===
 * If you intend to target Android: https://developer.android.com/studio[Android Studio] (which you can also install via https://www.jetbrains.com/toolbox-app/[Jetbrains Toolbox]) with the Android SDK & emulator installed.
 * If you intend to target iOS: https://developer.apple.com/xcode/[Xcode] with the iOS SDK & simulator installed.
 
@@ -90,3 +105,5 @@ If you are using a Linux or MacOS X computer you'll need extra installation to w
 NOTE: You can only compile Kotlin/Native code for iOS on a MacOS X computer.
 
 TIP: You can develop on a non-Mac computer and just compile for iOS on a Mac.
+
+
