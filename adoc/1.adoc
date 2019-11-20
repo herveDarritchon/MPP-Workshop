@@ -32,6 +32,25 @@ image:res/1-1.png[New project configuration wizard]
 
 Finally, select where the code rests, click finish, and enjoy your newly created multiplatform project :)
 
+[IMPORTANT]
+====
+To avoid any misconfiguration issues you should change the Gradle Wrapper properties right now.
+
+Go the the newly created file `gradle-wrapper.properties` under `/business-library/gradle/wrapper/`
+and change the property `distributionUrl` with the value `https\://services.gradle.org/distributions/gradle-5.6.1-bin.zip`
+
+.gradle-wrapper.properties
+[source,properties]
+----
+distributionBase=GRADLE_USER_HOME
+distributionPath=wrapper/dists
+distributionUrl=https\://services.gradle.org/distributions/gradle-5.6.1-bin.zip
+zipStoreBase=GRADLE_USER_HOME
+zipStorePath=wrapper/dists
+----
+
+The Gradle wrapper should upgrade itself within the next Gradle action.
+====
 
 == Targets & compilers
 
