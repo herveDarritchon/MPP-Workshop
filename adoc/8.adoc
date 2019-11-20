@@ -606,7 +606,116 @@ Not so fast! Before that, we will add some more logic in ou Kotlin multi-platfor
 
 === What is the MVP pattern ?
 
+**M**odel-**V**iew-**P**resenter is a design pattern that help you decouple the business logic from the view of your application.
+This can be represented by the following schema:
+
+
+[cols="^40%,<.^60%a",grid="none",frame="none"]
+|===
+|image:res/mvp.png[mvp pattern, 250]
+|
+The *Model* is responsible for carrying the the data model, and how the data are manipulated/read/stored.
+
+The *Presenter* is responsible to:
+
+- access the data from the Model or update them.
+- serve the data to the View (generally the UI), and accept interactions from the View
+
+The *View* is an interface that needs to be implemented by the UI classes, that interact with the Presenter to update or get new data.
+|===
+
+Well, we can also implement this pattern in our Kotlin multi-platform library to maximize the code sharing for our project.
+
 === Implementing the MVP pattern
+
+Let's assume that our different applications would have a Master/Detail flow.
+The master view would show us a list of contacts, and by clicking on a contact, we will display its details on a new view.
+
+This give us two use cases to implement; One where we will retrieve the list of contacts from the backend API and display it on the main view.
+And one where we will retrieve a contact with its details from the backend API, according to its Id, and display it on another view.
+
+Don't forget that we also have to provide a view to create or update an existing contact, and then send the creation/modification to the backend API.
+This is our third use case.
+
+==== Architecture for the MVP pattern
+
+Before we implement our different use cases, we have to take a step back, and prepare the architecture of our MVP implementation.
+Indeed, without spoiling, we can tell that our different *Presenter*s will certainly have the same shape.
+
+For example, they all have to attach the view at their initialization and detach the view when this one will be destroyed.
+Also, they all have to call the backend API in the background, and then update the UI in the main thread of the app.
+This where the coroutines step inside our scope. In the same way that presenter needs to be detached from the view while its destroyed,
+the coroutine jobs also needs to be cancelled.
+
+That is why we need to define some architectural classes, to make our code clearer and robust.
+
+Let's create a new package `presentation` and a Kotlin source file `base.kt`, still in `commonMain/kotlin`:
+
+image:res/8-9.png[source directory structure,300]
+
+[TIP]
+====
+[cols="40%,<.^60%a",grid="none",frame="none"]
+|===
+|image:res/8-10.png[new directory]
+|To create a package aside of an existing one, you need to create with its full path
+|===
+====
+
+First of all we will create a `CoroutineScope` that will be carrying our `CoroutineContext` and the `Job`to run, or cancel if the view is detached.
+
+.base.kt
+[source,kotlin]
+----
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlin.coroutines.CoroutineContext
+
+class PresenterCoroutineScope(
+    context: CoroutineContext // <1>
+) : CoroutineScope { // <2>
+
+    private var cancellableJob = Job() // <3>
+    override val coroutineContext: CoroutineContext = context + cancellableJob // <4>
+
+    fun viewDetached() { // <5>
+        cancellableJob.cancel()
+    }
+}
+----
+<1> Pass as parameter of the constructor a `CoroutineContext` (either background or UI context).
+<2> Extend the `CoroutineScope`.
+<3> Create a Job, that will be responsible of the execution code, and is cancellable at any time.
+<4> _Override_ the `CoroutineContext` by combining the current context and the cancellable job.
+<5> If a view is detached from the *Presenter*, call this to cancel the job, and avoid leaks.
+
+Now we can create the base class for any *Presenter* of our project.
+
+.base.kt
+[source,kotlin]
+----
+abstract class BasePresenter<T>(private val coroutineContext: CoroutineContext) { // <1>
+    protected var view: T? = null // <2>
+    protected lateinit var scope: PresenterCoroutineScope // <3>
+
+    fun attachView(view: T) { // <4>
+        this.view = view
+        scope = PresenterCoroutineScope(coroutineContext)
+    }
+
+    fun detachView() { // <5>
+        view = null
+        scope.viewDetached()
+    }
+}
+----
+<1> `T` represents the type of the *View* that is bind to the *Presenter*
+<2> Declare the *View* bind to the *Presenter*. This will be used to send data to the *View* when the *Presenter* needs to send update to the UI.
+<3> Declare the `CoroutineScope` that will manage code execution in the background (calling the backend API for example)
+<4> Use this to attach the view to the *Presenter* and create the `CoroutineScope`
+<5> Use this when you do not need the *View* anymore, avoiding leaks in your application.
+
+That's it. You are all set up to implement the MVP pattern for our three use cases.
 
 ==== Use case 1: retrieving a list of contacts
 
