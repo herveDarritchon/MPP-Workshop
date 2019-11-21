@@ -449,7 +449,7 @@ data class Address(
     val city: String,
     val country: String
 ) {
-    enum class Type { HOME, WORK, OTHER }
+    enum class Type(val displayedName: String) { HOME("HOME"), WORK("WORK"), OTHER("OTHER") }
 }
 
 @Serializable // <1>
@@ -457,7 +457,7 @@ data class Phone(
     val type: Type,
     val number: String
 ) {
-    enum class Type { HOME, WORK, MOBILE, OTHER }
+    enum class Type(val displayedName: String) { HOME("HOME"), WORK("WORK"), MOBILE("MOBILE"), OTHER("OTHER") }
 }
 ----
 <1> Make the data classes serializable
@@ -584,7 +584,7 @@ As the *Ktor* `HttpClient` works asynchronously with Kotlin coroutines, we need 
 class ContactApi {
     //...
     suspend fun getAllContacts(): List<Contact> { // <1>
-        return Json.parse( // <2>
+        return Json.nonstrict.parse( // <2>
             Contact.serializer().list, // <3>
             client.get { // <4>
                 apiUrl() // <5>
@@ -594,7 +594,7 @@ class ContactApi {
 }
 ----
 <1> Define a `suspend` function that returns a `List<Contact>`.
-<2> Use the `Json.parse` function from *Kotlinx.Serialization* to transfrom Json to `Contact` data class.
+<2> Use the `Json.nonstrict.parse` function from *Kotlinx.Serialization* to transfrom Json to `Contact` data class.
 <3> Register the serializer generated on `Contact` by the `kotlinx.serialization` plugin.
 <4> Call the backend API...
 <5>... on the path `/api/contacts/`.
@@ -610,7 +610,7 @@ So, we should be able to get the detailed information for a contact giving its `
 class ContactApi {
   //...
   suspend fun getContactById(contactId: String): Contact { // <1>
-        return Json.parse( // <2>
+        return Json.nonstrict.parse( // <2>
             Contact.serializer(), // <3>
             client.get { // <4>
                 apiUrl("/$contactId") // <5>
@@ -620,7 +620,7 @@ class ContactApi {
 }
 ----
 <1> Define a `suspend` function that wait for a `String` as parameter and returns a `Contact`.
-<2> Use the `Json.parse` function from *Kotlinx.Serialization* to transfrom Json to `Contact` data class.
+<2> Use the `Json.nonstrict.parse` function from *Kotlinx.Serialization* to transfrom Json to `Contact` data class.
 <3> Register the serializer generated on `Contact` by the `kotlinx.serialization` plugin.
 <4> Call the backend API...
 <5>... on the path `/api/contacts/{id}`, by passing the `contactId` received by the current function.
@@ -639,7 +639,7 @@ Here is how to do it:
 class ContactApi {
     //...
     suspend fun putContact(contactEntity: Contact): String { // <1>
-        return Json.parse( // <2>
+        return Json.nonstrict.parse( // <2>
             (StringSerializer to StringSerializer).map, // <3>
             client.put { // <4>
                 apiUrl() // <5>
@@ -652,7 +652,7 @@ class ContactApi {
 }
 ----
 <1> Define a `suspend` function that wait for a `Contact` as parameter and returns a `String`.
-<2> Use the `Json.parse` function from *Kotlinx.Serialization* to transfrom Json to a `Map<String, String>`.
+<2> Use the `Json.nonstrict.parse` function from *Kotlinx.Serialization* to transfrom Json to a `Map<String, String>`.
 <3> Register an existing serializer from *Kotlinx.Serialization* to get a `Map<String, String>`.
 <4> Call the backend API...
 <5> ... on the path `/api/contacts/`...
@@ -1022,7 +1022,7 @@ class ContactCreationUpdate {
 .ContactCreateUpdate.kt
 [source,kotlin]
 ----
-class ContactCreationUpdatePresenterImpl(
+class ContactCreationUpdatePresenter(
     private val contactApi: ContactApi, // <1>
     coroutineContext: CoroutineContext = ApplicationDispatcher // <2>
 ) : ContactCreationUpdate.Presenter, BasePresenter<ContactCreationUpdate.View>(coroutineContext) { // <3>
