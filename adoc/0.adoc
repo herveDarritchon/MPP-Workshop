@@ -87,7 +87,7 @@ Go to *Languages & Frameworks* > *Kotlin* and check that:
 
 *You have the latest version of the plugin installed*
 
-If not, upgrade it now!
+If not, *_install_* it now!
 |===
 * If you intend to target Android: https://developer.android.com/studio[Android Studio] (which you can also install via https://www.jetbrains.com/toolbox-app/[Jetbrains Toolbox]) with the Android SDK & emulator installed.
 * If you intend to target iOS: https://developer.apple.com/xcode/[Xcode] with the iOS SDK & simulator installed.

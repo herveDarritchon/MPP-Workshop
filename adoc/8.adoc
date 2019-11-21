@@ -76,7 +76,20 @@ NOTE: Note that we won't cover how to deploy binaries for *Native* or *_JavaScri
 Before configuring our plugins, we will configure the plugin management that will allow us to define plugins,
 without taking care of the version, or where should Gradle get the plugins while using them.
 
-Go to the `settings.gradle.kts` file and add the following lines:
+[WARNING]
+====
+If, in your directory hierarchy, you have a file named `settings.gradle`, it should be renamed as `settings.gradle.kts``
+
+To do so, either *right-click* on the file, then click on *Refactor* > *Rename...*, or use the keyboard shortcut *Shift+F6*.
+
+Inside the file `settings.gradle.kts`, replace:
+
+`rootProject.name = 'addressbook-common'` by ``rootProject.name = "addressbook-common"`
+
+Simple quote are from _Groovy_.
+====
+
+Now, go to the `settings.gradle.kts` file and add the following lines:
 
 .settings.gradle.kts
 [source,kotlin]
@@ -155,7 +168,6 @@ kotlin {
             }
         }
     }
-
 
     js { browser() } // <5>
 }
@@ -345,6 +357,40 @@ Remember:
 * we do not need to declare the Kotlin Standard Library for native project, as it is included by the native compiler.
 ====
 
+==== The iOS special case
+
+Building libraries for *_iOS_* is also a special case in our build script.
+In fact, to be able to use our common library in *_Xcode_*, we need to build a *_framework_* file.
+
+To obtain this *_framework_* file, add the following block at the end of your Gradle build file:
+
+.build.gradle.kts
+[source,kotlin]
+----
+//...
+val packForXcode by tasks.creating(Sync::class) { //<1>
+    val mode = System.getenv("CONFIGURATION") ?: "DEBUG" //<2>
+    val framework = kotlin.targets
+        .getByName<org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget>("ios")
+        .binaries.getFramework(mode)
+    inputs.property("mode", mode)
+
+    dependsOn(framework.linkTask) //<3>
+
+    val targetDir = File(buildDir, "xcode-frameworks")
+    from({ framework.outputDirectory }) //<4>
+    into(targetDir) //<5>
+}
+
+tasks.getByName("build").dependsOn(packForXcode) //<6>
+----
+<1> Create a new task to make the framework available for *_Xcode_*
+<2> Selecting the right configuration depending on the environment variables set by Xcode build
+<3> The new task depends on the fact that the framework has been built
+<4> Move the built framework from the build directory
+<5> To a new location (could/should be a remote path)
+<6> Set the `packForXcode` task as part of the `build` task
+
 Let's keep the configuration aside and start coding :)
 
 == Defining the domain objects
@@ -462,6 +508,35 @@ class ContactApi {
 <5> Register *Kotlinx.Serialization* to serialize and de-serialize JSON
 
 TIP: Every import in `ContactApi.kt` should come from `io.ktor.client` or `kotlinx.serialization``
+
+==== `apiBaseUrl()` actual implementation
+
+We have defined an `expect` function in our code,
+thus we must define an `actual` behaviors foreach targeted platform to be able to compile our project.
+
+For each targeted platform, create a kotlin source file named `[ContactApi][platform].kt`, and add the right implementation for `apiBaseUrl()`.
+
+.androidMain > kotlin > com.mybusiness.api/ContactApiAndroid.kt
+[source,kotlin]
+----
+actual fun apiBaseUrl(): String = "10.0.2.2" // <1>
+----
+<1> On an *_Android_* emulator `127.0.0.1` refers to the device itself.
+To access your actual machine you need to use `10.0.2.2`
+
+.iosMain > kotlin > com.mybusiness.api/ContactApiIos.kt
+[source,kotlin]
+----
+actual fun apiBaseUrl() = LOCALHOST // <1>
+----
+<1> No special case here, your machine can be reached on `127.0.0.1`
+
+.jsMain > kotlin > com.mybusiness.api/ContactApiJs.kt
+[source,kotlin]
+----
+actual fun apiBaseUrl() = LOCALHOST // <1>
+----
+<1> No special case here, your machine can be reached on `127.0.0.1`
 
 === Creating the APIs interfaces
 
@@ -743,6 +818,7 @@ Also, we will create an implementation for each *Presenter*s' contract that will
 
 Previously, we have defined that our *Presenter* will execute some business logic into a given `CoroutineScope`, to avoid blocking the main thread.
 Thus, we should define a coroutine context on which our background processes will be executed, but we should also provide a coroutine context that will allow the *Presenter* to interact with the *View*.
+That is why we will provide coroutine dispatchers, as they determine what thread the corresponding coroutine uses for its execution.
 
 In `commonMain/kotlin`, create a new Kotlin source file `dispatchers.kt`:
 
@@ -770,6 +846,52 @@ internal expect val UIDispatcher: CoroutineContext // <2>
 ----
 <1> To execute code in the background of the application.
 <2> To execute code in the foreground of the application and interact with the UI.
+
+===== `actual` implementation for the dispatchers
+
+We have defined an `expect` function in our code,
+thus we must define an `actual` behaviors foreach targeted platform to be able to compile our project.
+
+For each targeted platform, create a kotlin source file named `[dispatchers][platform].kt`, and add the right implementation for `apiBaseUrl()`.
+
+.androidMain > kotlin > com.mybusiness/dispatchersAndroid.kt
+[source,kotlin]
+----
+internal actual val ApplicationDispatcher: CoroutineContext = Dispatchers.Default // <1>
+internal actual val UIDispatcher: CoroutineContext = Dispatchers.Main // <2>
+----
+<1> Uses a shared pool of threads
+<2> Uses the main thread
+
+.iosMain > kotlin > com.mybusiness/dispatchersIos.kt
+[source,kotlin]
+----
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Runnable
+import platform.darwin.dispatch_async
+import platform.darwin.dispatch_get_main_queue
+import kotlin.coroutines.CoroutineContext
+
+internal actual val ApplicationDispatcher: CoroutineContext = IosMainDispatcher() // <1>
+internal actual val UIDispatcher: CoroutineContext = IosMainDispatcher() // <1>
+
+internal class IosMainDispatcher() : CoroutineDispatcher() {
+    override fun dispatch(context: CoroutineContext, block: Runnable) {
+        dispatch_async(dispatch_get_main_queue()) { block.run() }
+    }
+}
+----
+<1> As told before, for now the coroutines can only work on the main thread for Kotlin/Native,
+thus the dispatchers for *_iOS_* will run on the same thread.
+
+.jsMain > kotlin > com.mybusiness/dispatchersJs.kt
+[source,kotlin]
+----
+internal actual val ApplicationDispatcher: CoroutineContext = Dispatchers.Default // <1>
+internal actual val UIDispatcher: CoroutineContext = Dispatchers.Main // <2>
+----
+<1> Uses a shared pool of threads
+<2> Uses the main thread
 
 That's it. You are all set up to implement the MVP pattern for our three use cases.
 
