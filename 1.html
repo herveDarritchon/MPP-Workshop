@@ -92,6 +92,37 @@ Don&#8217;t forget to check the <code>Kotlin DSL build script</code> checkbox.</
 <div class="paragraph">
 <p>Finally, select where the code rests, click finish, and enjoy your newly created multiplatform project :)</p>
 </div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>To avoid any misconfiguration issues you should change the Gradle Wrapper properties right now.</p>
+</div>
+<div class="paragraph">
+<p>Go the the newly created file <code>gradle-wrapper.properties</code> under <code>/business-library/gradle/wrapper/</code>
+and change the property <code>distributionUrl</code> with the value <code>https\://services.gradle.org/distributions/gradle-5.6.1-bin.zip</code></p>
+</div>
+<div class="listingblock">
+<div class="title">gradle-wrapper.properties</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="properties" class="language-properties hljs">distributionBase=GRADLE_USER_HOME
+distributionPath=wrapper/dists
+distributionUrl=https\://services.gradle.org/distributions/gradle-5.6.1-bin.zip
+zipStoreBase=GRADLE_USER_HOME
+zipStorePath=wrapper/dists</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The Gradle wrapper should upgrade itself within the next Gradle action.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
 </div>
 </div>
 <div class="sect1">

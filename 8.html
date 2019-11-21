@@ -101,13 +101,13 @@ This one will be more complete, as we would like it to handle as much logic as p
 <div class="ulist">
 <ul>
 <li>
-<p>Name: <code>adressbook-common</code></p>
+<p>Name: <code>addressbook-common</code></p>
 </li>
 <li>
 <p>Group ID: <code>com.mybusiness</code></p>
 </li>
 <li>
-<p>Artifact ID: <code>adressbook-common</code></p>
+<p>Artifact ID: <code>addressbook-common</code></p>
 </li>
 </ul>
 </div></div></td>
@@ -120,6 +120,37 @@ This one will be more complete, as we would like it to handle as much logic as p
 </tr>
 </tbody>
 </table>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>To avoid any misconfiguration issues you should change the Gradle Wrapper properties right now.</p>
+</div>
+<div class="paragraph">
+<p>Go the the newly created file <code>gradle-wrapper.properties</code> under <code>/addressbook-common/gradle/wrapper/</code>
+and change the property <code>distributionUrl</code> with the value <code>https\://services.gradle.org/distributions/gradle-5.6.1-bin.zip</code></p>
+</div>
+<div class="listingblock">
+<div class="title">gradle-wrapper.properties</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="properties" class="language-properties hljs">distributionBase=GRADLE_USER_HOME
+distributionPath=wrapper/dists
+distributionUrl=https\://services.gradle.org/distributions/gradle-5.6.1-bin.zip
+zipStoreBase=GRADLE_USER_HOME
+zipStorePath=wrapper/dists</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The Gradle wrapper should upgrade itself within the next Gradle action.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -162,8 +193,34 @@ Note that we won&#8217;t cover how to deploy binaries for <strong>Native</strong
 <p>Before configuring our plugins, we will configure the plugin management that will allow us to define plugins,
 without taking care of the version, or where should Gradle get the plugins while using them.</p>
 </div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
 <div class="paragraph">
-<p>Go to the <code>settings.gradle.kts</code> file and add the following lines:</p>
+<p>If, in your directory hierarchy, you have a file named <code>settings.gradle</code>, it should be renamed as <code>settings.gradle.kts`</code></p>
+</div>
+<div class="paragraph">
+<p>To do so, either <strong>right-click</strong> on the file, then click on <strong>Refactor</strong> &gt; <strong>Rename&#8230;&#8203;</strong>, or use the keyboard shortcut <strong>Shift+F6</strong>.</p>
+</div>
+<div class="paragraph">
+<p>Inside the file <code>settings.gradle.kts</code>, replace:</p>
+</div>
+<div class="paragraph">
+<p><code>rootProject.name = 'addressbook-common'</code> by <code>`rootProject.name = "addressbook-common"</code></p>
+</div>
+<div class="paragraph">
+<p>Simple quote are from <em>Groovy</em>.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Now, go to the <code>settings.gradle.kts</code> file and add the following lines:</p>
 </div>
 <div class="listingblock">
 <div class="title">settings.gradle.kts</div>
@@ -279,7 +336,6 @@ repositories {
             }
         }
     }
-
 
     js { browser() } <i class="conum" data-value="5"></i><b>(5)</b>
 }</code></pre>
@@ -635,6 +691,65 @@ We will have to use multiple implementations to be able to make some HTTP calls,
 </tr>
 </table>
 </div>
+</div>
+<div class="sect3">
+<h4 id="_the_ios_special_case"><a class="anchor" href="#_the_ios_special_case"></a>The iOS special case</h4>
+<div class="paragraph">
+<p>Building libraries for <strong><em>iOS</em></strong> is also a special case in our build script.
+In fact, to be able to use our common library in <strong><em>Xcode</em></strong>, we need to build a <strong><em>framework</em></strong> file.</p>
+</div>
+<div class="paragraph">
+<p>To obtain this <strong><em>framework</em></strong> file, add the following block at the end of your Gradle build file:</p>
+</div>
+<div class="listingblock">
+<div class="title">build.gradle.kts</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">//...
+val packForXcode by tasks.creating(Sync::class) { <i class="conum" data-value="1"></i><b>(1)</b>
+    val mode = System.getenv("CONFIGURATION") ?: "DEBUG" <i class="conum" data-value="2"></i><b>(2)</b>
+    val framework = kotlin.targets
+        .getByName&lt;org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget&gt;("ios")
+        .binaries.getFramework(mode)
+    inputs.property("mode", mode)
+
+    dependsOn(framework.linkTask) <i class="conum" data-value="3"></i><b>(3)</b>
+
+    val targetDir = File(buildDir, "xcode-frameworks")
+    from({ framework.outputDirectory }) <i class="conum" data-value="4"></i><b>(4)</b>
+    into(targetDir) <i class="conum" data-value="5"></i><b>(5)</b>
+}
+
+tasks.getByName("build").dependsOn(packForXcode) <i class="conum" data-value="6"></i><b>(6)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Create a new task to make the framework available for <strong><em>Xcode</em></strong></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Selecting the right configuration depending on the environment variables set by Xcode build</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>The new task depends on the fact that the framework has been built</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Move the built framework from the build directory</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>To a new location (could/should be a remote path)</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>Set the <code>packForXcode</code> task as part of the <code>build</code> task</td>
+</tr>
+</table>
+</div>
 <div class="paragraph">
 <p>Let&#8217;s keep the configuration aside and start coding :)</p>
 </div>
@@ -858,6 +973,59 @@ Every import in <code>ContactApi.kt</code> should come from <code>io.ktor.client
 </td>
 </tr>
 </table>
+</div>
+<div class="sect3">
+<h4 id="_apibaseurl_actual_implementation"><a class="anchor" href="#_apibaseurl_actual_implementation"></a><code>apiBaseUrl()</code> actual implementation</h4>
+<div class="paragraph">
+<p>We have defined an <code>expect</code> function in our code,
+thus we must define an <code>actual</code> behaviors foreach targeted platform to be able to compile our project.</p>
+</div>
+<div class="paragraph">
+<p>For each targeted platform, create a kotlin source file named <code>[ContactApi][platform].kt</code>, and add the right implementation for <code>apiBaseUrl()</code>.</p>
+</div>
+<div class="listingblock">
+<div class="title">androidMain &gt; kotlin &gt; com.mybusiness.api/ContactApiAndroid.kt</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">actual fun apiBaseUrl(): String = "10.0.2.2" <i class="conum" data-value="1"></i><b>(1)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>On an <strong><em>Android</em></strong> emulator <code>127.0.0.1</code> refers to the device itself.
+To access your actual machine you need to use <code>10.0.2.2</code></td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="title">iosMain &gt; kotlin &gt; com.mybusiness.api/ContactApiIos.kt</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">actual fun apiBaseUrl() = LOCALHOST <i class="conum" data-value="1"></i><b>(1)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>No special case here, your machine can be reached on <code>127.0.0.1</code></td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="title">jsMain &gt; kotlin &gt; com.mybusiness.api/ContactApiJs.kt</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">actual fun apiBaseUrl() = LOCALHOST <i class="conum" data-value="1"></i><b>(1)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>No special case here, your machine can be reached on <code>127.0.0.1</code></td>
+</tr>
+</table>
+</div>
 </div>
 </div>
 <div class="sect2">
@@ -1347,7 +1515,8 @@ Also, we will create an implementation for each <strong>Presenter*s' contract th
 <h4 id="_coroutine_contexts_definition"><a class="anchor" href="#_coroutine_contexts_definition"></a>Coroutine contexts definition</h4>
 <div class="paragraph">
 <p>Previously, we have defined that our <strong>Presenter</strong> will execute some business logic into a given <code>CoroutineScope</code>, to avoid blocking the main thread.
-Thus, we should define a coroutine context on which our background processes will be executed, but we should also provide a coroutine context that will allow the <strong>Presenter</strong> to interact with the <strong>View</strong>.</p>
+Thus, we should define a coroutine context on which our background processes will be executed, but we should also provide a coroutine context that will allow the <strong>Presenter</strong> to interact with the <strong>View</strong>.
+That is why we will provide coroutine dispatchers, as they determine what thread the corresponding coroutine uses for its execution.</p>
 </div>
 <div class="paragraph">
 <p>In <code>commonMain/kotlin</code>, create a new Kotlin source file <code>dispatchers.kt</code>:</p>
@@ -1400,8 +1569,84 @@ internal expect val UIDispatcher: CoroutineContext <i class="conum" data-value="
 </tr>
 </table>
 </div>
+<div class="sect4">
+<h5 id="_actual_implementation_for_the_dispatchers"><a class="anchor" href="#_actual_implementation_for_the_dispatchers"></a><code>actual</code> implementation for the dispatchers</h5>
+<div class="paragraph">
+<p>We have defined an <code>expect</code> function in our code,
+thus we must define an <code>actual</code> behaviors foreach targeted platform to be able to compile our project.</p>
+</div>
+<div class="paragraph">
+<p>For each targeted platform, create a kotlin source file named <code>[dispatchers][platform].kt</code>, and add the right implementation for <code>apiBaseUrl()</code>.</p>
+</div>
+<div class="listingblock">
+<div class="title">androidMain &gt; kotlin &gt; com.mybusiness/dispatchersAndroid.kt</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">internal actual val ApplicationDispatcher: CoroutineContext = Dispatchers.Default <i class="conum" data-value="1"></i><b>(1)</b>
+internal actual val UIDispatcher: CoroutineContext = Dispatchers.Main <i class="conum" data-value="2"></i><b>(2)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Uses a shared pool of threads</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Uses the main thread</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="title">iosMain &gt; kotlin &gt; com.mybusiness/dispatchersIos.kt</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Runnable
+import platform.darwin.dispatch_async
+import platform.darwin.dispatch_get_main_queue
+import kotlin.coroutines.CoroutineContext
+
+internal actual val ApplicationDispatcher: CoroutineContext = IosMainDispatcher() <i class="conum" data-value="1"></i><b>(1)</b>
+internal actual val UIDispatcher: CoroutineContext = IosMainDispatcher() <i class="conum" data-value="1"></i><b>(1)</b>
+
+internal class IosMainDispatcher() : CoroutineDispatcher() {
+    override fun dispatch(context: CoroutineContext, block: Runnable) {
+        dispatch_async(dispatch_get_main_queue()) { block.run() }
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>As told before, for now the coroutines can only work on the main thread for Kotlin/Native,
+thus the dispatchers for <strong><em>iOS</em></strong> will run on the same thread.</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="title">jsMain &gt; kotlin &gt; com.mybusiness/dispatchersJs.kt</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">internal actual val ApplicationDispatcher: CoroutineContext = Dispatchers.Default <i class="conum" data-value="1"></i><b>(1)</b>
+internal actual val UIDispatcher: CoroutineContext = Dispatchers.Main <i class="conum" data-value="2"></i><b>(2)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Uses a shared pool of threads</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Uses the main thread</td>
+</tr>
+</table>
+</div>
 <div class="paragraph">
 <p>That&#8217;s it. You are all set up to implement the MVP pattern for our three use cases.</p>
+</div>
 </div>
 </div>
 <div class="sect3">
