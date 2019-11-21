@@ -1102,7 +1102,7 @@ As the <strong>Ktor</strong> <code>HttpClient</code> works asynchronously with K
 <pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">class ContactApi {
     //...
     suspend fun getAllContacts(): List&lt;Contact&gt; { <i class="conum" data-value="1"></i><b>(1)</b>
-        return Json.parse( <i class="conum" data-value="2"></i><b>(2)</b>
+        return Json.nonstrict.parse( <i class="conum" data-value="2"></i><b>(2)</b>
             Contact.serializer().list, <i class="conum" data-value="3"></i><b>(3)</b>
             client.get { <i class="conum" data-value="4"></i><b>(4)</b>
                 apiUrl() <i class="conum" data-value="5"></i><b>(5)</b>
@@ -1120,7 +1120,7 @@ As the <strong>Ktor</strong> <code>HttpClient</code> works asynchronously with K
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>Use the <code>Json.parse</code> function from <strong>Kotlinx.Serialization</strong> to transfrom Json to <code>Contact</code> data class.</td>
+<td>Use the <code>Json.nonstrict.parse</code> function from <strong>Kotlinx.Serialization</strong> to transfrom Json to <code>Contact</code> data class.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="3"></i><b>3</b></td>
@@ -1146,7 +1146,7 @@ So, we should be able to get the detailed information for a contact giving its <
 <pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">class ContactApi {
   //...
   suspend fun getContactById(contactId: String): Contact { <i class="conum" data-value="1"></i><b>(1)</b>
-        return Json.parse( <i class="conum" data-value="2"></i><b>(2)</b>
+        return Json.nonstrict.parse( <i class="conum" data-value="2"></i><b>(2)</b>
             Contact.serializer(), <i class="conum" data-value="3"></i><b>(3)</b>
             client.get { <i class="conum" data-value="4"></i><b>(4)</b>
                 apiUrl("/$contactId") <i class="conum" data-value="5"></i><b>(5)</b>
@@ -1164,7 +1164,7 @@ So, we should be able to get the detailed information for a contact giving its <
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>Use the <code>Json.parse</code> function from <strong>Kotlinx.Serialization</strong> to transfrom Json to <code>Contact</code> data class.</td>
+<td>Use the <code>Json.nonstrict.parse</code> function from <strong>Kotlinx.Serialization</strong> to transfrom Json to <code>Contact</code> data class.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="3"></i><b>3</b></td>
@@ -1195,7 +1195,7 @@ with a body containing a <code>Contact</code> transformed into JSON.</p>
 <pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">class ContactApi {
     //...
     suspend fun putContact(contactEntity: Contact): String { <i class="conum" data-value="1"></i><b>(1)</b>
-        return Json.parse( <i class="conum" data-value="2"></i><b>(2)</b>
+        return Json.nonstrict.parse( <i class="conum" data-value="2"></i><b>(2)</b>
             (StringSerializer to StringSerializer).map, <i class="conum" data-value="3"></i><b>(3)</b>
             client.put { <i class="conum" data-value="4"></i><b>(4)</b>
                 apiUrl() <i class="conum" data-value="5"></i><b>(5)</b>
@@ -1216,7 +1216,7 @@ with a body containing a <code>Contact</code> transformed into JSON.</p>
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>Use the <code>Json.parse</code> function from <strong>Kotlinx.Serialization</strong> to transfrom Json to a <code>Map&lt;String, String&gt;</code>.</td>
+<td>Use the <code>Json.nonstrict.parse</code> function from <strong>Kotlinx.Serialization</strong> to transfrom Json to a <code>Map&lt;String, String&gt;</code>.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="3"></i><b>3</b></td>
@@ -1873,7 +1873,7 @@ internal actual val UIDispatcher: CoroutineContext = Dispatchers.Main <i class="
 <div class="listingblock">
 <div class="title">ContactCreateUpdate.kt</div>
 <div class="content">
-<pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">class ContactCreationUpdatePresenterImpl(
+<pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">class ContactCreationUpdatePresenter(
     private val contactApi: ContactApi, <i class="conum" data-value="1"></i><b>(1)</b>
     coroutineContext: CoroutineContext = ApplicationDispatcher <i class="conum" data-value="2"></i><b>(2)</b>
 ) : ContactCreationUpdate.Presenter, BasePresenter&lt;ContactCreationUpdate.View&gt;(coroutineContext) { <i class="conum" data-value="3"></i><b>(3)</b>
