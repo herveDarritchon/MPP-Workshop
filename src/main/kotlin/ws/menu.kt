@@ -32,7 +32,7 @@ private object Styles : StyleSheet("menu", isStatic = true) {
         display = Display.flex
         flexDirection = FlexDirection.column
 
-        "h1" {
+        h1 {
             fontSize = 2.5.em
             margin(1.em, 0.5.em)
             color = Color("#703f1c")
