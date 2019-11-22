@@ -85,6 +85,10 @@ tasks {
         }
     }
     getByName("assemble").dependsOn("pagesJson")
+
+    create("compileAll") {
+        dependsOn("asciidoctor", "pagesJson", "compileKotlinJs")
+    }
 }
 
 kotlin {
