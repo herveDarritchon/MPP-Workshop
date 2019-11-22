@@ -12,7 +12,7 @@ Thus, after creating the project, we will put in it the following parts:
 - The backend API interfaces
 - The MVP pattern, to handle API calls and view updates.
 
-Each of those steps will be defined in the common code, and shared between every targeted platform!
+Each of those steps will be defined in the common code, and shared between every targeted platforms!
 
 == Project creation
 
@@ -64,17 +64,16 @@ As we saw earlier, we will need multiple Gradle plugins to achieve our Kotlin mu
 
 We already saw that in order to create a Kotlin multi-platform project we have to use the plugin `org.jetbrains.kotlin.multiplatform`.
 
-Our multi-platform application will need to call a backend API, thus should be able to serialize and de-serialize data.
+Plus, our multi-platform application will need to call a backend API, thus should be able to serialize and de-serialize data.
 So, we also have to use *Kotlinx.Serialization* with the `serialization` plugin.
 
 Finally, as in the previous exercise, we will need the `maven-publish` plugin to be able to publish locally our library.
 
 NOTE: Note that we won't cover how to deploy binaries for *Native* or *_JavaScript_* targets.
 
-==== Plugin management
+==== Enabling the `GRADLE_METADATA` feature
 
-Before configuring our plugins, we will configure the plugin management that will allow us to define plugins,
-without taking care of the version, or where should Gradle get the plugins while using them.
+Before configuring our plugins, we will add some configuration to be able to depends on `Kotlin/Native` libraries.
 
 [WARNING]
 ====
@@ -94,27 +93,8 @@ Now, go to the `settings.gradle.kts` file and add the following lines:
 .settings.gradle.kts
 [source,kotlin]
 ----
-val kotlinVersion = "1.3.50" // <1>
-
-pluginManagement {
-    resolutionStrategy {
-        eachPlugin {
-            when (requested.id.id) {
-                "org.jetbrains.kotlin.multiplatform"
-                  -> useModule("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion") // <2>
-                "org.jetbrains.kotlin.plugin.serialization"
-                  -> useModule("org.jetbrains.kotlin:kotlin-serialization:$kotlinVersion") // <3>
-            }
-        }
-    }
-}
-
-enableFeaturePreview("GRADLE_METADATA") // <4>
+enableFeaturePreview("GRADLE_METADATA")
 ----
-<1> Set the targeted Kotlin version for your project.
-<2> While using the Kotlin `multiplatform` plugin, say where to get it
-<3> While using the Kotlin `serialization` plugin, say where to get it
-<4> Enables the `GRADLE_METADATA` feature, to be able to depends on `Kotlin/Native` libraries
 
 Now, go to the `build.gradle.kts` file and replace the `plugins` and `repositories` sections by the following lines:
 
@@ -122,13 +102,13 @@ Now, go to the `build.gradle.kts` file and replace the `plugins` and `repositori
 [source,kotlin]
 ----
 plugins {
-    id("org.jetbrains.kotlin.multiplatform") // <1>
-    id("org.jetbrains.kotlin.plugin.serialization") // <2>
+    kotlin("multiplatform") version "1.3.50" // <1>
+    kotlin("plugin.serialization") version "1.3.50" // <2>
     `maven-publish`
 }
 
 group = "com.mybusiness"
-version = "1.0-SNAPSHOT"
+version = "1.0.0-SNAPSHOT"
 
 repositories {
     jcenter()
@@ -143,7 +123,7 @@ repositories {
 
 === Targets
 
-As before, we will target the 3 environments that are the *_JVM_*, *_iOS_* and the *_Web_*.
+As before, we will target the three environments that are the *_JVM_*, *_iOS_* and the *_Web_*.
 
 Open the `build.gradle.kts` file and add the following code into the `kotlin` block:
 
@@ -153,15 +133,7 @@ Open the `build.gradle.kts` file and add the following code into the `kotlin` bl
 kotlin {
     jvm("android") // <1>
 
-    //select iOS target platform depending on the Xcode environment variables
-    val iOSTarget: (String, org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget.() -> Unit)
-            -> org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget =
-        if (System.getenv("SDK_NAME")?.startsWith("iphoneos") == true)
-            ::iosArm64
-        else
-            ::iosX64
-
-    iOSTarget("ios") { // <2>
+    iosX64("ios") { // <2>
         binaries {
             framework { // <3>
                 baseName = "AddressBookCommon" // <4>
@@ -182,17 +154,13 @@ kotlin {
 ====
 *_Android_* is running on a JVM, so it's just a JVM target. As we could have different JVM target we can specify it,
 and as we know for sure that we want to target *_Android_*, we will name it in the target declaration *android*.
-
-TIP: Since Kotlin 1.3.60, there is new targets for *_Android_* native.
 ====
-
-NOTE: *_iOS_* can have multiple target, depending on your Xcode environment. Here `iosArm64` is for *iphonesimulator*.
 
 === Source sets and dependencies
 
-In this section we will define all de dependencies needed for our Kotlin multi-platform common code.
+In this section we will define all the dependencies needed for our Kotlin multi-platform common code.
 
-There are 3 main dependencies that we will need to develop and use the Kotlin multi-platform library:
+There are three main dependencies that we will need to develop and use the Kotlin multi-platform library:
 
 * *Ktor client*
 +
@@ -211,7 +179,7 @@ To serialize and de-serialize our HTTP calls content, we will use a Kotlin multi
 +
 As *Ktor* is an asynchronous framework, and it is based on coroutines, we need to use coroutines context to wrap our HTTP calls.
 
-To avoid code redondance. we will prepare some shortcuts to declare the dependencies:
+To avoid code redundancy, we will prepare some shortcuts to declare the dependencies:
 
 .build.gradle.kts - source sets code block
 [source,kotlin]
@@ -222,7 +190,7 @@ kotlin {
         // Versions
         val ktorVersion = "1.2.5"
         val coroutinesVersion = "1.3.2"
-        val serializationVersion = "0.13.0"
+        val serializationVersion = "0.14.0"
         // Shortcuts
         fun kotlinx(module: String, version: String)
             = "org.jetbrains.kotlinx:kotlinx-$module:$version" // <1>
@@ -479,7 +447,7 @@ image:res/8-7.png[source directory structure,300]
 [cols="40%,<.^60%a",grid="none",frame="none"]
 |===
 |image:res/8-8.png[new directory]
-|To create a package aside of an existing one, you need to create with its full path
+|To create a package aside of an existing one, you need to create it with its full path
 |===
 ====
 
@@ -540,8 +508,8 @@ actual fun apiBaseUrl() = LOCALHOST // <1>
 
 === Creating the APIs interfaces
 
-Before writing our interfaces to reach each endpoints on the backend API,
-we will declare an Extension Function to wrap the API url definition.
+Before writing our interfaces to reach each endpoints of the backend API,
+we will declare an _extension function_ to wrap the API url definition.
 
 .ContactApi.kt
 [source,kotlin]
@@ -1075,6 +1043,41 @@ object CommonInjector {
 <1> Every thread gets its own instance of `CommonInjector`.
 <2> Lazily instantiate a `ContactApi`.
 <3> Instantiating presenters with the `ContactApi` instance.
+
+=== Building and publishing your multi-platform library
+
+Before going further, we need to prepare our multi-platform library by building and publishing it with Gradle.
+
+* For the `JVM`
++
+[NOTE]
+====
+In your Gradle build file `build.gradle.kts` we have put the plugin `maven-publish`
+
+.build.gradle.kts > plugin
+[source,kotlin]
+----
+plugins {
+    //...
+    `maven-publish`
+}
+----
+====
++
+In your Gradle script change your version from `1.0.0-SNAPSHOT` to `1.0.0`.
++
+In the Gradle pane, you should see a new task group, named `publishing` (hit the refresh button if you don't).
++
+image:res/8-16.png[gradle publishing, 250]
++
+Then, in `Tasks` > `publishing`, double click on `publishToMavenLocal` to run this Gradle task.
+
+* For all the other platform
++
+As told before, we won't cover library publication for *_Native_* and *_JavaScript_* is this workshop.
+So, to use our Kotlin multi-platform library on those platform we will generate and import them manually.
+
+To build your Kotlin multi-platform library go to the Gradle pane and run the task `build` in the `build`group.
 
 == What's next ?
 

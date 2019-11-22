@@ -57,7 +57,7 @@ IMPORTANT: This is important: if not taken care of, it *will* result into *unwan
 
 == What? How?
 
-During this workshop, we are going to build a multi-platform *kAddress Book*.
+During this workshop, we are going to build a multi-platform *Address Book*.
 
 By the end of the day, _if everything goes well_, you *may* have:
 
@@ -68,7 +68,7 @@ By the end of the day, _if everything goes well_, you *may* have:
 
 == Install
 
-Do you have what it takes to develop with Kotlin/Multiplatform?
+Do you have what it takes to develop with *_Kotlin/Multiplatform_*?
 
 Before starting this workshop, you need:
 

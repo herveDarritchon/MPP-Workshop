@@ -17,7 +17,7 @@ This templates...
 == The creation wizard
 
 We are going to create a new Gradle project. +
-While we're at it, we'll be using the Gradle Kotlin DSL (if you haven't used it already, now's your chance!).
+While we're at it, we'll be using the Gradle Kotlin DSL (if you haven't used it already, now is your chance!).
 
 TIP: The Gradle Kotlin DSL allows you to bring type safety as well as IDE completion & API exploration into your build script.
 
@@ -293,7 +293,7 @@ Create the following directories:
 
 [TIP]
 ====
-If your using IntelliJ IDEA 2019.3 EAP or superior, it will suggest you the right folder creating regarding of your build script.
+If your using IntelliJ IDEA 2019.3 EAP or superior, it will suggest you the right folder to create regarding of your build script.
 
 image:res/1-2.png[new directory]
 

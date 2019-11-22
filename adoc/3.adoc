@@ -12,7 +12,7 @@ So we should be able to work with every specifics of each platform in our common
 == What is ``expect``ed must ``actual``y exist
 
 Kotlin/Multiplatform provides a way to define an `expect`/`actual` mechanism.
-In the common code, we define the ``expect``ed behaviors, allowing us to provide the `actual` behavior in each targeted platform.
+In the common code, we define the ``expect``ed behaviors, allowing us to provide the `actual` behaviors in each targeted platform.
 
 *The expectation [`expect`] code will be defined in the common module:*
 
@@ -112,7 +112,7 @@ Meaning, you'll have to create a new kotlin file for each platform:
 
 [IMPORTANT]
 ====
-1. You must define your `actual` members into the same package as the ``expect``ed behavior
+1. You must define your `actual` members into the same package as the ``expect``ed behaviors
 2. Your `actual` members should not be in a file with the same name as your `expect` members, otherwise your could have conflicts at build time.
 
 [cols="2", grid="none", frame="none"]
@@ -466,7 +466,7 @@ If you run the Gradle task `build` you'll find `businessLibrary.framework` in yo
 image:res/3-7.png[build directory]
 ====
 
-To use this newly generated *_framework_* directory in *_Xcode_* we need to provide a new Gradle task to copy
+To use this newly generated *_framework_* file in *_Xcode_* we need to provide a new Gradle task to copy
 it into a shared place.
 
 Add the following block at the end of your Gradle build file:
