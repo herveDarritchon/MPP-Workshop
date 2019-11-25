@@ -77,7 +77,7 @@ tasks {
         doLast {
             val titles = rootDir.resolve("adoc").list()!!
                     .filter { it.endsWith(".adoc") }
-                    .sorted()
+                    .sortedBy { it.substring(0, it.indexOf(".")).toInt() }
                     .map { rootDir.resolve("adoc/$it").useLines { it.first() } }
                     .map { it.trimMargin("=").trim() }
 
