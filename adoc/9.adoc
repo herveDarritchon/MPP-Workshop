@@ -54,13 +54,13 @@ That is why we need to define some architectural classes, to make our code clear
 
 Let's create a new package `presentation` and a Kotlin source file `base.kt`, still in `commonMain/kotlin`:
 
-image:res/8-9.png[source directory structure,300]
+image:res/9-1.png[source directory structure,300]
 
 [TIP]
 ====
 [cols="40%,<.^60%a",grid="none",frame="none"]
 |===
-|image:res/8-10.png[new directory]
+|image:res/9-2.png[new directory]
 |To create a package aside of an existing one, you need to create with its full path
 |===
 ====
@@ -104,9 +104,12 @@ abstract class BasePresenter<T>(private val coroutineContext: CoroutineContext) 
     fun attachView(view: T) { // <4>
         this.view = view
         scope = PresenterCoroutineScope(coroutineContext)
+        onViewAttached(view)
     }
 
-    fun detachView() { // <5>
+    protected open fun onViewAttached(view: T) {} // <5>
+
+    fun detachView() { // <6>
         view = null
         scope.viewDetached()
     }
@@ -116,7 +119,8 @@ abstract class BasePresenter<T>(private val coroutineContext: CoroutineContext) 
 <2> Declare the *View* bind to the *Presenter*. This will be used to send data to the *View* when the *Presenter* needs to send update to the UI.
 <3> Declare the `CoroutineScope` that will manage code execution in the background (calling the backend API for example)
 <4> Use this to attach the view to the *Presenter* and create the `CoroutineScope`
-<5> Use this when you do not need the *View* anymore, avoiding leaks in your application.
+<5> This function will be called while attaching the view to the *Presenter*, we could override it to put some business logic here.
+<6> Use this when you do not need the *View* anymore, avoiding leaks in your application.
 
 For each of the use cases, we have to define two interfaces.
 Those interfaces will be the contract that the *View* and the *Presenter* have to respect.
@@ -130,7 +134,7 @@ That is why we will provide coroutine dispatchers, as they determine what thread
 
 In `commonMain/kotlin`, create a new Kotlin source file `dispatchers.kt`:
 
-image:res/8-11.png[source directory structure,300]
+image:res/9-3.png[source directory structure,300]
 
 In this source file, we will put two dispatchers, one for background work (`ApplicationDispatcher`) and one for UI interaction (`UIDispatcher`).
 
@@ -207,7 +211,7 @@ That's it. You are all set up to implement the MVP pattern for our three use cas
 
 In the `presentation` package, create a new Kotlin source file `ContactList.kt`, still in the `commonMain` module:
 
-image:res/8-12.png[source directory structure,300]
+image:res/9-4.png[source directory structure,300]
 
 * The contract
 +
@@ -256,7 +260,7 @@ class ContactListPresenter(
 
 In the `presentation` package, create a new Kotlin source file `ContactDetail.kt`, still in the `commonMain` module:
 
-image:res/8-13.png[source directory structure,300]
+image:res/9-5.png[source directory structure,300]
 
 * The contract
 +
@@ -305,7 +309,7 @@ class ContactDetailPresenter(
 
 In the `presentation` package, create a new Kotlin source file `ContactCreateUpdate.kt`, still in the `commonMain` module:
 
-image:res/8-14.png[source directory structure,300]
+image:res/9-6.png[source directory structure,300]
 
 * The contract
 +
@@ -363,7 +367,7 @@ To avoid creating our different objects manually, let's provide a singleton obje
 
 Create a new package `di` and a Kotlin source file `CommonInjector.kt`:
 
-image:res/8-15.png[source directory structure,300]
+image:res/9-7.png[source directory structure,300]
 
 .CommonInjector.kt
 [source,kotlin]
@@ -408,7 +412,7 @@ In your Gradle script change your version from `1.0.0-SNAPSHOT` to `1.0.0`.
 +
 In the Gradle pane, you should see a new task group, named `publishing` (hit the refresh button if you don't).
 +
-image:res/8-16.png[gradle publishing, 250]
+image:res/9-8.png[gradle publishing, 250]
 +
 Then, in `Tasks` > `publishing`, double click on `publishToMavenLocal` to run this Gradle task.
 
