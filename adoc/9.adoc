@@ -101,6 +101,7 @@ abstract class BasePresenter<T>(private val coroutineContext: CoroutineContext) 
     protected var view: T? = null; private set // <2>
     protected lateinit var scope: PresenterCoroutineScope // <3>
 
+    @JsName("attachView")
     fun attachView(view: T) { // <4>
         this.view = view
         scope = PresenterCoroutineScope(coroutineContext)
@@ -109,6 +110,7 @@ abstract class BasePresenter<T>(private val coroutineContext: CoroutineContext) 
 
     protected open fun onViewAttached(view: T) {} // <5>
 
+    @JsName("detachView")
     fun detachView() { // <6>
         view = null
         scope.viewDetached()
@@ -121,6 +123,8 @@ abstract class BasePresenter<T>(private val coroutineContext: CoroutineContext) 
 <4> Use this to attach the view to the *Presenter* and create the `CoroutineScope`
 <5> This function will be called while attaching the view to the *Presenter*, we could override it to put some business logic here.
 <6> Use this when you do not need the *View* anymore, avoiding leaks in your application.
+
+NOTE: We use the `@JsName` annotation to avoid that _Kotlin/JS_ compiler mangles the functions' names
 
 For each of the use cases, we have to define two interfaces.
 Those interfaces will be the contract that the *View* and the *Presenter* have to respect.
@@ -219,16 +223,14 @@ image:res/9-4.png[source directory structure,300]
 [source,kotlin]
 ----
 class ContactList {
-    interface Presenter {
-        fun getContactList() // <1>
-    }
+    interface Presenter
     interface View {
-        fun displayContactList(contactList: List<Contact>) // <2>
+        @JsName("displayContactList")
+        fun displayContactList(contactList: List<Contact>) // <1>
     }
 }
 ----
-<1> Function called by the *View* to retrieve all the contacts from the backend.
-<2> Function called by the *Presenter* when the data are ready to be displayed.
+<1> Function called by the *Presenter* when the data are ready to be displayed.
 
 * The presenter implementation
 +
@@ -239,7 +241,7 @@ class ContactListPresenter(
     private val contactApi: ContactApi, // <1>
     coroutineContext: CoroutineContext = ApplicationDispatcher // <2>
 ) : ContactList.Presenter, BasePresenter<ContactList.View>(coroutineContext) { // <3>
-    override fun getContactList() {
+    override fun onViewAttached(view: ContactList.View) {
         scope.launch { // <4>
             val contactList = contactApi.getAllContacts()
             withContext(UIDispatcher) { // <5>
@@ -269,9 +271,11 @@ image:res/9-5.png[source directory structure,300]
 ----
 class ContactDetail {
     interface Presenter {
+        @JsName("getContact")
         fun getContact(contactId: String) // <1>
     }
     interface View {
+        @JsName("displayContact")
         fun displayContact(contact: Contact) // <2>
     }
 }
@@ -318,10 +322,13 @@ image:res/9-6.png[source directory structure,300]
 ----
 class ContactCreationUpdate {
     interface Presenter {
+        @JsName("updateOrCreateContact")
         fun updateOrCreateContact(contact: Contact) // <1>
     }
     interface View {
+        @JsName("updateOrCreationSucceed")
         fun updateOrCreationSucceed() // <2>
+        @JsName("updateOrCreationFails")
         fun updateOrCreationFails() // <3>
     }
 }
