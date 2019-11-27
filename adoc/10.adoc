@@ -17,7 +17,7 @@ Open a terminal and run the following *Git* command:
 .Cloning the starter project
 [source,shell script]
 ----
-git clone https://github.com/romainbsl/mpp-workshop-android-starter
+git clone https://github.com/romainbsl/mpp-workshop-android-starter.git
 ----
 
 [cols="^40%,<.^60%a",grid="none",frame="none"]
@@ -176,7 +176,7 @@ class ItemListActivity : AppCompatActivity(), ContactList.View { // <1>
 }
 ----
 <1> Implements the interface `ContactList.View`, defined into the common library
-<2> Overrides the function `displayContactList`, defined by the interface
+<2> Implements the function `displayContactList`, defined by the interface
 <3> Setting up the `RecyclerView` adapter, by giving it the contact list that need to be displayed on screen
 +
 Finally, the function `displayContactList` would be called by the *Presenter* when the data will be ready to display.
