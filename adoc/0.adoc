@@ -2,7 +2,7 @@
 :toc:
 :icons: font
 
-Welcome to the Mobile Multiplatform Kotlin Workshop.
+Welcome to the Mobile Multi-Platform Kotlin Workshop.
 
 Learning to develop with Kotlin multiplatform is exactly like learning for any other technology: it is a set of skills that can be divided into three categories:
 
