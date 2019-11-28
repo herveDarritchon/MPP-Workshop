@@ -55,7 +55,7 @@ Then, add the following dependencies to your `build.gradle` into the `app` modul
 //...
 dependencies {
     //...
-    implementation 'com.mybusiness:addressbook-common-android:1.0.0' // <1>
+    implementation 'com.mybusiness:addressbook-common:1.0.0' // <1>
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.2' // <2>
     //...
 }
@@ -63,7 +63,7 @@ dependencies {
 <1> The dependency is named `addressbook-common-android` because we have defined `android` as our target
 <2> Provides `Dispatchers.Main` context for Android applications
 
-TIP: We will see in a later chapter how to avoid target naming when building a Kotlin multi-platform project.
+NOTE: We do not need to specify the target name for our Kotlin multi-platform project.
 
 === Android Manifest
 
@@ -93,7 +93,7 @@ Go to the Kotlin source file `SimpleItemRecyclerViewAdapter.kt`
 
 Then, remove the class `EmptyContact`, leading to an issue `Unresolved reference: EmptyContact`.
 
-To fix this, change the constructor's second parameter `values`, to be type of `List<Contact>` instead of List<EmptyContact>.
+To fix this, change the constructor's second parameter `values`, to be type of `List<Contact>` instead of `List<EmptyContact>`.
 
 .SimpleItemRecyclerViewAdapter.kt
 [source,kotlin]
@@ -102,11 +102,11 @@ class SimpleItemRecyclerViewAdapter(private val parentActivity: ItemListActivity
                                     private val values: List<Contact>)
 ----
 
-Afterwards, we need to do two things onto this class:
+Afterwards, we need to do two things into this class:
 
 1. change the event `onClickListener`, to launch a new activity that will display the details of the clicked contact.
 +
-Go to the `init` block and change the `View.OnClickListener` behavior
+Go to the `init` block and change the `View.OnClickListener` lambda:
 +
 .SimpleItemRecyclerViewAdapter.kt
 [source,kotlin]
@@ -124,8 +124,8 @@ Go to the `init` block and change the `View.OnClickListener` behavior
 //...
 ----
 <1> Get the contact clicked from the `RecyclerView`
-<2> Create a new screen that will be responsible to show the contact details
-<3> Set the contact Id into the new screen extra data to be able to get the contact details
+<2> Create a new screen that will be responsible to show the contact's details
+<3> Set the contact Id into the  extra data of the new screen to be able to get the contact details
 <4> Launch the new screen
 
 2. override the function `onBindViewHolder`, to set the `RecyclerView` item behavior
@@ -162,7 +162,7 @@ The view that will show the contact list is `ItemListActivity`.
 This is the last class that we need to change to display our contact list. Open it.
 
 _Remember the MVP pattern._ We already have wrote the *Model* and the *Presenter* into our Kotlin multi-platform library.
-Here we are working on the *View*. So, the View needs to implement the contract that we have defined and to be bound to the right *Presenter*.
+Here we are working on the *View*. So, the View needs to implement the contract that we have defined and needs to be bound to the right *Presenter*.
 
 * Respect the contract from `ContactList.View`
 +
@@ -177,7 +177,7 @@ class ItemListActivity : AppCompatActivity(), ContactList.View { // <1>
 ----
 <1> Implements the interface `ContactList.View`, defined into the common library
 <2> Implements the function `displayContactList`, defined by the interface
-<3> Setting up the `RecyclerView` adapter, by giving it the contact list that need to be displayed on screen
+<3> Setting up the `RecyclerView` adapter, by passing the contact list that needs to be displayed on screen
 +
 Finally, the function `displayContactList` would be called by the *Presenter* when the data will be ready to display.
 
@@ -186,6 +186,8 @@ Finally, the function `displayContactList` would be called by the *Presenter* wh
 To bind our view with the presenter, surely we will need to provide a `ContactListPresenter` to `ItemListActivity`, and we must attached them while the view starts.
 +
 Also, as we want to avoid memory leaks, we have to detach the view from the presenter when the view is destroyed.
++
+NOTE: In a real world application, you should manage a state for the presenter, to avoid destroying it if the phone orientation change, for example.
 +
 .ItemListActivity.kt
 [source,kotlin]
@@ -207,8 +209,7 @@ override fun onDestroy() {
 <2> When the view starts, attach the view to the presenter.
 <3> When the view is destroyed, detach the view from the presenter.
 
-Remember, in the common library, into the ContactListPresenter, when the view is attached to the presenter,
-the function `ContactListPresenter#getContactList` is triggered, thus the backend API is called to retrieve the contact list.
+=== Run the application
 
 You can run the application onto an *Android Emulator* by clicking the button image:res/run-android.png[run,16] in *Android Studio*.
 
@@ -224,15 +225,15 @@ This is our next part, showing the contact details.
 == Retrieve and display the contact details
 
 In the previous part, we have worked on displaying the contacts into a `RecyclerView`. While configuring this `RecyclerView`,
-we have wrote that when clicking onto an item of the list we should run an another view, by giving it the contact Id.
+we have wrote that when clicking onto an item of the list we should run an another view, by passing it the contact Id.
 
-Now, we are able to change this details view by binding it to the presenter `ContactDetailPresenter` and implementing the contract interface `ContactDetail.View`.
+Now, we are able to change this view by binding it to the presenter `ContactDetailPresenter` and implementing the contract interface `ContactDetail.View`.
 
 The view is divided into two parts, the `ItemDetailActivity` that will handle the state of the view,
-and the `ItemDetailFragment` that is responsible on displaying data to the sceen.
+and the `ItemDetailFragment` that is responsible on displaying data to the screen.
 
-When the `ItemDetailActivity` is created, it receives the Id of the contact that we need to display the details.
-As we will be binding the view (Fragment) with the presenter, we have to pass this reference to the fragment as well.
+When the `ItemDetailActivity` is created, it receives the Id of the contact for which we need to display the details.
+As we will be binding the view (`Fragment`) with the presenter, we have to pass this reference to the fragment as well.
 For that, we should update the function `onCreate` of `ItemDetailActivity`:
 
 .ItemDetailActivity
@@ -253,10 +254,10 @@ override fun onCreate(savedInstanceState: Bundle?) {
     }
 }
 ----
-<1> Add extra data as arguments after creating the new fragment
-<2> Add the contact Id, already passed to the `Activity` by the `RecyclerView`
+<1> Add extra data as arguments after creating the new fragment.
+<2> Add the contact Id, already passed to the `Activity` by the `RecyclerView`.
 
-* Respect the contract from `ContactDetail.View`
+*Respect the contract from `ContactDetail.View`*
 
 .ItemDetailFragment
 [source,kotlin]
@@ -290,7 +291,7 @@ class ItemDetailFragment : Fragment() , ContactDetail.View { // <1>
 <4> Show the phone list as a text in the body of the screen.
 <5> Show the address list as a text in the body of the screen.
 
-* Bind the view to the presenter `ContactListPresenter`
+*Bind the view to the presenter `ContactListPresenter`*
 
 .ItemDetailFragment
 [source,kotlin]
@@ -324,12 +325,14 @@ override fun onDestroy() {
 <3> Call the presenter to retrieve the contact details for a given contact Id. The contact Id found in the arguments passed at the `Fragment` instantiation.
 <4> When the view is destroyed, detach it from the presenter.
 
+=== Run the application
+
 You can run the application onto an *Android Emulator* by clicking the button image:res/run-android.png[run,16] in *Android Studio*.
 
 [cols="^40%,<.^60%a",grid="none",frame="none"]
 |===
+|image:res/10-2.png[contact list,300]
 |image:res/10-3.png[contact list,300]
-|Here is the contact details retrieved from our backend API
 |===
 
 == What's next ?
