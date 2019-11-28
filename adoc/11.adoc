@@ -2,6 +2,10 @@
 :toc:
 :icons: font
 
+NOTE: As said in the first chapter, we are not here to take a deep dive into the different targeted platform.
+So, to stay focused on Kotlin multi-platform development, we will provide empty projects, ready to run for each platform.
+Of course, those projects need to be modified.
+
 == Cloning the starter project
 
 You can find the *_iOS_* starter project on https://github.com/romainbsl/mpp-workshop-ios-starter[GitHub].
@@ -22,7 +26,7 @@ git clone https://github.com/romainbsl/mpp-workshop-ios-starter.git
 
 == Configuration
 
-Remember, while we were building our Kotlin multi-platform library, we added a build step named `packForXcode`.
+_Remember_, while we were building our Kotlin multi-platform library, we added a build step named `packForXcode`.
 This task should have built and published the `framework` needed by *_Xcode_* to consume our library with *_iOS_* in a specific directory.
 
 .Kotlin multi-platform library build directory.
@@ -54,11 +58,11 @@ Then find the *Search Paths* section
 |image:res/11-8.png[add search path]
 |===
 
-Now that we have configured our project we will be able to use our Kotlin multi-platform library directly in Swift.
+Now that we have configured our project we will be able to use our Kotlin multi-platform library directly in _Swift_.
 
 == Retrieve and display the contact list
 
-For displaying a list of contacts, all our modification will appear in the class `MasterViewController`. So, open it in *Xcode*.
+For displaying a list of contacts, all our modifications will appear in the class `MasterViewController`. So, open it in *Xcode*.
 
 [NOTE]
 ====
@@ -102,7 +106,7 @@ we will wrote some code to prepare the UI interactions.
 * Set the flow interaction between the _Master_ and _Detail_ views
 +
 When the list of contacts will be displayed,
-we would like to click on the items to be able to see the detail information for each contact.
+we would like to click on the items to be able to see the details information for each contact.
 To do that, we will configure an existing _Segue_, `showDetail`.
 +
 TIP: For those who are not familiar with `iOS`, a _Segue_ represents a navigation flow between two screens
@@ -126,10 +130,12 @@ class MasterViewController: UITableViewController {
 }
 ----
 <1> Declare a global variable, a list of contacts, that will be used to update our view.
-<2> Retrieve the contact in contactList, based on the index of the clicked element in the TableView.
-<3> The the contact Id for which we want to show the details on the next screen.
+<2> Retrieve the contact in `contactList`, based on the index of the clicked element of the TableView.
+<3> The contact Id for which we want to show the details on the next screen.
 
 * Configure what and how the _TableView_ is display
++
+As our class is implementing `UITableViewController`, we need to implement `tableView(...)` functions to configure its behavior.
 +
 .MasterViewController.swift
 [source,swift]
@@ -158,12 +164,12 @@ class MasterViewController: UITableViewController {
 As for the *_Android_* application, mainly, we have two steps that we need to fulfill to consume our shared library.
 First, we should implement the contract defined for the view, then declare and bind the presenter to it.
 
-1. Implement the `ContractList.View` interface
+1. Implement the `ContactList.View` interface
 +
-IMPORTANT: In our Kotlin multi-platform library we defined our interface as part of a class, giving us something like `ContractList.View`.
-In Kotlin/Native, `ContractList.View` has been renamed `ContactListView`.
+IMPORTANT: In our Kotlin multi-platform library we defined our interface as part of a class, giving us something like `ContactList.View`.
+In Kotlin/Native, `ContactList.View` has been renamed `ContactListView`.
 +
-Our first task is to implement the view, with some extras, to be able to display contacts in the existing _Table View _.
+Our first task is to implement the view, with some extras, to be able to display contacts in the existing _TableView_.
 +
 .MasterViewController.swift
 [source,swift]
@@ -182,7 +188,7 @@ class MasterViewController: UITableViewController, ContactListView { // <1>
 <3> Update the global variable with new data.
 <4> reload the Table View to display new data.
 
-2. Bind the `ContractListPresenter` to the view
+2. Bind the `ContactListPresenter` to the view
 +
 [cols=">.^35%,<.^75%a",grid="none",frame="none"]
 |===
@@ -224,6 +230,8 @@ override func viewWillDisappear(_ animated: Bool) {
 ----
 |===
 
+=== Run the application
+
 Now, you can run the application onto an *iOS Simulator* by clicking the button image:res/run-ios.png[run,16] in *Xcode*.
 
 [cols="^40%,<.^60%a",grid="none",frame="none"]
@@ -237,12 +245,15 @@ This is our next part, showing the contact details.
 
 == Retrieve and display the contact details
 
-While we were displaying the contact list, we also prepared the transition between the *Master* and *Detail* screens,
-by giving to the *Detail* view the contact Id for which we need to display the contact details.
+While we were displaying the contact list, we also prepared the transition between the _Master_ and _Detail_ screens,
+by giving to the _Detail_ view the contact Id for which we need to display the contact details.
 
-Like for the *Master* view we must implement a contract and bind to a presenter.
+Like for the _Master_ view we must implement a contract and bind to a presenter.
 
-1. Implement the `ContractDetail.View` interface
+1. Implement the `ContactDetail.View` interface
++
+IMPORTANT: In our Kotlin multi-platform library we defined our interface as part of a class, giving us something like `ContactDetail.View`.
+In Kotlin/Native, `ContactDetail.View` has been renamed `ContactDetailView`.
 +
 .DetailViewController.swift
 [source,swift]
@@ -278,14 +289,14 @@ class DetailViewController: UIViewController, ContactDetailView { // <1>
     // ...
 }
 ----
-<1> abc
-<2> abc
-<3> abc
-<4> abc
-<5> abc
-<6> abc
+<1> Implement the interface `ContactDetailView`
+<2> Screen objects that will be used to display the contact details
+<3> Implement the function `displayContact`
+<4> Display the contact name
+<5> Display the contact phones
+<6> Display the contact addresses
 
-2. Bind the `ContractDetailPresenter` to the view
+2. Bind the `ContactDetailPresenter` to the view
 
 +
 [cols=">.^35%,<.^75%a",grid="none",frame="none"]
@@ -331,12 +342,14 @@ override func viewWillDisappear(_ animated: Bool) {
 ----
 |===
 
+=== Run the application
+
 Now, you can run the application onto an *iOS Simulator* by clicking the button image:res/run-ios.png[run,16] in *Xcode*.
 
 [cols="^40%,<.^60%a",grid="none",frame="none"]
 |===
+|image:res/11-9.png[contact list,300]
 |image:res/11-10.png[contact details,300]
-|Here are the contact details retrieved from our backend API
 |===
 
 == What's next ?
