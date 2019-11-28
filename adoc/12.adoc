@@ -4,7 +4,7 @@
 
 In the first chapters of this workshop we have used a Kotlin multi-platform library with pure *_JavaScript_*.
 As we attend to prove that we can define a whole architecture with Kotlin/Multiplatform projects,
-in this exercise we will be using a *React* application.
+in this exercise we will be using a trend library, *React*.
 
 Do not worry, you do not need to know about it, we will give you everything to succeed.
 
@@ -23,15 +23,16 @@ git clone https://github.com/romainbsl/mpp-workshop-webapp-starter.git
 [cols="^60%,<.^40%a",grid="none",frame="none"]
 |===
 |image:res/12-1.png[open react project]
-|Now, open the project with any IDE, here we are using *_Visual Studio Code_*.
+|Now, open the project with any IDE, here we are using https://code.visualstudio.com/[Visual Studio Code].
 |===
 
 == Configuration
 
 === Installing Node/npm and yarn
 
-In order to use the previously clone *React* project you need to install *Node/npm* and *yarn*.
-If you already have them installed, jump to the next section.
+In order to use the previously cloned *React* project, you need to install *Node/npm* and *yarn*.
+
+NOTE: If you already have them installed, jump to the next section.
 
 * *Node/npm*
 - For Linux use the https://github.com/nodesource/distributions[source installer]
@@ -56,7 +57,7 @@ yarn --version
 
 If you want to fully check your configuration, open a terminal and run the following commands:
 
-.
+.Run the React project
 [source,shell script]
 ----
 cd mpp-workshop-webapp-starter
@@ -67,16 +68,17 @@ yarn start
 Then you should see in your browser something like the following page:
 image:res/12-2.png[webapp,500]
 
+TIP: Starting from here, you should not have to restart your web application for every changes you made.
+The pages will automatically be reloaded.
+
 === Copying the generated package as dependency
 
-When we have built our Kotlin multi-platform library, the build task has also built a package for a Node web application.
+When we have built our Kotlin multi-platform library, the build task has also generated a *_Node_* module, for a web application.
 
 .Kotlin multi-platform library build directory.
 image:res/12-3.png[build directory,250]
 
-To be able to use it in our Web application we need to copy the package into our React project.
-
-* Copy the `build/js` directory from the Kotlin multi-platform library project
+To empower our web application with the Kotlin multi-platform library, we need to copy the generated *Node* module into our *React* project.
 
 [cols="^.^55%a,^.^40%a",grid="none",frame="none"]
 |===
@@ -86,12 +88,19 @@ To be able to use it in our Web application we need to copy the package into our
 |image:res/12-5.png[tob]
 |===
 
-* Rename the directory `js` to `addressbook-common`
-image:res/12-6.png[renamed package,500]
+[cols="<.^45%a,<.^55%a",grid="none",frame="none"]
+|===
+|image:res/12-6.png[renamed package]
+|Then, rename the directory `js` to `addressbook-common`, to distinguish it from other modules.
+|===
 
 === Adding the dependency to the project
 
 We are almost there!
+
+Now we just have to add the module dependency to the *Node* application and install it, before writing the UI.
+
+Open the file `package.json` to add the dependency.
 
 .package.json
 [source,json]
@@ -112,7 +121,7 @@ We are almost there!
 ----
 <1> Add a reference to the manually added Node module `addressbook-common`.
 
-Finally, run the command `yarn install`, you should see something like that:
+Finally, open a terminal in the directory of the web application  and run the command `yarn install`, you should see something like that:
 
      $ yarn install
     yarn install v1.19.2
@@ -129,7 +138,8 @@ Now let's code our UI!
 == Retrieve and display the contact list
 
 Create a new file in `src`, named `ContactList.js`.
-Add imports and create the React component
+
+We will start by adding some imports and create the React component that will handle the UI for our contact list.
 
 .ContactList.js
 [source,js]
@@ -143,6 +153,9 @@ export default function ContactList() { } // <3>
 <1> React's dependencies
 <2> Our Kotlin multi-platform library dependency
 <3> Create our React component for the contact list
+
+In *_JavaScript_* there is such thing as interface, so we won't be able to implement our contracts.
+Instead, we will define a hook (`useEffect(...)`), that will run after that the UI rendering.
 
 Set the presenter and bind it to the view
 
@@ -163,10 +176,14 @@ export default function ContactList() {
 }
 ----
 <1> Initialize the presenter while the component is created, by calling our manual dependency injection object `CommonInjector`.
-<2> Define a local variable, a list of contacts, that will be used to update our view.
-<3> Attach the presenter to the view
-<4> Override the function `displayContactList`
+<2> Define a local variable, a list of contacts, and a function to update it. _(default value is an empty array)_
+<3> Call the attachment function of the presenter on an anonymous object, that represents the View
+<4> Define the function `displayContactList` from the `ContactList.View` interface, that is needed by the presenter to update the UI.
 <5> Update the contact list
+
+We now have everything we need to retrieve our contact list from the backend API. It would be nicer to display it on the web page, right ?
+
+At the end of our component, set a return statement, that will handle the content to display on the screen
 
 .ContactList.js
 [source]
@@ -175,10 +192,10 @@ export default function ContactList() {
     // ...
     return (
       <ul>
-        {contacts.map(contact => { // <1>
+        {contacts.map(contact => { <1>
           return (
             <li>
-                <Link to={`/contact/${contact.id}`}> // <2>
+                <Link to={`/contact/${contact.id}`}> <2>
                     {contact.fullName}
                 </Link>
             </li>)
@@ -188,28 +205,63 @@ export default function ContactList() {
 }
 ----
 <1> For each contact, display its name and...
-<2> ...set a link to go to its details view.
+<2> ...set a link to go to its detail view.
 
-Then you should see in your browser something like the following page:
+If you go to the web page, you should see that nothing change. This is because we must use our component inside the `App.js`.
+
+Open the `App.js`, add an import and a usage for the component `ContactList`.
+
+.App.js
+[source,js]
+----
+//...
+import ContactList from "./ContactList.js" // <1>
+
+function App() {
+  return (
+    <Router>
+      <Switch>
+        <Route path="/">
+          <ContactList /> // <2>
+        </Route>
+      </Switch>
+    </Router>
+  )
+}
+// ...
+----
+<1> Add the import on the `ContactList` component
+<2> Remove the `<h1>` and replace it by the `ContactList` usage
+
+=== Run the application
+
+If you reopen your web page in your browser, you should see something like that:
 image:res/12-7.png[contact list,600]
 
 == Retrieve and display the contact details
 
-Create a new file in `src`, named `Contact.js`.
-Add imports and create the React component
+We have just wrote that for each contact we show its full name on a list.
+That name is clickable, and should lead you to a new page.
+If you have clicked on the contacts' names, you may have noticed that nothing showed up.
+We are going to make this right.
+
+Create a new file in `src`, named `Contact.js`. It will embed the *React* component that will be responsible
+for retrieving the contact's details and display them on the page.
+
+Open the `Contact.js` file and add the following imports, then create the *React* component.
 
 .Contact.js
 [source,js]
 ----
 import React, { useState, useEffect } from 'react'; // <1>
-import { useParams } from "react-router-dom"; // <1>
+import { useParams, Link } from "react-router-dom"; // <1>
 import AddressBook from 'addressbook-common/packages/addressbook-common'; // <2>
 
 export default function Contact() { } // <3>
 ----
 <1> React's dependencies
 <2> Our Kotlin multi-platform library dependency
-<3> Create our React component for the contact list
+<3> Create our *React* component for the contact list
 
 Set the presenter and bind it to the view
 
@@ -217,35 +269,49 @@ Set the presenter and bind it to the view
 [source,js]
 ----
 export default function Contact() {
-    let { id } = useParams();
-    let [presenter] = useState(() => AddressBook.com.mybusiness.di.CommonInjector.contactDetailPresenter());
-    let [contact, setContact] = useState(null)
+    let { id } = useParams(); // <1>
+    let [presenter] = useState(() => AddressBook.com.mybusiness.di.CommonInjector.contactDetailPresenter()); // <2>
+    let [contact, setContact] = useState(null) // <3>
 
     useEffect(() => {
-        presenter.attachView({
-            displayContact: function(c) {
-                setContact(c)
+        presenter.attachView({ // <4>
+            displayContact: function(c) { // <5>
+                setContact(c) // <6>
             }
         });
-        presenter.getContact(id);
+        presenter.getContact(id); // <7>
     }, []);
 }
 ----
+<1> Get the contact Id, passed as URL parameter. This will be used for retrieving contact details from the backend API.
+<2> Initialize the presenter while the component is created, by calling our manual dependency injection object `CommonInjector`.
+<3> Define a local variable, a contact, and a function to update it. _(default value is null)_.
+<4> Call the attachment function of the presenter on an anonymous object, that represents the View.
+<5> Define the function `displayContact` from the `ContactDetail.View` interface, that is needed by the presenter to update the UI.
+<6> Update the contact when retrieved from the backend API.
+<7> Trigger the API call to get the contact details.
+
+Let's ho to the end of the component to add the UI that will show our contact details.
 
 .Contact.js
 [source]
 ----
 export default function Contact() {
     // ...
-    if (contact == null) return (<p></p>);
+    if (contact == null) return (<p></p>); <1>
 
     return (<div>
-      <p>First name: {contact.name.firstName}</p>
-      <p>Last name: {contact.name.lastName}</p>
+      <p>
+          <Link to={`/`}>
+              Back to the contact list
+          </Link>
+      </p>
+      <p>First name: {contact.name.firstName}</p> <2>
+      <p>Last name: {contact.name.lastName}</p> <2>
       <p>
           Phones:
           <ul>
-              {contact.phones.toArray().map(phone => (
+              {contact.phones.toArray().map(phone => ( <3>
                   <li>
                       {phone.type.displayedName}: {phone.number}
                   </li>
@@ -255,7 +321,7 @@ export default function Contact() {
       <p>
           Addresses:
           <ul>
-              {contact.addresses.toArray().map(address => (
+              {contact.addresses.toArray().map(address => ( <4>
                   <li>
                       {address.type.displayedName}:
                       {address.street} {address.type.displayedName},
@@ -267,3 +333,50 @@ export default function Contact() {
     </div>)
 }
 ----
+<1> If the contact is null, obvisouly nothing is displayed
+<2> Print the full name on the screen
+<3> Print a list of the contact phones
+<4> Print a list of the contact addresses
+
+Again, if you tried to get the contact details, you probably saw that nothing has changed.
+This is because we must use our component inside the `App.js`.
+
+Open the `App.js`, add an import and a usage for the `Contact` component.
+
+.App.js
+[source,js]
+----
+//...
+import ContactList from "./ContactList.js"
+import Contact from "./Contact.js" // <1>
+
+function App() {
+  return (
+    <Router>
+      <Switch>
+        <Route path="/contact/:id" children={<Contact />} /> // <2>
+        <Route path="/">
+          <ContactList />
+        </Route>
+      </Switch>
+    </Router>
+  )
+}
+// ...
+----
+<1> Add the import on the `Contact` component
+<2> Add a route for the path `/contact/:id`, that should display to the `Contact` component
+
+=== Run the application
+
+[cols="50%,50%",grid="none",frame="none"]
+|===
+|image:res/12-7.png[contact list]
+|image:res/12-8.png[contact details]
+|===
+
+== What's next ?
+
+Congratulations!!! You have develop a Kotlin multi-platform library and use it on three different platforms!
+
+However, our journey is not over, yet.
