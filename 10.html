@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 2.0.10">
+<title>Address book - Android Application</title>
+<link rel="stylesheet" href="./golo.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<body class="article">
+<div id="header">
+<h1>Address book - Android Application</h1>
+<div class="details">
+<span id="revnumber">version 1.0</span>
+</div>
+<div id="toc" class="toc">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#_cloning_the_starter_project">Cloning the starter project</a></li>
+<li><a href="#_configuration">Configuration</a>
+<ul class="sectlevel2">
+<li><a href="#_gradle">Gradle</a></li>
+<li><a href="#_android_manifest">Android Manifest</a></li>
+</ul>
+</li>
+<li><a href="#_retrieve_and_display_the_contact_list">Retrieve and display the contact list</a>
+<ul class="sectlevel2">
+<li><a href="#_change_the_recyclerview_adapter">Change the <code>RecyclerView</code> adapter</a></li>
+<li><a href="#_call_the_common_library_from_the_view">Call the common library from the View</a></li>
+<li><a href="#_run_the_application">Run the application</a></li>
+</ul>
+</li>
+<li><a href="#_retrieve_and_display_the_contact_details">Retrieve and display the contact details</a>
+<ul class="sectlevel2">
+<li><a href="#_run_the_application_2">Run the application</a></li>
+</ul>
+</li>
+<li><a href="#_whats_next">What&#8217;s next ?</a></li>
+</ul>
+</div>
+</div>
+<div id="content">
+<div id="preamble">
+<div class="sectionbody">
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+As said in the first chapter, we are not here to take a deep dive into the different targeted platform.
+So, to stay focused on Kotlin multi-platform development, we will provide empty projects, ready to run for each platform.
+Of course, those projects need to be modified.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Starting with <strong><em>Android</em></strong>, we will be modifying an existing project to use our Kotlin multi-platform library.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_cloning_the_starter_project"><a class="anchor" href="#_cloning_the_starter_project"></a>Cloning the starter project</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>You can find the <strong><em>Android</em></strong> starter project on <a href="https://github.com/romainbsl/mpp-workshop-android-starter">GitHub</a>.</p>
+</div>
+<div class="paragraph">
+<p>Open a terminal and run the following <strong>Git</strong> command:</p>
+</div>
+<div class="listingblock">
+<div class="title">Cloning the starter project</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="shell script" class="language-shell script hljs">git clone https://github.com/romainbsl/mpp-workshop-android-starter.git</code></pre>
+</div>
+</div>
+<table class="tableblock frame-none grid-none stretch">
+<colgroup>
+<col style="width: 40%;">
+<col style="width: 60%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><span class="image"><img src="images/res/10-1.png" alt="open AS project"></span></p></td>
+<td class="tableblock halign-left valign-middle"><div class="content"><div class="paragraph">
+<p>Now, open the project with <em>Android Studio</em>, by clicking on <strong>Open an existing Android Studio project</strong>.</p>
+</div></div></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_configuration"><a class="anchor" href="#_configuration"></a>Configuration</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_gradle"><a class="anchor" href="#_gradle"></a>Gradle</h3>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+<strong><em>Android Studio</em></strong> generates the <code>build.gradle</code> files, in Groovy, not Kotlin.
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Here the Gradle configuration as been generated and prepared to avoid any issues.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Normally, you have published your Kotlin multi-platform library on your local Maven repository, with the version <code>1.0.0</code>.
+So, we just have to add it to the gradle configuration to be able to use our Kotlin multi-platform library as a project dependency.</p>
+</div>
+<div class="listingblock">
+<div class="title">app &gt; build.gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="groovy" class="language-groovy hljs">//...
+repositories {
+    mavenLocal()
+}
+//...</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Then, add the following dependencies to your <code>build.gradle</code> into the <code>app</code> module</p>
+</div>
+<div class="listingblock">
+<div class="title">app &gt; build.gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="groovy" class="language-groovy hljs">//...
+dependencies {
+    //...
+    implementation 'com.mybusiness:addressbook-common:1.0.0' <i class="conum" data-value="1"></i><b>(1)</b>
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.2' <i class="conum" data-value="2"></i><b>(2)</b>
+    //...
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The dependency is named <code>addressbook-common-android</code> because we have defined <code>android</code> as our target</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Provides <code>Dispatchers.Main</code> context for Android applications</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+We do not need to specify the target name for our Kotlin multi-platform project.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_android_manifest"><a class="anchor" href="#_android_manifest"></a>Android Manifest</h3>
+<div class="paragraph">
+<p>Our application needs to access a backend API to retrieve the contacts.
+This means that the application must have internet privilege, otherwise we will get a permission exception from the <strong><em>Android</em></strong> system</p>
+</div>
+<div class="paragraph">
+<p>Go to the file <code>app/src/main/AndroidManifest.xml</code> and add the following permission:</p>
+</div>
+<div class="listingblock">
+<div class="title">AndroidManifest.xml</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="xml" class="language-xml hljs">&lt;manifest&gt;
+    &lt;!-- ... --&gt;
+    &lt;uses-permission android:name="android.permission.INTERNET"/&gt;
+    &lt;!-- ... --&gt;
+&lt;/manifest&gt;</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_retrieve_and_display_the_contact_list"><a class="anchor" href="#_retrieve_and_display_the_contact_list"></a>Retrieve and display the contact list</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_change_the_recyclerview_adapter"><a class="anchor" href="#_change_the_recyclerview_adapter"></a>Change the <code>RecyclerView</code> adapter</h3>
+<div class="paragraph">
+<p>The most popular way to display items in a list on <strong><em>Android</em></strong> is using a <code>RecyclerView</code>.
+We already have defined an adapter for the <code>RecyclerView</code>, but we need to configure it.</p>
+</div>
+<div class="paragraph">
+<p>Go to the Kotlin source file <code>SimpleItemRecyclerViewAdapter.kt</code></p>
+</div>
+<div class="paragraph">
+<p>Then, remove the class <code>EmptyContact</code>, leading to an issue <code>Unresolved reference: EmptyContact</code>.</p>
+</div>
+<div class="paragraph">
+<p>To fix this, change the constructor&#8217;s second parameter <code>values</code>, to be type of <code>List&lt;Contact&gt;</code> instead of <code>List&lt;EmptyContact&gt;</code>.</p>
+</div>
+<div class="listingblock">
+<div class="title">SimpleItemRecyclerViewAdapter.kt</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">class SimpleItemRecyclerViewAdapter(private val parentActivity: ItemListActivity,
+                                    private val values: List&lt;Contact&gt;)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Afterwards, we need to do two things into this class:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>change the event <code>onClickListener</code>, to launch a new activity that will display the details of the clicked contact.</p>
+<div class="paragraph">
+<p>Go to the <code>init</code> block and change the <code>View.OnClickListener</code> lambda:</p>
+</div>
+<div class="listingblock">
+<div class="title">SimpleItemRecyclerViewAdapter.kt</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">//...
+    init {
+        onClickListener = View.OnClickListener { v -&gt;
+            val contact = v.tag as Contact <i class="conum" data-value="1"></i><b>(1)</b>
+            val intent = Intent(v.context, ItemDetailActivity::class.java).apply { <i class="conum" data-value="2"></i><b>(2)</b>
+                putExtra(ItemDetailFragment.CONTACT_ID, contact.id) <i class="conum" data-value="3"></i><b>(3)</b>
+            }
+            v.context.startActivity(intent) <i class="conum" data-value="4"></i><b>(4)</b>
+        }
+    }
+//...</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Get the contact clicked from the <code>RecyclerView</code></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Create a new screen that will be responsible to show the contact&#8217;s details</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Set the contact Id into the  extra data of the new screen to be able to get the contact details</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Launch the new screen</td>
+</tr>
+</table>
+</div>
+</li>
+<li>
+<p>override the function <code>onBindViewHolder</code>, to set the <code>RecyclerView</code> item behavior</p>
+<div class="paragraph">
+<p>Add the following overriding function into the class <code>SimpleItemRecyclerViewAdapter</code>.
+This will define the behavior of each item into the <code>RecyclerView</code>.</p>
+</div>
+<div class="listingblock">
+<div class="title">SimpleItemRecyclerViewAdapter.kt</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+    val contact = values[position] <i class="conum" data-value="1"></i><b>(1)</b>
+
+    holder.contentView.text = contact.fullName <i class="conum" data-value="2"></i><b>(2)</b>
+
+    with(holder.itemView) {
+        tag = contact <i class="conum" data-value="3"></i><b>(3)</b>
+        setOnClickListener(onClickListener) <i class="conum" data-value="4"></i><b>(4)</b>
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Get the contact for a given <code>RecyclerView</code> item position</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Define what is shown into the <code>RecyclerView</code> item</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Add the contact as meta data of the <code>RecyclerView</code> item</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Set the on click event for the current <code>RecyclerView</code> item</td>
+</tr>
+</table>
+</div>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_call_the_common_library_from_the_view"><a class="anchor" href="#_call_the_common_library_from_the_view"></a>Call the common library from the View</h3>
+<div class="paragraph">
+<p>We just finished the configuration of our <code>RecyclerView</code> adapter, that will help display our contact list.
+Now, we should be able to call our business logic, defined into our Kotlin multi-platform library,
+to give life to our application.</p>
+</div>
+<div class="paragraph">
+<p>The view that will show the contact list is <code>ItemListActivity</code>.
+This is the last class that we need to change to display our contact list. Open it.</p>
+</div>
+<div class="paragraph">
+<p><em>Remember the MVP pattern.</em> We already have wrote the <strong>Model</strong> and the <strong>Presenter</strong> into our Kotlin multi-platform library.
+Here we are working on the <strong>View</strong>. So, the View needs to implement the contract that we have defined and needs to be bound to the right <strong>Presenter</strong>.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Respect the contract from <code>ContactList.View</code></p>
+<div class="listingblock">
+<div class="title">ItemListActivity.kt</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">class ItemListActivity : AppCompatActivity(), ContactList.View { <i class="conum" data-value="1"></i><b>(1)</b>
+    override fun displayContactList(contactList: List&lt;Contact&gt;) { <i class="conum" data-value="2"></i><b>(2)</b>
+        item_list.adapter = SimpleItemRecyclerViewAdapter(this, contactList) <i class="conum" data-value="3"></i><b>(3)</b>
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Implements the interface <code>ContactList.View</code>, defined into the common library</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Implements the function <code>displayContactList</code>, defined by the interface</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Setting up the <code>RecyclerView</code> adapter, by passing the contact list that needs to be displayed on screen</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Finally, the function <code>displayContactList</code> would be called by the <strong>Presenter</strong> when the data will be ready to display.</p>
+</div>
+</li>
+<li>
+<p>Bind the view to the presenter <code>ContactListPresenter</code></p>
+<div class="paragraph">
+<p>To bind our view with the presenter, surely we will need to provide a <code>ContactListPresenter</code> to <code>ItemListActivity</code>, and we must attached them while the view starts.</p>
+</div>
+<div class="paragraph">
+<p>Also, as we want to avoid memory leaks, we have to detach the view from the presenter when the view is destroyed.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+In a real world application, you should manage a state for the presenter, to avoid destroying it if the phone orientation change, for example.
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="title">ItemListActivity.kt</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">// ...
+private val presenter = CommonInjector.contactListPresenter() <i class="conum" data-value="1"></i><b>(1)</b>
+// ...
+override fun onStart() {
+    super.onStart()
+    presenter.attachView(this) <i class="conum" data-value="2"></i><b>(2)</b>
+}
+// ...
+override fun onDestroy() {
+    super.onDestroy()
+    presenter.detachView() <i class="conum" data-value="3"></i><b>(3)</b>
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Retrieve a <code>ContactListPresenter</code> instance from the dependency injection object <code>CommonInjector</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>When the view starts, attach the view to the presenter.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>When the view is destroyed, detach the view from the presenter.</td>
+</tr>
+</table>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_run_the_application"><a class="anchor" href="#_run_the_application"></a>Run the application</h3>
+<div class="paragraph">
+<p>You can run the application onto an <strong>Android Emulator</strong> by clicking the button <span class="image"><img src="images/res/run-android.png" alt="run" width="16"></span> in <strong>Android Studio</strong>.</p>
+</div>
+<table class="tableblock frame-none grid-none stretch">
+<colgroup>
+<col style="width: 40%;">
+<col style="width: 60%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><span class="image"><img src="images/res/10-2.png" alt="contact list" width="300"></span></p></td>
+<td class="tableblock halign-left valign-middle"><div class="content"><div class="paragraph">
+<p>Here are the contacts retrieved from our backend API</p>
+</div></div></td>
+</tr>
+</tbody>
+</table>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you are curious and have clicked on an item from the list, you should see that nothing is shown, except static values.
+This is our next part, showing the contact details.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_retrieve_and_display_the_contact_details"><a class="anchor" href="#_retrieve_and_display_the_contact_details"></a>Retrieve and display the contact details</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In the previous part, we have worked on displaying the contacts into a <code>RecyclerView</code>. While configuring this <code>RecyclerView</code>,
+we have wrote that when clicking onto an item of the list we should run an another view, by passing it the contact Id.</p>
+</div>
+<div class="paragraph">
+<p>Now, we are able to change this view by binding it to the presenter <code>ContactDetailPresenter</code> and implementing the contract interface <code>ContactDetail.View</code>.</p>
+</div>
+<div class="paragraph">
+<p>The view is divided into two parts, the <code>ItemDetailActivity</code> that will handle the state of the view,
+and the <code>ItemDetailFragment</code> that is responsible on displaying data to the screen.</p>
+</div>
+<div class="paragraph">
+<p>When the <code>ItemDetailActivity</code> is created, it receives the Id of the contact for which we need to display the details.
+As we will be binding the view (<code>Fragment</code>) with the presenter, we have to pass this reference to the fragment as well.
+For that, we should update the function <code>onCreate</code> of <code>ItemDetailActivity</code>:</p>
+</div>
+<div class="listingblock">
+<div class="title">ItemDetailActivity</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">override fun onCreate(savedInstanceState: Bundle?) {
+    // ...
+    if (savedInstanceState == null) {
+        val fragment = ItemDetailFragment().apply {
+            arguments = Bundle().apply { <i class="conum" data-value="1"></i><b>(1)</b>
+                putString(
+                    ItemDetailFragment.CONTACT_ID,
+                    intent.getStringExtra(ItemDetailFragment.CONTACT_ID) <i class="conum" data-value="2"></i><b>(2)</b>
+                )
+            }
+        }
+      // ...
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Add extra data as arguments after creating the new fragment.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Add the contact Id, already passed to the <code>Activity</code> by the <code>RecyclerView</code>.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><strong>Respect the contract from <code>ContactDetail.View</code></strong></p>
+</div>
+<div class="listingblock">
+<div class="title">ItemDetailFragment</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">class ItemDetailFragment : Fragment() , ContactDetail.View { <i class="conum" data-value="1"></i><b>(1)</b>
+    override fun displayContact(contact: Contact) { <i class="conum" data-value="2"></i><b>(2)</b>
+        val toolbarLayout: CollapsingToolbarLayout? = activity?.toolbar_layout
+        if (toolbarLayout != null) toolbarLayout.title = contact.fullName <i class="conum" data-value="3"></i><b>(3)</b>
+
+        phonesTextView.text = if (contact.phones.isNotEmpty()) { <i class="conum" data-value="4"></i><b>(4)</b>
+            contact.phones.map {
+                "${it.type}: ${it.number}"
+            }.joinToString (separator = "\n")
+        } else "_"
+
+        addressesTextView.text = if (contact.addresses.isNotEmpty()) { <i class="conum" data-value="5"></i><b>(5)</b>
+            contact.addresses.map {
+                """
+                |${it.type}:${it.street}
+                |             ${it.postalCode} ${it.country}
+                |             ${it.country}
+                """.trimMargin()
+            }.joinToString (separator = "\n------------------------------------------------------------\n")
+        } else "_"
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Implements the interface <code>ContactDetail.View</code>, defined into the common library.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Overrides the function <code>displayContact</code>, defined by the interface and called by the presenter.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Display the contact name in the header of the screen.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Show the phone list as a text in the body of the screen.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>Show the address list as a text in the body of the screen.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><strong>Bind the view to the presenter <code>ContactListPresenter</code></strong></p>
+</div>
+<div class="listingblock">
+<div class="title">ItemDetailFragment</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">// ...
+private val presenter =CommonInjector.contactDetailPresenter() <i class="conum" data-value="1"></i><b>(1)</b>
+// ...
+override fun onCreateView(
+    inflater: LayoutInflater, container: ViewGroup?,
+    savedInstanceState: Bundle?
+): View? {
+    presenter.attachView(this) <i class="conum" data-value="2"></i><b>(2)</b>
+
+    arguments?.let {
+        if (it.containsKey(CONTACT_ID)) {
+            presenter.getContact(it.getString(CONTACT_ID) as String) <i class="conum" data-value="3"></i><b>(3)</b>
+        }
+    }
+
+    return inflater.inflate(R.layout.item_detail, container, false)
+}
+// ...
+override fun onDestroy() {
+    super.onDestroy()
+    presenter.detachView() <i class="conum" data-value="4"></i><b>(4)</b>
+}
+// ...</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Retrieve a <code>ContactListPresenter</code> instance from the dependency injection object <code>CommonInjector</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>When the view is created, attach it to the presenter.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Call the presenter to retrieve the contact details for a given contact Id. The contact Id found in the arguments passed at the <code>Fragment</code> instantiation.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>When the view is destroyed, detach it from the presenter.</td>
+</tr>
+</table>
+</div>
+<div class="sect2">
+<h3 id="_run_the_application_2"><a class="anchor" href="#_run_the_application_2"></a>Run the application</h3>
+<div class="paragraph">
+<p>You can run the application onto an <strong>Android Emulator</strong> by clicking the button <span class="image"><img src="images/res/run-android.png" alt="run" width="16"></span> in <strong>Android Studio</strong>.</p>
+</div>
+<table class="tableblock frame-none grid-none stretch">
+<colgroup>
+<col style="width: 40%;">
+<col style="width: 60%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><span class="image"><img src="images/res/10-2.png" alt="contact list" width="300"></span></p></td>
+<td class="tableblock halign-left valign-middle"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="images/res/10-3.png" alt="contact details" width="300"></span></p>
+</div></div></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_whats_next"><a class="anchor" href="#_whats_next"></a>What&#8217;s next ?</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In the next chapter, we will see how to use our Kotlin multi-platform library with iOS!</p>
+</div>
+</div>
+</div>
+</div>
+<link rel="stylesheet" href="highlightjs/styles/idea.min.css">
+<script src="highlightjs/highlight.min.js"></script>
+<script>hljs.initHighlighting()</script>
+</body>
+</html>

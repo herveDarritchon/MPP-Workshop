@@ -49,7 +49,7 @@ So we should be able to work with every specifics of each platform in our common
 <div class="sectionbody">
 <div class="paragraph">
 <p>Kotlin/Multiplatform provides a way to define an <code>expect</code>/<code>actual</code> mechanism.
-In the common code, we define the <code>expect</code>ed behaviors, allowing us to provide the <code>actual</code> behavior in each targeted platform.</p>
+In the common code, we define the <code>expect</code>ed behaviors, allowing us to provide the <code>actual</code> behaviors in each targeted platform.</p>
 </div>
 <div class="paragraph">
 <p><strong>The expectation [<code>expect</code>] code will be defined in the common module:</strong></p>
@@ -217,7 +217,7 @@ Meaning, you&#8217;ll have to create a new kotlin file for each platform:</p>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>You must define your <code>actual</code> members into the same package as the <code>expect</code>ed behavior</p>
+<p>You must define your <code>actual</code> members into the same package as the <code>expect</code>ed behaviors</p>
 </li>
 <li>
 <p>Your <code>actual</code> members should not be in a file with the same name as your <code>expect</code> members, otherwise your could have conflicts at build time.</p>
@@ -745,7 +745,7 @@ In fact, to be able to use our common library in <strong><em>Xcode</em></strong>
 </table>
 </div>
 <div class="paragraph">
-<p>To use this newly generated <strong><em>framework</em></strong> directory in <strong><em>Xcode</em></strong> we need to provide a new Gradle task to copy
+<p>To use this newly generated <strong><em>framework</em></strong> file in <strong><em>Xcode</em></strong> we need to provide a new Gradle task to copy
 it into a shared place.</p>
 </div>
 <div class="paragraph">
