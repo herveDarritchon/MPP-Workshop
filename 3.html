@@ -49,7 +49,7 @@ So we should be able to work with every specifics of each platform in our common
 <div class="sectionbody">
 <div class="paragraph">
 <p>Kotlin/Multiplatform provides a way to define an <code>expect</code>/<code>actual</code> mechanism.
-In the common code, we define the <code>expect</code>ed behaviors, allowing us to provide the <code>actual</code> behaviors in each targeted platform.</p>
+In the common code, we define the <code>expect</code>ed behaviors, allowing us to provide the <code>actual</code> behaviors in each targeted platforms.</p>
 </div>
 <div class="paragraph">
 <p><strong>The expectation [<code>expect</code>] code will be defined in the common module:</strong></p>
@@ -67,7 +67,7 @@ In the common code, we define the <code>expect</code>ed behaviors, allowing us t
 </div>
 </div>
 <div class="paragraph">
-<p><strong>And the implementation [<code>actual</code>] will be defined for each targeted platform:</strong></p>
+<p><strong>And the implementation [<code>actual</code>] will be defined for each targeted platforms:</strong></p>
 </div>
 <div class="ulist">
 <ul>
@@ -123,11 +123,11 @@ In the common code, we define the <code>expect</code>ed behaviors, allowing us t
 <h2 id="_write_your_first_multi_platform_code"><a class="anchor" href="#_write_your_first_multi_platform_code"></a>Write your first multi-platform code!</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>In this section we will prepare our common code to be executable and testable for each targeted platform.</p>
+<p>In this section we will prepare our common code to be executable and testable for each targeted platforms.</p>
 </div>
 <div class="paragraph">
-<p>To show you how it works, and how yo play with the <code>expect</code>/<code>actual</code> mechanism, we will use a simple example.
-For each targeted platform, we will print on the screen/console a message, with a specific part, different for each platform.</p>
+<p>To show you how it works, and how to play with the <code>expect</code>/<code>actual</code> mechanism, we will use a simple example.
+For each targeted platforms, we will print on the screen/console a message, with a specific part, different for each platform.</p>
 </div>
 <div class="listingblock">
 <div class="title">Example of a platform specific message</div>
@@ -144,7 +144,7 @@ We are running on JVM! <i class="conum" data-value="2"></i><b>(2)</b></code></pr
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>Platform specific message, for the <strong><em>JVM</em></strong> is this case</td>
+<td>Platform specific message, for the <strong><em>JVM</em></strong> in this case</td>
 </tr>
 </table>
 </div>
@@ -198,7 +198,7 @@ This is because we&#8217;ve used the <code>expect</code> keyword without definin
 </table>
 </div>
 <div class="paragraph">
-<p>To fix this error we will need to provide an <code>actual</code> implementation for the  <code>platformName()</code> function, for every targeted platform.</p>
+<p>To fix this error we will need to provide an <code>actual</code> implementation for the  <code>platformName()</code> function, for every targeted platforms.</p>
 </div>
 </div>
 <div class="sect2">
@@ -333,9 +333,9 @@ actual fun platformName(): String = "iOS"</code></pre>
 <div class="sect2">
 <h3 id="_testing_your_multi_platform_library"><a class="anchor" href="#_testing_your_multi_platform_library"></a>Testing your multi-platform library</h3>
 <div class="paragraph">
-<p>To empower our example, we should provide some tests for each of the targeted platform.
+<p>To empower our example, we should provide some tests for each of the targeted platforms.
 Our test environment is already configured, so we just have to write a test for our <code>sayHelloKotlinConf()</code>
-function, on every platform.</p>
+function, on every platforms.</p>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -616,7 +616,10 @@ tasks.getByName("allTests").dependsOn(iosTest) <i class="conum" data-value="7"><
 <p>Before going further, we need to prepare our multi-platform library by building and publishing it with Gradle.</p>
 </div>
 <div class="paragraph">
-<p>In your Gradle build file <code>build.gradle.kts</code> add the plugin <code>maven-publish</code> and change the version of your library, <code>1.0.0</code> to be proud :)</p>
+<p>In your Gradle build file <code>build.gradle.kts</code> add the plugin <code>maven-publish</code> and change the version of your library.</p>
+</div>
+<div class="paragraph">
+<p><code>1.0.0</code>, be proud :)</p>
 </div>
 <div class="listingblock">
 <div class="title">build.gradle.kts &gt; plugin</div>
@@ -633,7 +636,7 @@ version = "1.0.0"</code></pre>
 <table>
 <tr>
 <td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>Notice the use back ticks <code>`</code></td>
+<td>Notice the use of back ticks <code>`</code></td>
 </tr>
 </table>
 </div>
@@ -690,11 +693,23 @@ On a real world project, you may publish your library to a remote repository (Ma
 </tr>
 </table>
 </div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Note that we won&#8217;t cover how to deploy binaries for <strong>Native</strong> or <strong><em>JavaScript</em></strong> targets.
+</td>
+</tr>
+</table>
+</div>
 <div class="sect3">
 <h4 id="_the_ios_special_case_2"><a class="anchor" href="#_the_ios_special_case_2"></a>The iOS special case</h4>
 <div class="paragraph">
 <p>Building libraries for <strong><em>iOS</em></strong> is also a special case in our build script.
-In fact, to be able to use our common library in <strong><em>Xcode</em></strong>, we need to build a <strong><em>framework</em></strong> directory.</p>
+In fact, to be able to use our common library in <strong><em>Xcode</em></strong>, we need to build a <strong><em>framework</em></strong> file.</p>
 </div>
 <div class="paragraph">
 <p>First, in the <code>target</code> definition for <strong><em>iOS</em></strong> we need to add the following block of code:</p>
@@ -719,7 +734,7 @@ In fact, to be able to use our common library in <strong><em>Xcode</em></strong>
 <table>
 <tr>
 <td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>define that the output binaries must be a <strong><em>framework</em></strong> file&#8230;&#8203;</td>
+<td>Defines that the output binaries must be a <strong><em>framework</em></strong> file&#8230;&#8203;</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
@@ -735,7 +750,7 @@ In fact, to be able to use our common library in <strong><em>Xcode</em></strong>
 </td>
 <td class="content">
 <div class="paragraph">
-<p>If you run the Gradle task <code>build</code> you&#8217;ll find <code>businessLibrary.framework</code> in your build directory</p>
+<p>If you run the Gradle task <code>build</code> you will find <code>businessLibrary.framework</code> in your build directory</p>
 </div>
 <div class="paragraph">
 <p><span class="image"><img src="images/res/3-7.png" alt="build directory"></span></p>
@@ -776,11 +791,11 @@ tasks.getByName("build").dependsOn(packForXcode) <i class="conum" data-value="6"
 <table>
 <tr>
 <td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>Create a new task to make the framework available for <strong><em>Xcode</em></strong></td>
+<td>Creates a new task to make the framework available for <strong><em>Xcode</em></strong></td>
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>Selecting the right configuration depending on the environment variables set by Xcode build</td>
+<td>Selects the right configuration depending on the environment variables set by <strong><em>Xcode</em></strong> build</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="3"></i><b>3</b></td>
@@ -788,15 +803,15 @@ tasks.getByName("build").dependsOn(packForXcode) <i class="conum" data-value="6"
 </tr>
 <tr>
 <td><i class="conum" data-value="4"></i><b>4</b></td>
-<td>Move the built framework from the build directory</td>
+<td>Moves the built framework from the build directory&#8230;&#8203;</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="5"></i><b>5</b></td>
-<td>To a new location (could/should be a remote path)</td>
+<td>&#8230;&#8203;to a new location (could/should be a remote path)</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="6"></i><b>6</b></td>
-<td>Set the <code>packForXcode</code> task as part of the <code>build</code> task</td>
+<td>Sets the <code>packForXcode</code> task as part of the <code>build</code> task</td>
 </tr>
 </table>
 </div>

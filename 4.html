@@ -26,10 +26,10 @@
 <li><a href="#_modifying_the_code">Modifying the code</a></li>
 </ul>
 </li>
-<li><a href="#_run_the_application_in_an_android_simulator">Run the application in an Android Simulator</a>
+<li><a href="#_running_the_application_in_an_android_simulator">Running the application in an Android Simulator</a>
 <ul class="sectlevel2">
 <li><a href="#_android_virtual_device_manager">Android Virtual Device Manager</a></li>
-<li><a href="#_run_the_application">Run the application</a></li>
+<li><a href="#_running_the_application">Running the application</a></li>
 </ul>
 </li>
 <li><a href="#_whats_next">What&#8217;s next ?</a></li>
@@ -51,20 +51,30 @@
 <h2 id="_project_creation_wizard"><a class="anchor" href="#_project_creation_wizard"></a>Project Creation Wizard</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>By now you should have installed <a href="https://developer.android.com/studio">Android Studio</a>.
-Open it and create a new project:</p>
+<p>By now you should have installed <a href="https://developer.android.com/studio">Android Studio</a>.</p>
 </div>
-<div class="paragraph">
-<p><span class="image"><img src="images/res/4-1.png" alt="creation wizard" width="600"></span></p>
-</div>
-<div class="paragraph">
+<table class="tableblock frame-none grid-none stretch">
+<colgroup>
+<col style="width: 65%;">
+<col style="width: 35%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="image"><img src="images/res/4-1.png" alt="creation wizard" width="600"></span></p></td>
+<td class="tableblock halign-left valign-middle"><div class="content"><div class="paragraph">
+<p>Open it and create a new project</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="image"><img src="images/res/4-2.png" alt="project template" width="600"></span></p></td>
+<td class="tableblock halign-left valign-middle"><div class="content"><div class="paragraph">
 <p>Choose a project template: <strong>Empty Activity</strong>.</p>
-</div>
-<div class="paragraph">
-<p><span class="image"><img src="images/res/4-2.png" alt="project template" width="600"></span></p>
-</div>
-<div class="paragraph">
-<p>Then, set the application details:</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="image"><img src="images/res/4-3.png" alt="project details" width="600"></span></p></td>
+<td class="tableblock halign-left valign-middle"><div class="content"><div class="paragraph">
+<p>Then, set the application&#8217;s details:</p>
 </div>
 <div class="ulist">
 <ul>
@@ -81,10 +91,10 @@ Open it and create a new project:</p>
 <p>set the minimum API level: <code>API 21: Android 5.0</code></p>
 </li>
 </ul>
-</div>
-<div class="paragraph">
-<p><span class="image"><img src="images/res/4-3.png" alt="project details" width="600"></span></p>
-</div>
+</div></div></td>
+</tr>
+</tbody>
+</table>
 <div class="paragraph">
 <p>Click the <strong>Finish</strong> button, you now have an empty <strong><em>Android</em></strong> application, with one screen, ready to display a <code>Hello World!</code>.</p>
 </div>
@@ -102,10 +112,10 @@ Open it and create a new project:</p>
 <div class="ulist">
 <ul>
 <li>
-<p>one for the project build configuration</p>
+<p>one for the project&#8217;s build configuration</p>
 </li>
 <li>
-<p>one for the <strong><em>Android</em></strong> application build configuration</p>
+<p>one for the <strong><em>Android</em></strong> application&#8217;s build configuration</p>
 </li>
 </ul>
 </div>
@@ -119,7 +129,7 @@ Open it and create a new project:</p>
 <i class="fa icon-warning" title="Warning"></i>
 </td>
 <td class="content">
-<strong><em>Android Studio</em></strong> generates the <code>build.gradle</code> files, in Groovy, not Kotlin.
+<strong><em>Android Studio</em></strong> generates a <code>build.gradle</code> files, in Groovy, not Kotlin.
 </td>
 </tr>
 </table>
@@ -130,7 +140,7 @@ Open it and create a new project:</p>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>The <strong>plugins</strong> needed to build an Android application with Kotlin</p>
+<p>The <strong>plugins</strong>, needed to build an Android application with Kotlin</p>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code data-lang="groovy" class="language-groovy hljs">apply plugin: 'com.android.application'
@@ -142,7 +152,7 @@ apply plugin: 'kotlin-android-extensions'</code></pre>
 <li>
 <p>The <strong>android configuration</strong>, under <code>android{ &#8230;&#8203; }</code></p>
 <div class="paragraph">
-<p>This is the Gradle configuration to build any Android application defining
+<p>This is the Gradle configuration to build any <strong><em>Android</em></strong> application defining
 which SDK to use to build the app,
 which minimum API version the app should be compatible with, etc.</p>
 </div>
@@ -155,7 +165,7 @@ This is where we will bound the application with our Kotlin multi-platform libra
 </div>
 <div class="paragraph">
 <p>Remember, in the previous step we have built and published our library on <strong><em>Maven Local</em></strong>,
-thus we need to add <strong><em>Maven Local</em></strong> to the Gradle configuration.</p>
+thus we need to add it to the Gradle configuration.</p>
 </div>
 <div class="listingblock">
 <div class="title">app &gt; build.gradle</div>
@@ -168,7 +178,7 @@ repositories {
 </div>
 </div>
 <div class="paragraph">
-<p>Then, add the following dependency to your <code>build.gradle</code> into the <code>app</code> module</p>
+<p>Then, add the following dependency to your <code>build.gradle</code>, into the <code>app</code> module</p>
 </div>
 <div class="listingblock">
 <div class="title">app &gt; build.gradle</div>
@@ -177,7 +187,7 @@ repositories {
 dependencies {
     // implementations
     //...
-    implementation 'com.mybusiness:business-library-jvm:1.0.0'
+    implementation 'com.mybusiness:business-library:1.0.0'
     //...
     // testImplementation
     // androidTestImplementation
@@ -198,12 +208,11 @@ dependencies {
 </tr>
 <tr>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>com.mybusiness</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>business-library-jvm</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>business-library</code></p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>1.0.0</code></p></td>
 </tr>
 </tbody>
 </table>
-<hr>
 <div class="paragraph">
 <p>By default, your project view is set to <strong>Android</strong>, but you can change it to be on a <strong>Project</strong> view</p>
 </div>
@@ -225,7 +234,7 @@ dependencies {
 <h2 id="_using_your_kotlin_multi_platform_library"><a class="anchor" href="#_using_your_kotlin_multi_platform_library"></a>Using your Kotlin multi-platform library</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Now that we are ready to use our library we need to prepare our main application activity.</p>
+<p>Now that we are ready to use our library, we need to prepare our application&#8217;s <code>MainActivity</code>.</p>
 </div>
 <div class="admonitionblock important">
 <table>
@@ -272,7 +281,7 @@ dependencies {
 <div class="ulist">
 <ul>
 <li>
-<p>an <em>XML</em> file (<code>res/layout/activity_main.xml</code>) defining the view and the components that will be displayed on the screen</p>
+<p>an <em>XML</em> file (<code>res/layout/activity_main.xml</code>), defining the view and the components that will be displayed on the screen</p>
 </li>
 </ul>
 </div>
@@ -301,7 +310,7 @@ dependencies {
 <div class="ulist">
 <ul>
 <li>
-<p>a <em>Kotlin</em> file (<code>com.mybusiness.android.MainActivity.kt</code>) defining the code behind the scene,
+<p>a <em>Kotlin</em> file (<code>com.mybusiness.android.MainActivity.kt</code>), defining the code behind the scene,
 where we write the actions that will be applied on the displayed screen</p>
 </li>
 </ul>
@@ -345,11 +354,11 @@ where we write the actions that will be applied on the displayed screen</p>
 <table>
 <tr>
 <td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>Give a unique ID to the <code>TextView</code> to be able to call it from our Kotlin code</td>
+<td>Gives a unique ID to the <code>TextView</code> to be able to call it from our Kotlin code</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>Set the text to a bigger size</td>
+<td>Sets the text to a bigger size</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="3"></i><b>3</b></td>
@@ -415,7 +424,7 @@ class MainActivity : AppCompatActivity() {
 </div>
 </div>
 <div class="sect1">
-<h2 id="_run_the_application_in_an_android_simulator"><a class="anchor" href="#_run_the_application_in_an_android_simulator"></a>Run the application in an Android Simulator</h2>
+<h2 id="_running_the_application_in_an_android_simulator"><a class="anchor" href="#_running_the_application_in_an_android_simulator"></a>Running the application in an Android Simulator</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>To run and test your application locally you need to configure an <em>Android Virtual Device</em>.</p>
@@ -480,7 +489,7 @@ if you do not have the SDK already, click on <strong>Download</strong>.
 </table>
 </div>
 <div class="sect2">
-<h3 id="_run_the_application"><a class="anchor" href="#_run_the_application"></a>Run the application</h3>
+<h3 id="_running_the_application"><a class="anchor" href="#_running_the_application"></a>Running the application</h3>
 <div class="paragraph">
 <p><span class="image"><img src="images/res/4-12.png" alt="run the app" width="480"></span>
 Run the application by clicking on <span class="image"><img src="images/res/run-android.png" alt="run adnroid" width="16"></span></p>

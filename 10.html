@@ -21,20 +21,20 @@
 <li><a href="#_cloning_the_starter_project">Cloning the starter project</a></li>
 <li><a href="#_configuration">Configuration</a>
 <ul class="sectlevel2">
-<li><a href="#_gradle">Gradle</a></li>
+<li><a href="#_gradle_configuration">Gradle configuration</a></li>
 <li><a href="#_android_manifest">Android Manifest</a></li>
 </ul>
 </li>
-<li><a href="#_retrieve_and_display_the_contact_list">Retrieve and display the contact list</a>
+<li><a href="#_displaying_the_contact_list">Displaying the contact list</a>
 <ul class="sectlevel2">
-<li><a href="#_change_the_recyclerview_adapter">Change the <code>RecyclerView</code> adapter</a></li>
-<li><a href="#_call_the_common_library_from_the_view">Call the common library from the View</a></li>
-<li><a href="#_run_the_application">Run the application</a></li>
+<li><a href="#_changing_the_recyclerview_adapter">Changing the <code>RecyclerView</code> adapter</a></li>
+<li><a href="#_calling_the_common_library_from_the_view">Calling the common library from the View</a></li>
+<li><a href="#_running_the_application">Running the application</a></li>
 </ul>
 </li>
-<li><a href="#_retrieve_and_display_the_contact_details">Retrieve and display the contact details</a>
+<li><a href="#_displaying_the_contacts_details">Displaying the contact&#8217;s details</a>
 <ul class="sectlevel2">
-<li><a href="#_run_the_application_2">Run the application</a></li>
+<li><a href="#_running_the_application_2">Running the application</a></li>
 </ul>
 </li>
 <li><a href="#_whats_next">What&#8217;s next ?</a></li>
@@ -51,8 +51,8 @@
 <i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
-As said in the first chapter, we are not here to take a deep dive into the different targeted platform.
-So, to stay focused on Kotlin multi-platform development, we will provide empty projects, ready to run for each platform.
+As said in the first chapter, we are not here to take a deep dive into the different targeted platforms.
+So, to stay focused on Kotlin multi-platform development, we will provide empty projects, ready to run for each platforms.
 Of course, those projects need to be modified.
 </td>
 </tr>
@@ -98,7 +98,7 @@ Of course, those projects need to be modified.
 <h2 id="_configuration"><a class="anchor" href="#_configuration"></a>Configuration</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_gradle"><a class="anchor" href="#_gradle"></a>Gradle</h3>
+<h3 id="_gradle_configuration"><a class="anchor" href="#_gradle_configuration"></a>Gradle configuration</h3>
 <div class="admonitionblock warning">
 <table>
 <tr>
@@ -164,18 +164,6 @@ dependencies {
 </tr>
 </table>
 </div>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-note" title="Note"></i>
-</td>
-<td class="content">
-We do not need to specify the target name for our Kotlin multi-platform project.
-</td>
-</tr>
-</table>
-</div>
 </div>
 <div class="sect2">
 <h3 id="_android_manifest"><a class="anchor" href="#_android_manifest"></a>Android Manifest</h3>
@@ -200,10 +188,10 @@ This means that the application must have internet privilege, otherwise we will 
 </div>
 </div>
 <div class="sect1">
-<h2 id="_retrieve_and_display_the_contact_list"><a class="anchor" href="#_retrieve_and_display_the_contact_list"></a>Retrieve and display the contact list</h2>
+<h2 id="_displaying_the_contact_list"><a class="anchor" href="#_displaying_the_contact_list"></a>Displaying the contact list</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_change_the_recyclerview_adapter"><a class="anchor" href="#_change_the_recyclerview_adapter"></a>Change the <code>RecyclerView</code> adapter</h3>
+<h3 id="_changing_the_recyclerview_adapter"><a class="anchor" href="#_changing_the_recyclerview_adapter"></a>Changing the <code>RecyclerView</code> adapter</h3>
 <div class="paragraph">
 <p>The most popular way to display items in a list on <strong><em>Android</em></strong> is using a <code>RecyclerView</code>.
 We already have defined an adapter for the <code>RecyclerView</code>, but we need to configure it.</p>
@@ -230,7 +218,7 @@ We already have defined an adapter for the <code>RecyclerView</code>, but we nee
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>change the event <code>onClickListener</code>, to launch a new activity that will display the details of the clicked contact.</p>
+<p>Changing the event <code>onClickListener</code>, to launch a new activity that will display the details of the clicked contact.</p>
 <div class="paragraph">
 <p>Go to the <code>init</code> block and change the <code>View.OnClickListener</code> lambda:</p>
 </div>
@@ -254,28 +242,28 @@ We already have defined an adapter for the <code>RecyclerView</code>, but we nee
 <table>
 <tr>
 <td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>Get the contact clicked from the <code>RecyclerView</code></td>
+<td>Gets the contact clicked from the <code>RecyclerView</code></td>
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>Create a new screen that will be responsible to show the contact&#8217;s details</td>
+<td>Creates a new screen that will be responsible to show the contact&#8217;s details</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="3"></i><b>3</b></td>
-<td>Set the contact Id into the  extra data of the new screen to be able to get the contact details</td>
+<td>Sets the contact&#8217;s <code>id</code> into the extra data of the new screen to be able to get its details</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="4"></i><b>4</b></td>
-<td>Launch the new screen</td>
+<td>Launches the new screen</td>
 </tr>
 </table>
 </div>
 </li>
 <li>
-<p>override the function <code>onBindViewHolder</code>, to set the <code>RecyclerView</code> item behavior</p>
+<p>Overriding the function <code>onBindViewHolder</code>, to set the <code>RecyclerView</code> item behavior</p>
 <div class="paragraph">
 <p>Add the following overriding function into the class <code>SimpleItemRecyclerViewAdapter</code>.
-This will define the behavior of each item into the <code>RecyclerView</code>.</p>
+This will define the behavior of each items into the <code>RecyclerView</code>.</p>
 </div>
 <div class="listingblock">
 <div class="title">SimpleItemRecyclerViewAdapter.kt</div>
@@ -296,7 +284,7 @@ This will define the behavior of each item into the <code>RecyclerView</code>.</
 <table>
 <tr>
 <td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>Get the contact for a given <code>RecyclerView</code> item position</td>
+<td>Gets the contact for a given <code>RecyclerView</code> item&#8217;s position</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
@@ -304,11 +292,11 @@ This will define the behavior of each item into the <code>RecyclerView</code>.</
 </tr>
 <tr>
 <td><i class="conum" data-value="3"></i><b>3</b></td>
-<td>Add the contact as meta data of the <code>RecyclerView</code> item</td>
+<td>Adds the contact as meta data of the <code>RecyclerView</code> item</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="4"></i><b>4</b></td>
-<td>Set the on click event for the current <code>RecyclerView</code> item</td>
+<td>Sets the on click event for the current <code>RecyclerView</code> item</td>
 </tr>
 </table>
 </div>
@@ -317,9 +305,9 @@ This will define the behavior of each item into the <code>RecyclerView</code>.</
 </div>
 </div>
 <div class="sect2">
-<h3 id="_call_the_common_library_from_the_view"><a class="anchor" href="#_call_the_common_library_from_the_view"></a>Call the common library from the View</h3>
+<h3 id="_calling_the_common_library_from_the_view"><a class="anchor" href="#_calling_the_common_library_from_the_view"></a>Calling the common library from the View</h3>
 <div class="paragraph">
-<p>We just finished the configuration of our <code>RecyclerView</code> adapter, that will help display our contact list.
+<p>We just finished the configuration of our <code>RecyclerView</code> adapter, that will help displaying our contact list.
 Now, we should be able to call our business logic, defined into our Kotlin multi-platform library,
 to give life to our application.</p>
 </div>
@@ -329,12 +317,12 @@ This is the last class that we need to change to display our contact list. Open 
 </div>
 <div class="paragraph">
 <p><em>Remember the MVP pattern.</em> We already have wrote the <strong>Model</strong> and the <strong>Presenter</strong> into our Kotlin multi-platform library.
-Here we are working on the <strong>View</strong>. So, the View needs to implement the contract that we have defined and needs to be bound to the right <strong>Presenter</strong>.</p>
+Here we are working on the <strong>view</strong>. So, the view needs to implement the contract that we have defined and needs to be bound to the right presenter.</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p>Respect the contract from <code>ContactList.View</code></p>
+<p>Implementing the contract from <code>ContactList.View</code></p>
 <div class="listingblock">
 <div class="title">ItemListActivity.kt</div>
 <div class="content">
@@ -362,11 +350,11 @@ Here we are working on the <strong>View</strong>. So, the View needs to implemen
 </table>
 </div>
 <div class="paragraph">
-<p>Finally, the function <code>displayContactList</code> would be called by the <strong>Presenter</strong> when the data will be ready to display.</p>
+<p>Finally, the function <code>displayContactList</code> would be called by the presenter when the data will be ready to display.</p>
 </div>
 </li>
 <li>
-<p>Bind the view to the presenter <code>ContactListPresenter</code></p>
+<p>Binding the view to the presenter <code>ContactListPresenter</code></p>
 <div class="paragraph">
 <p>To bind our view with the presenter, surely we will need to provide a <code>ContactListPresenter</code> to <code>ItemListActivity</code>, and we must attached them while the view starts.</p>
 </div>
@@ -380,7 +368,7 @@ Here we are working on the <strong>View</strong>. So, the View needs to implemen
 <i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
-In a real world application, you should manage a state for the presenter, to avoid destroying it if the phone orientation change, for example.
+In a real world application, you should manage a state for the presenter to avoid destroying it, when the phone orientation change for example.
 </td>
 </tr>
 </table>
@@ -406,7 +394,7 @@ override fun onDestroy() {
 <table>
 <tr>
 <td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>Retrieve a <code>ContactListPresenter</code> instance from the dependency injection object <code>CommonInjector</code>.</td>
+<td>Retrieves a <code>ContactListPresenter</code> instance from the dependency injection object <code>CommonInjector</code>.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
@@ -423,7 +411,7 @@ override fun onDestroy() {
 </div>
 </div>
 <div class="sect2">
-<h3 id="_run_the_application"><a class="anchor" href="#_run_the_application"></a>Run the application</h3>
+<h3 id="_running_the_application"><a class="anchor" href="#_running_the_application"></a>Running the application</h3>
 <div class="paragraph">
 <p>You can run the application onto an <strong>Android Emulator</strong> by clicking the button <span class="image"><img src="images/res/run-android.png" alt="run" width="16"></span> in <strong>Android Studio</strong>.</p>
 </div>
@@ -449,7 +437,7 @@ override fun onDestroy() {
 </td>
 <td class="content">
 If you are curious and have clicked on an item from the list, you should see that nothing is shown, except static values.
-This is our next part, showing the contact details.
+This is our next part, showing the contact&#8217;s details.
 </td>
 </tr>
 </table>
@@ -458,11 +446,11 @@ This is our next part, showing the contact details.
 </div>
 </div>
 <div class="sect1">
-<h2 id="_retrieve_and_display_the_contact_details"><a class="anchor" href="#_retrieve_and_display_the_contact_details"></a>Retrieve and display the contact details</h2>
+<h2 id="_displaying_the_contacts_details"><a class="anchor" href="#_displaying_the_contacts_details"></a>Displaying the contact&#8217;s details</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>In the previous part, we have worked on displaying the contacts into a <code>RecyclerView</code>. While configuring this <code>RecyclerView</code>,
-we have wrote that when clicking onto an item of the list we should run an another view, by passing it the contact Id.</p>
+we have wrote that when clicking onto an item of the list we should run an another view, by passing it the contact <code>id</code>.</p>
 </div>
 <div class="paragraph">
 <p>Now, we are able to change this view by binding it to the presenter <code>ContactDetailPresenter</code> and implementing the contract interface <code>ContactDetail.View</code>.</p>
@@ -472,7 +460,7 @@ we have wrote that when clicking onto an item of the list we should run an anoth
 and the <code>ItemDetailFragment</code> that is responsible on displaying data to the screen.</p>
 </div>
 <div class="paragraph">
-<p>When the <code>ItemDetailActivity</code> is created, it receives the Id of the contact for which we need to display the details.
+<p>When the <code>ItemDetailActivity</code> is created, it receives the <code>id</code> of the contact for which we need to display the details.
 As we will be binding the view (<code>Fragment</code>) with the presenter, we have to pass this reference to the fragment as well.
 For that, we should update the function <code>onCreate</code> of <code>ItemDetailActivity</code>:</p>
 </div>
@@ -499,16 +487,16 @@ For that, we should update the function <code>onCreate</code> of <code>ItemDetai
 <table>
 <tr>
 <td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>Add extra data as arguments after creating the new fragment.</td>
+<td>Adds extra data as arguments after creating the new fragment.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>Add the contact Id, already passed to the <code>Activity</code> by the <code>RecyclerView</code>.</td>
+<td>Adds the contact <code>id</code>, already passed to the <code>Activity</code> by the <code>RecyclerView</code>.</td>
 </tr>
 </table>
 </div>
 <div class="paragraph">
-<p><strong>Respect the contract from <code>ContactDetail.View</code></strong></p>
+<p><strong>Implementing the contract from <code>ContactDetail.View</code></strong></p>
 </div>
 <div class="listingblock">
 <div class="title">ItemDetailFragment</div>
@@ -549,20 +537,20 @@ For that, we should update the function <code>onCreate</code> of <code>ItemDetai
 </tr>
 <tr>
 <td><i class="conum" data-value="3"></i><b>3</b></td>
-<td>Display the contact name in the header of the screen.</td>
+<td>Displays the contact&#8217;s name in the header of the screen.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="4"></i><b>4</b></td>
-<td>Show the phone list as a text in the body of the screen.</td>
+<td>Shows the phone list as a text in the body of the screen.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="5"></i><b>5</b></td>
-<td>Show the address list as a text in the body of the screen.</td>
+<td>Shows the address list as a text in the body of the screen.</td>
 </tr>
 </table>
 </div>
 <div class="paragraph">
-<p><strong>Bind the view to the presenter <code>ContactListPresenter</code></strong></p>
+<p><strong>Binding the view to the presenter <code>ContactListPresenter</code></strong></p>
 </div>
 <div class="listingblock">
 <div class="title">ItemDetailFragment</div>
@@ -596,7 +584,7 @@ override fun onDestroy() {
 <table>
 <tr>
 <td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>Retrieve a <code>ContactListPresenter</code> instance from the dependency injection object <code>CommonInjector</code>.</td>
+<td>Retrieves a <code>ContactListPresenter</code> instance from the dependency injection object <code>CommonInjector</code>.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
@@ -604,7 +592,7 @@ override fun onDestroy() {
 </tr>
 <tr>
 <td><i class="conum" data-value="3"></i><b>3</b></td>
-<td>Call the presenter to retrieve the contact details for a given contact Id. The contact Id found in the arguments passed at the <code>Fragment</code> instantiation.</td>
+<td>Calls the presenter to retrieve the contact&#8217;s details for a given contact <code>id</code>. The contact <code>id</code> found in the arguments passed at the <code>Fragment</code> instantiation.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="4"></i><b>4</b></td>
@@ -613,7 +601,7 @@ override fun onDestroy() {
 </table>
 </div>
 <div class="sect2">
-<h3 id="_run_the_application_2"><a class="anchor" href="#_run_the_application_2"></a>Run the application</h3>
+<h3 id="_running_the_application_2"><a class="anchor" href="#_running_the_application_2"></a>Running the application</h3>
 <div class="paragraph">
 <p>You can run the application onto an <strong>Android Emulator</strong> by clicking the button <span class="image"><img src="images/res/run-android.png" alt="run" width="16"></span> in <strong>Android Studio</strong>.</p>
 </div>

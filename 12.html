@@ -26,14 +26,14 @@
 <li><a href="#_adding_the_dependency_to_the_project">Adding the dependency to the project</a></li>
 </ul>
 </li>
-<li><a href="#_retrieve_and_display_the_contact_list">Retrieve and display the contact list</a>
+<li><a href="#_displaying_the_contact_list">Displaying the contact list</a>
 <ul class="sectlevel2">
-<li><a href="#_run_the_application">Run the application</a></li>
+<li><a href="#_running_the_application">Running the application</a></li>
 </ul>
 </li>
-<li><a href="#_retrieve_and_display_the_contact_details">Retrieve and display the contact details</a>
+<li><a href="#_displaying_the_contacts_details">Displaying the contact&#8217;s details</a>
 <ul class="sectlevel2">
-<li><a href="#_run_the_application_2">Run the application</a></li>
+<li><a href="#_running_the_application_2">Running the application</a></li>
 </ul>
 </li>
 <li><a href="#_whats_next">What&#8217;s next ?</a></li>
@@ -286,7 +286,7 @@ success Saved lockfile.
 </div>
 </div>
 <div class="sect1">
-<h2 id="_retrieve_and_display_the_contact_list"><a class="anchor" href="#_retrieve_and_display_the_contact_list"></a>Retrieve and display the contact list</h2>
+<h2 id="_displaying_the_contact_list"><a class="anchor" href="#_displaying_the_contact_list"></a>Displaying the contact list</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>Create a new file in <code>src</code>, named <code>ContactList.js</code>.</p>
@@ -445,7 +445,7 @@ function App() {
 </table>
 </div>
 <div class="sect2">
-<h3 id="_run_the_application"><a class="anchor" href="#_run_the_application"></a>Run the application</h3>
+<h3 id="_running_the_application"><a class="anchor" href="#_running_the_application"></a>Running the application</h3>
 <div class="paragraph">
 <p>If you reopen your web page in your browser, you should see something like that:
 <span class="image"><img src="images/res/12-7.png" alt="contact list" width="600"></span></p>
@@ -454,7 +454,7 @@ function App() {
 </div>
 </div>
 <div class="sect1">
-<h2 id="_retrieve_and_display_the_contact_details"><a class="anchor" href="#_retrieve_and_display_the_contact_details"></a>Retrieve and display the contact details</h2>
+<h2 id="_displaying_the_contacts_details"><a class="anchor" href="#_displaying_the_contacts_details"></a>Displaying the contact&#8217;s details</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>We have just wrote that for each contact we show its full name on a list.
@@ -521,7 +521,7 @@ export default function Contact() { } <i class="conum" data-value="3"></i><b>(3)
 <table>
 <tr>
 <td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>Get the contact Id, passed as URL parameter. This will be used for retrieving contact details from the backend API.</td>
+<td>Get the contact <code>id</code>, passed as URL parameter. This will be used for retrieving contact&#8217;s details from the backend API.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
@@ -545,12 +545,12 @@ export default function Contact() { } <i class="conum" data-value="3"></i><b>(3)
 </tr>
 <tr>
 <td><i class="conum" data-value="7"></i><b>7</b></td>
-<td>Trigger the API call to get the contact details.</td>
+<td>Trigger the API call to get the contact&#8217;s details.</td>
 </tr>
 </table>
 </div>
 <div class="paragraph">
-<p>Let&#8217;s ho to the end of the component to add the UI that will show our contact details.</p>
+<p>Let&#8217;s ho to the end of the component to add the UI that will show our contact&#8217;s details.</p>
 </div>
 <div class="listingblock">
 <div class="title">Contact.js</div>
@@ -605,16 +605,16 @@ export default function Contact() { } <i class="conum" data-value="3"></i><b>(3)
 </tr>
 <tr>
 <td><i class="conum" data-value="3"></i><b>3</b></td>
-<td>Print a list of the contact phones</td>
+<td>Print a list of the contact&#8217;s phones</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="4"></i><b>4</b></td>
-<td>Print a list of the contact addresses</td>
+<td>Print a list of the contact&#8217;s addresses</td>
 </tr>
 </table>
 </div>
 <div class="paragraph">
-<p>Again, if you tried to get the contact details, you probably saw that nothing has changed.
+<p>Again, if you tried to get the contact&#8217;s details, you probably saw that nothing has changed.
 This is because we must use our component inside the <code>App.js</code>.</p>
 </div>
 <div class="paragraph">
@@ -655,7 +655,7 @@ function App() {
 </table>
 </div>
 <div class="sect2">
-<h3 id="_run_the_application_2"><a class="anchor" href="#_run_the_application_2"></a>Run the application</h3>
+<h3 id="_running_the_application_2"><a class="anchor" href="#_running_the_application_2"></a>Running the application</h3>
 <table class="tableblock frame-none grid-none stretch">
 <colgroup>
 <col style="width: 50%;">

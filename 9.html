@@ -22,9 +22,9 @@
 <li><a href="#_implementing_the_mvp_pattern">Implementing the MVP pattern</a>
 <ul class="sectlevel2">
 <li><a href="#_architecture_for_the_mvp_pattern">Architecture for the MVP pattern</a></li>
-<li><a href="#_coroutine_contexts_definition">Coroutine contexts definition</a></li>
+<li><a href="#_coroutines_contexts_definition">Coroutines contexts definition</a></li>
 <li><a href="#_use_case_1_retrieving_a_list_of_contacts">Use case 1: retrieving a list of contacts</a></li>
-<li><a href="#_use_case_2_getting_the_detail_of_a_contact">Use case 2: getting the detail of a contact</a></li>
+<li><a href="#_use_case_2_getting_the_details_of_a_contact">Use case 2: getting the details of a contact</a></li>
 <li><a href="#_use_case_3_creating_or_updating_a_contact">Use case 3: creating or updating a contact</a></li>
 </ul>
 </li>
@@ -45,8 +45,8 @@
 <p>Do you remember that we are working on a Kotlin multi-platform project ? Right!</p>
 </div>
 <div class="paragraph">
-<p>By now, we should be able to use our business logic on every targeted platform, and make some HTTP calls to render our data.
-Not so fast! Before that, we will add some more logic in ou Kotlin multi-platform library, with the <em>MVP pattern</em>,</p>
+<p>By now, we should be able to use our business logic on every targeted platforms, and make some HTTP calls to render our data.
+Not so fast! Before that, we will add some more logic in ou Kotlin multi-platform library, with the <em>MVP pattern</em>.</p>
 </div>
 </div>
 </div>
@@ -88,7 +88,7 @@ This can be represented by the following schema:</p>
 </tbody>
 </table>
 <div class="paragraph">
-<p>Well, we can also implement this pattern in our Kotlin multi-platform library to maximize the code sharing for our project.</p>
+<p>Well, we can also implement this pattern in our Kotlin multi-platform library to maximize code sharing in our project.</p>
 </div>
 </div>
 </div>
@@ -96,12 +96,12 @@ This can be represented by the following schema:</p>
 <h2 id="_implementing_the_mvp_pattern"><a class="anchor" href="#_implementing_the_mvp_pattern"></a>Implementing the MVP pattern</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Let&#8217;s assume that our different applications would have a Master/Detail flow.
+<p>Let&#8217;s assume that our different applications would have a <em>Master/Detail</em> flow.
 The master view would show us a list of contacts, and by clicking on a contact, we will display its details on a new view.</p>
 </div>
 <div class="paragraph">
-<p>This give us two use cases to implement; One where we will retrieve the list of contacts from the backend API and display it on the main view.
-And one where we will retrieve a contact with its details from the backend API, according to its Id, and display it on another view.</p>
+<p>This gives us two use cases to implement; One where we will retrieve the list of contacts from the backend API and display it on the main view.
+And one where we will retrieve a contact with its details from the backend API, according to its <code>id</code>, and display it on another view.</p>
 </div>
 <div class="paragraph">
 <p>Don&#8217;t forget that we also have to provide a view to create or update an existing contact, and then send the creation/modification to the backend API.
@@ -111,12 +111,13 @@ This is our third use case.</p>
 <h3 id="_architecture_for_the_mvp_pattern"><a class="anchor" href="#_architecture_for_the_mvp_pattern"></a>Architecture for the MVP pattern</h3>
 <div class="paragraph">
 <p>Before we implement our different use cases, we have to take a step back, and prepare the architecture of our MVP implementation.
-Indeed, without spoiling, we can tell that our different *Presenter*s will certainly have the same shape.</p>
+Indeed, without spoiling, we can tell that our different presenters will certainly have the same shape.</p>
 </div>
 <div class="paragraph">
 <p>For example, they all have to attach the view at their initialization and detach the view when this one will be destroyed.
 Also, they all have to call the backend API in the background, and then update the UI in the main thread of the app.
-This where the coroutines step inside our scope. In the same way that presenter needs to be detached from the view while its destroyed,
+This is where the coroutines step inside our scope.
+In the same way that a presenter needs to be detached from the view while its destroyed,
 the coroutine jobs also needs to be cancelled.</p>
 </div>
 <div class="paragraph">
@@ -154,10 +155,10 @@ the coroutine jobs also needs to be cancelled.</p>
 </table>
 </div>
 <div class="paragraph">
-<p>First of all we will create a <code>CoroutineScope</code> that will be carrying our <code>CoroutineContext</code> and the `Job`to run, or cancel if the view is detached.</p>
+<p>First of all we will create a <code>CoroutineScope</code> that will be carrying our <code>CoroutineContext</code> and the <code>Job</code> to run.
+.base.kt</p>
 </div>
 <div class="listingblock">
-<div class="title">base.kt</div>
 <div class="content">
 <pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -180,28 +181,28 @@ class PresenterCoroutineScope(
 <table>
 <tr>
 <td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>Pass as parameter of the constructor a <code>CoroutineContext</code> (either background or UI context).</td>
+<td>Passes a <code>CoroutineContext</code> as parameter of the constructor (either background or UI context).</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>Extend the <code>CoroutineScope</code>.</td>
+<td>Extends the <code>CoroutineScope</code>.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="3"></i><b>3</b></td>
-<td>Create a Job, that will be responsible of the execution code, and is cancellable at any time.</td>
+<td>Creates a Job, that will be responsible of the execution code, and is cancellable at any time.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="4"></i><b>4</b></td>
-<td><em>Override</em> the <code>CoroutineContext</code> by combining the current context and the cancellable job.</td>
+<td><em>Overrides</em> the <code>CoroutineContext</code> by combining the current context and the cancellable job.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="5"></i><b>5</b></td>
-<td>If a view is detached from the <strong>Presenter</strong>, call this to cancel the job, and avoid leaks.</td>
+<td>If a view is detached from the presenter, call this to cancel the job, and avoid leaks.</td>
 </tr>
 </table>
 </div>
 <div class="paragraph">
-<p>Now we can create the base class for any <strong>Presenter</strong> of our project.</p>
+<p>Now we can create the base class for any presenter of our project.</p>
 </div>
 <div class="listingblock">
 <div class="title">base.kt</div>
@@ -231,27 +232,27 @@ class PresenterCoroutineScope(
 <table>
 <tr>
 <td><i class="conum" data-value="1"></i><b>1</b></td>
-<td><code>T</code> represents the type of the <strong>View</strong> that is bind to the <strong>Presenter</strong></td>
+<td><code>T</code> represents the type of the view that is bind to the presenter</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>Declare the <strong>View</strong> bind to the <strong>Presenter</strong>. This will be used to send data to the <strong>View</strong> when the <strong>Presenter</strong> needs to send update to the UI.</td>
+<td>Declares the view bind to the presenter. This will be used to send data to the view when the presenter needs to send update to the UI.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="3"></i><b>3</b></td>
-<td>Declare the <code>CoroutineScope</code> that will manage code execution in the background (calling the backend API for example)</td>
+<td>Declares the <code>CoroutineScope</code> that will manage code execution in the background (calling the backend API for example)</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="4"></i><b>4</b></td>
-<td>Use this to attach the view to the <strong>Presenter</strong> and create the <code>CoroutineScope</code></td>
+<td>Uses this to attach the view to the presenter and create the <code>CoroutineScope</code></td>
 </tr>
 <tr>
 <td><i class="conum" data-value="5"></i><b>5</b></td>
-<td>This function will be called while attaching the view to the <strong>Presenter</strong>, we could override it to put some business logic here.</td>
+<td>This function will be called while attaching the view to the presenter, we could override it to put some business logic here.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="6"></i><b>6</b></td>
-<td>Use this when you do not need the <strong>View</strong> anymore, avoiding leaks in your application.</td>
+<td>Uses this when you do not need the view anymore, avoiding leaks in your application.</td>
 </tr>
 </table>
 </div>
@@ -269,15 +270,15 @@ We use the <code>@JsName</code> annotation to avoid that <em>Kotlin/JS</em> comp
 </div>
 <div class="paragraph">
 <p>For each of the use cases, we have to define two interfaces.
-Those interfaces will be the contract that the <strong>View</strong> and the <strong>Presenter</strong> have to respect.
-Also, we will create an implementation for each <strong>Presenter*s' contract that will work with the backend API and interact with the *View</strong>.</p>
+Those interfaces will be the contract that the view and the presenter have to respect.
+Also, we will create an implementation for each presenters' contract that will work with the backend API and interact with the view.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_coroutine_contexts_definition"><a class="anchor" href="#_coroutine_contexts_definition"></a>Coroutine contexts definition</h3>
+<h3 id="_coroutines_contexts_definition"><a class="anchor" href="#_coroutines_contexts_definition"></a>Coroutines contexts definition</h3>
 <div class="paragraph">
-<p>Previously, we have defined that our <strong>Presenter</strong> will execute some business logic into a given <code>CoroutineScope</code>, to avoid blocking the main thread.
-Thus, we should define a coroutine context on which our background processes will be executed, but we should also provide a coroutine context that will allow the <strong>Presenter</strong> to interact with the <strong>View</strong>.
+<p>Previously, we have defined that our presenter will execute some business logic into a given <code>CoroutineScope</code>, to avoid blocking the main thread.
+Thus, we should define a coroutine context on which our background processes will be executed, but we should also provide a coroutine context that will allow the presenter to interact with the view.
 That is why we will provide coroutine dispatchers, as they determine what thread the corresponding coroutine uses for its execution.</p>
 </div>
 <div class="paragraph">
@@ -287,7 +288,7 @@ That is why we will provide coroutine dispatchers, as they determine what thread
 <p><span class="image"><img src="images/res/9-3.png" alt="source directory structure" width="300"></span></p>
 </div>
 <div class="paragraph">
-<p>In this source file, we will put two dispatchers, one for background work (<code>ApplicationDispatcher</code>) and one for UI interaction (<code>UIDispatcher</code>).</p>
+<p>In this source file, we will put two dispatchers, one for background jobs (<code>ApplicationDispatcher</code>) and one for UI interactions (<code>UIDispatcher</code>).</p>
 </div>
 <div class="admonitionblock important">
 <table>
@@ -298,10 +299,10 @@ That is why we will provide coroutine dispatchers, as they determine what thread
 <td class="content">
 <div class="paragraph">
 <p>You may know that coroutines does not work in the same way depending on the platform we are running.
-For example, on <strong><em>iOS</em></strong> every coroutines are running on the main thread. This will be fixed in future version.</p>
+For example, on <strong><em>iOS</em></strong> every coroutines are running on the main thread (even, this would change in future version).</p>
 </div>
 <div class="paragraph">
-<p>However, for that reason our dispatchers will be defined as <code>expect</code>ed properties, and must be explicitly declare for each platform.</p>
+<p>However, for that reason our dispatchers will be defined as <code>expect</code>ed properties, and must be explicitly declared for each platforms.</p>
 </div>
 </td>
 </tr>
@@ -335,10 +336,10 @@ internal expect val UIDispatcher: CoroutineContext <i class="conum" data-value="
 <h4 id="_actual_implementation_for_the_dispatchers"><a class="anchor" href="#_actual_implementation_for_the_dispatchers"></a><code>actual</code> implementation for the dispatchers</h4>
 <div class="paragraph">
 <p>We have defined an <code>expect</code> function in our code,
-thus we must define an <code>actual</code> behaviors foreach targeted platform to be able to compile our project.</p>
+thus we must define an <code>actual</code> behaviors foreach targeted platforms to be able to compile our project.</p>
 </div>
 <div class="paragraph">
-<p>For each targeted platform, create a kotlin source file named <code>[dispatchers][platform].kt</code>, and add the right implementation for <code>apiBaseUrl()</code>.</p>
+<p>For each targets, create a kotlin source file named <code>[dispatchers][platform].kt</code>, and add the right implementation for <code>apiBaseUrl()</code>.</p>
 </div>
 <div class="listingblock">
 <div class="title">androidMain &gt; kotlin &gt; com.mybusiness/dispatchersAndroid.kt</div>
@@ -439,7 +440,7 @@ internal actual val UIDispatcher: CoroutineContext = Dispatchers.Main <i class="
 <table>
 <tr>
 <td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>Function called by the <strong>Presenter</strong> when the data are ready to be displayed.</td>
+<td>Function called by the presenter when the data are ready to be displayed.</td>
 </tr>
 </table>
 </div>
@@ -480,15 +481,15 @@ internal actual val UIDispatcher: CoroutineContext = Dispatchers.Main <i class="
 </tr>
 <tr>
 <td><i class="conum" data-value="4"></i><b>4</b></td>
-<td>Launch a coroutine on <code>BasePresenter.scope</code> which runs on the coroutine context <code>ApplicationDispatcher</code>.</td>
+<td>Launches a coroutine on <code>BasePresenter.scope</code> which runs on the coroutine context <code>ApplicationDispatcher</code>.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="5"></i><b>5</b></td>
-<td>After executing the API call we launch another coroutine in which we can interact with the UI, using the result of the API call.</td>
+<td>After executing the API call we use another coroutine context in which we can interact with the UI, using the result of the API call.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="6"></i><b>6</b></td>
-<td>Update the UI.</td>
+<td>Updates the UI.</td>
 </tr>
 </table>
 </div>
@@ -497,7 +498,7 @@ internal actual val UIDispatcher: CoroutineContext = Dispatchers.Main <i class="
 </div>
 </div>
 <div class="sect2">
-<h3 id="_use_case_2_getting_the_detail_of_a_contact"><a class="anchor" href="#_use_case_2_getting_the_detail_of_a_contact"></a>Use case 2: getting the detail of a contact</h3>
+<h3 id="_use_case_2_getting_the_details_of_a_contact"><a class="anchor" href="#_use_case_2_getting_the_details_of_a_contact"></a>Use case 2: getting the details of a contact</h3>
 <div class="paragraph">
 <p>In the <code>presentation</code> package, create a new Kotlin source file <code>ContactDetail.kt</code>, still in the <code>commonMain</code> module:</p>
 </div>
@@ -527,11 +528,11 @@ internal actual val UIDispatcher: CoroutineContext = Dispatchers.Main <i class="
 <table>
 <tr>
 <td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>Function called by the <strong>View</strong> to retrieve all the details of a contact, giving its Id.</td>
+<td>Function called by the view to retrieve all the details of a contact, giving its <code>id</code>.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>Function called by the <strong>Presenter</strong> when the data are ready to be displayed.</td>
+<td>Function called by the presenter when the data are ready to be displayed.</td>
 </tr>
 </table>
 </div>
@@ -572,15 +573,15 @@ internal actual val UIDispatcher: CoroutineContext = Dispatchers.Main <i class="
 </tr>
 <tr>
 <td><i class="conum" data-value="4"></i><b>4</b></td>
-<td>Launch a coroutine on <code>BasePresenter.scope</code> which runs on the coroutine context <code>ApplicationDispatcher</code>.</td>
+<td>Launches a coroutine on <code>BasePresenter.scope</code> which runs on the coroutine context <code>ApplicationDispatcher</code>.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="5"></i><b>5</b></td>
-<td>After executing the API call we launch another coroutine in which we can interact with the UI, using the result of the API call.</td>
+<td>After executing the API call we use another coroutine context in which we can interact with the UI, using the result of the API call.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="6"></i><b>6</b></td>
-<td>Update the UI.</td>
+<td>Updates the UI.</td>
 </tr>
 </table>
 </div>
@@ -621,11 +622,11 @@ internal actual val UIDispatcher: CoroutineContext = Dispatchers.Main <i class="
 <table>
 <tr>
 <td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>Function called by the <strong>View</strong> to create or update a contact on the backend.</td>
+<td>Function called by the view to create or update a contact on the backend.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>Function called by the <strong>Presenter</strong> when the data are ready to be displayed.</td>
+<td>Function called by the presenter when the data are ready to be displayed.</td>
 </tr>
 </table>
 </div>
@@ -670,15 +671,15 @@ internal actual val UIDispatcher: CoroutineContext = Dispatchers.Main <i class="
 </tr>
 <tr>
 <td><i class="conum" data-value="4"></i><b>4</b></td>
-<td>Launch a coroutine on <code>BasePresenter.scope</code> which runs on the coroutine context <code>ApplicationDispatcher</code>.</td>
+<td>Launches a coroutine on <code>BasePresenter.scope</code> which runs on the coroutine context <code>ApplicationDispatcher</code>.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="5"></i><b>5</b></td>
-<td>Run the API call. Depending on the contract Id, either we create a contact, either we update a contact.</td>
+<td>Runs the API call. Depending on the contract <code>id</code>, either we create a contact, either we update a contact.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="6"></i><b>6</b></td>
-<td>Depending on if the API call gone well, or if there has been an exception, we launch a coroutine on the UI dispatcher, and send an update to the UI.</td>
+<td>Depending on if the API call gone well, or if there has been an exception, we use a coroutine context on the UI dispatcher, and send an update to the UI.</td>
 </tr>
 </table>
 </div>
@@ -793,7 +794,7 @@ So, to use our Kotlin multi-platform library on those platform we will generate 
 </ul>
 </div>
 <div class="paragraph">
-<p>To build your Kotlin multi-platform library go to the Gradle pane and run the task <code>build</code> in the `build`group.</p>
+<p>To build your Kotlin multi-platform library go to the Gradle pane and run the task <code>build</code> in the <code>build</code> group.</p>
 </div>
 </div>
 </div>
@@ -802,7 +803,7 @@ So, to use our Kotlin multi-platform library on those platform we will generate 
 <div class="sectionbody">
 <div class="paragraph">
 <p>Now your Kotlin multi-platform library is all set up.
-In the next chapters we will see how to enjoy our common code across the different platform that we are targeting.</p>
+In the next chapters we will see how to enjoy our common code across the different platforms that we are targeting.</p>
 </div>
 <div class="paragraph">
 <p>Let&#8217;s start with <strong><em>Android</em></strong>!</p>

@@ -20,16 +20,16 @@
 <ul class="sectlevel1">
 <li><a href="#_cloning_the_starter_project">Cloning the starter project</a></li>
 <li><a href="#_configuration">Configuration</a></li>
-<li><a href="#_retrieve_and_display_the_contact_list">Retrieve and display the contact list</a>
+<li><a href="#_displaying_the_contact_list">Displaying the contact list</a>
 <ul class="sectlevel2">
-<li><a href="#_prepare_the_view_to_display_the_contacts">Prepare the view to display the contacts</a></li>
-<li><a href="#_consume_the_common_library">Consume the common library</a></li>
-<li><a href="#_run_the_application">Run the application</a></li>
+<li><a href="#_preparing_the_view_to_display_the_contacts">Preparing the view to display the contacts</a></li>
+<li><a href="#_consuming_the_common_library">Consuming the common library</a></li>
+<li><a href="#_running_the_application">Running the application</a></li>
 </ul>
 </li>
-<li><a href="#_retrieve_and_display_the_contact_details">Retrieve and display the contact details</a>
+<li><a href="#_displaying_the_contacts_details">Displaying the contact&#8217;s details</a>
 <ul class="sectlevel2">
-<li><a href="#_run_the_application_2">Run the application</a></li>
+<li><a href="#_running_the_application_2">Running the application</a></li>
 </ul>
 </li>
 <li><a href="#_whats_next">What&#8217;s next ?</a></li>
@@ -46,7 +46,7 @@
 <i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
-As said in the first chapter, we are not here to take a deep dive into the different targeted platform.
+As said in the first chapter, we are not here to take a deep dive into the different targeted platforms.
 So, to stay focused on Kotlin multi-platform development, we will provide empty projects, ready to run for each platform.
 Of course, those projects need to be modified.
 </td>
@@ -161,7 +161,7 @@ This task should have built and published the <code>framework</code> needed by <
 </div>
 </div>
 <div class="sect1">
-<h2 id="_retrieve_and_display_the_contact_list"><a class="anchor" href="#_retrieve_and_display_the_contact_list"></a>Retrieve and display the contact list</h2>
+<h2 id="_displaying_the_contact_list"><a class="anchor" href="#_displaying_the_contact_list"></a>Displaying the contact list</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>For displaying a list of contacts, all our modifications will appear in the class <code>MasterViewController</code>. So, open it in <strong>Xcode</strong>.</p>
@@ -213,12 +213,12 @@ class MasterViewController: UITableViewController {
 <table>
 <tr>
 <td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>Import the common library</td>
+<td>Imports the common library</td>
 </tr>
 </table>
 </div>
 <div class="sect2">
-<h3 id="_prepare_the_view_to_display_the_contacts"><a class="anchor" href="#_prepare_the_view_to_display_the_contacts"></a>Prepare the view to display the contacts</h3>
+<h3 id="_preparing_the_view_to_display_the_contacts"><a class="anchor" href="#_preparing_the_view_to_display_the_contacts"></a>Preparing the view to display the contacts</h3>
 <div class="paragraph">
 <p>Before using our shared business logic to display the contact list,
 we will wrote some code to prepare the UI interactions.</p>
@@ -226,7 +226,7 @@ we will wrote some code to prepare the UI interactions.</p>
 <div class="ulist">
 <ul>
 <li>
-<p>Set the flow interaction between the <em>Master</em> and <em>Detail</em> views</p>
+<p>Setting the flow interaction between the <em>Master</em> and <em>Detail</em> views</p>
 <div class="paragraph">
 <p>When the list of contacts will be displayed,
 we would like to click on the items to be able to see the details information for each contact.
@@ -267,21 +267,21 @@ For those who are not familiar with <code>iOS</code>, a <em>Segue</em> represent
 <table>
 <tr>
 <td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>Declare a global variable, a list of contacts, that will be used to update our view.</td>
+<td>Declares a global variable, a list of contacts, that will be used to update our view.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>Retrieve the contact in <code>contactList</code>, based on the index of the clicked element of the TableView.</td>
+<td>Retrieves the contact in <code>contactList</code>, based on the index of the clicked element of the TableView.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="3"></i><b>3</b></td>
-<td>The contact Id for which we want to show the details on the next screen.</td>
+<td>The contact <code>id</code> for which we want to show the details on the next screen.</td>
 </tr>
 </table>
 </div>
 </li>
 <li>
-<p>Configure what and how the <em>TableView</em> is display</p>
+<p>Configuring what and how the <em>TableView</em> is display</p>
 <div class="paragraph">
 <p>As our class is implementing <code>UITableViewController</code>, we need to implement <code>tableView(&#8230;&#8203;)</code> functions to configure its behavior.</p>
 </div>
@@ -307,19 +307,19 @@ For those who are not familiar with <code>iOS</code>, a <em>Segue</em> represent
 <table>
 <tr>
 <td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>Create the <em>TableView</em> with the correct dimensions.</td>
+<td>Creates the <em>TableView</em> with the correct dimensions.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>Configure the cells for each element of the <em>TableView</em>.</td>
+<td>Configures the cells for each element of the <em>TableView</em>.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="3"></i><b>3</b></td>
-<td>Get the contact from the shared variable <code>contactList</code>, based on the current cell index.</td>
+<td>Gets the contact from the shared variable <code>contactList</code>, based on the current cell index.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="4"></i><b>4</b></td>
-<td>Set what to display for each element of the <em>TableView</em>.</td>
+<td>Sets what to display for each element of the <em>TableView</em>.</td>
 </tr>
 </table>
 </div>
@@ -328,15 +328,15 @@ For those who are not familiar with <code>iOS</code>, a <em>Segue</em> represent
 </div>
 </div>
 <div class="sect2">
-<h3 id="_consume_the_common_library"><a class="anchor" href="#_consume_the_common_library"></a>Consume the common library</h3>
+<h3 id="_consuming_the_common_library"><a class="anchor" href="#_consuming_the_common_library"></a>Consuming the common library</h3>
 <div class="paragraph">
-<p>As for the <strong><em>Android</em></strong> application, mainly, we have two steps that we need to fulfill to consume our shared library.
+<p>As for the <strong><em>Android</em></strong> application, we have two steps that we need to fulfill to consume our shared library.
 First, we should implement the contract defined for the view, then declare and bind the presenter to it.</p>
 </div>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>Implement the <code>ContactList.View</code> interface</p>
+<p>Implementing the <code>ContactList.View</code> interface</p>
 <div class="admonitionblock important">
 <table>
 <tr>
@@ -370,25 +370,25 @@ In Kotlin/Native, <code>ContactList.View</code> has been renamed <code>ContactLi
 <table>
 <tr>
 <td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>Implement the interface <code>ContactListView</code>.</td>
+<td>Implements the interface <code>ContactListView</code>.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>Implement the function <code>displayContactList</code>, defined by the interface.</td>
+<td>Implements the function <code>displayContactList</code>, defined by the interface.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="3"></i><b>3</b></td>
-<td>Update the global variable with new data.</td>
+<td>Updates the global variable with new data.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="4"></i><b>4</b></td>
-<td>reload the Table View to display new data.</td>
+<td>Reloads the Table View to display new data.</td>
 </tr>
 </table>
 </div>
 </li>
 <li>
-<p>Bind the <code>ContactListPresenter</code> to the view</p>
+<p>Binding the <code>ContactListPresenter</code> to the view</p>
 <table class="tableblock frame-none grid-none stretch">
 <colgroup>
 <col style="width: 31.8181%;">
@@ -445,7 +445,7 @@ override func viewWillDisappear(_ animated: Bool) {
 </div>
 </div>
 <div class="sect2">
-<h3 id="_run_the_application"><a class="anchor" href="#_run_the_application"></a>Run the application</h3>
+<h3 id="_running_the_application"><a class="anchor" href="#_running_the_application"></a>Running the application</h3>
 <div class="paragraph">
 <p>Now, you can run the application onto an <strong>iOS Simulator</strong> by clicking the button <span class="image"><img src="images/res/run-ios.png" alt="run" width="16"></span> in <strong>Xcode</strong>.</p>
 </div>
@@ -471,7 +471,7 @@ override func viewWillDisappear(_ animated: Bool) {
 </td>
 <td class="content">
 As for <strong><em>Android</em></strong>, if you have clicked on an item from the list, you should see that nothing is shown, except static values.
-This is our next part, showing the contact details.
+This is our next part, showing the contact&#8217;s details.
 </td>
 </tr>
 </table>
@@ -480,11 +480,11 @@ This is our next part, showing the contact details.
 </div>
 </div>
 <div class="sect1">
-<h2 id="_retrieve_and_display_the_contact_details"><a class="anchor" href="#_retrieve_and_display_the_contact_details"></a>Retrieve and display the contact details</h2>
+<h2 id="_displaying_the_contacts_details"><a class="anchor" href="#_displaying_the_contacts_details"></a>Displaying the contact&#8217;s details</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>While we were displaying the contact list, we also prepared the transition between the <em>Master</em> and <em>Detail</em> screens,
-by giving to the <em>Detail</em> view the contact Id for which we need to display the contact details.</p>
+by giving to the <em>Detail</em> view the contact <code>id</code> for which we need to display the contact&#8217;s details.</p>
 </div>
 <div class="paragraph">
 <p>Like for the <em>Master</em> view we must implement a contract and bind to a presenter.</p>
@@ -492,7 +492,7 @@ by giving to the <em>Detail</em> view the contact Id for which we need to displa
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>Implement the <code>ContactDetail.View</code> interface</p>
+<p>Implementing the <code>ContactDetail.View</code> interface</p>
 <div class="admonitionblock important">
 <table>
 <tr>
@@ -545,33 +545,33 @@ In Kotlin/Native, <code>ContactDetail.View</code> has been renamed <code>Contact
 <table>
 <tr>
 <td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>Implement the interface <code>ContactDetailView</code></td>
+<td>Implements the interface <code>ContactDetailView</code></td>
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>Screen objects that will be used to display the contact details</td>
+<td>Screen objects that will be used to display the contact&#8217;s details</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="3"></i><b>3</b></td>
-<td>Implement the function <code>displayContact</code></td>
+<td>Implements the function <code>displayContact</code></td>
 </tr>
 <tr>
 <td><i class="conum" data-value="4"></i><b>4</b></td>
-<td>Display the contact name</td>
+<td>Displays the contact&#8217;s name</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="5"></i><b>5</b></td>
-<td>Display the contact phones</td>
+<td>Displays the contact&#8217;s phones</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="6"></i><b>6</b></td>
-<td>Display the contact addresses</td>
+<td>Displays the contact&#8217;s addresses</td>
 </tr>
 </table>
 </div>
 </li>
 <li>
-<p>Bind the <code>ContactDetailPresenter</code> to the view</p>
+<p>Binding the <code>ContactDetailPresenter</code> to the view</p>
 <table class="tableblock frame-none grid-none stretch">
 <colgroup>
 <col style="width: 31.8181%;">
@@ -608,7 +608,7 @@ In Kotlin/Native, <code>ContactDetail.View</code> has been renamed <code>Contact
 <tr>
 <td class="tableblock halign-right valign-middle"><p class="tableblock">Attach <strong><em>(1)</em></strong> and detach <strong><em>(3)</em></strong> the view to the presenter when it is shown or concealed.</p>
 <p class="tableblock">In this case, attaching the view to the presenter doesn&#8217;t trigger anything.
-We must call the presenter ourselves to retrieve the contact details, giving a contact Id <strong><em>(2)</em></strong>.</p></td>
+We must call the presenter ourselves to retrieve the contact&#8217;s details, giving a contact <code>id</code> <strong><em>(2)</em></strong>.</p></td>
 <td class="tableblock halign-left valign-middle"><div class="content"><div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code data-lang="swift" class="language-swift hljs">override func viewWillAppear(_ animated: Bool) {
@@ -629,7 +629,7 @@ override func viewWillDisappear(_ animated: Bool) {
 </ol>
 </div>
 <div class="sect2">
-<h3 id="_run_the_application_2"><a class="anchor" href="#_run_the_application_2"></a>Run the application</h3>
+<h3 id="_running_the_application_2"><a class="anchor" href="#_running_the_application_2"></a>Running the application</h3>
 <div class="paragraph">
 <p>Now, you can run the application onto an <strong>iOS Simulator</strong> by clicking the button <span class="image"><img src="images/res/run-ios.png" alt="run" width="16"></span> in <strong>Xcode</strong>.</p>
 </div>
