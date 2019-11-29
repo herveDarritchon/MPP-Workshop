@@ -197,7 +197,7 @@ If you have been curious, you may have opened `business-library.js` to see what 
 }));
 ----
 <1> Checks if the module `kotlin.js` is present.
-<2> Set the module accessible with `this['business-library']` from any *_JavaScript_* code.
+<2> Sets the module accessible with `this['business-library']` from any *_JavaScript_* code.
 <3> Our previously created common function `sayHelloKotlinConf()`.
 <4> The *_JavaScript_*  expect function for `platformName()`.
 <5> Managing packages, thus we will need to call the full qualified name to reach the module members.
@@ -222,7 +222,7 @@ To use our Kotlin multi-platform library in our *_HTML_* project we need to refe
 
 IMPORTANT: The order of the script references really matters. As the module `kotlin.js` is referenced in `business-library.js`, it must be declared first.
 
-NOTE: Your web page should work, but nothing will change. However, to see if there is some ongoing issues you can check the console of the developer console of your browser by clicking on the `F12` key on your keyboard.
+NOTE: Your web page should work, but nothing will change. However, to see if there is some ongoing issues you can check the console of the "developer tools" of your browser by clicking on the `F12` key on your keyboard.
 
 Now, you can change the `body` of your web page to use the Kotlin multi-platform library.
 
@@ -243,7 +243,7 @@ Now, you can change the `body` of your web page to use the Kotlin multi-platform
 </body>
 ----
 <1> Defining a *_JavaScript_* based script.
-<2> Accessing the *h1* `kotlin_mpp_message` to be able to set its _inner text_.
+<2> Accessing the *h1*, identified by `kotlin_mpp_message`, to be able to set its _inner text_.
 <3> Calling our `sayHelloKotlinConf()` function from the module `business-library`, with its full qualified name.
 
 Now rerun the page in a browser by clicking on the tooltip bar

@@ -9,22 +9,22 @@ The first target of Kotlin was the *JVM*, thus its the easiest integration, so w
 == Project Creation Wizard
 
 By now you should have installed https://developer.android.com/studio[Android Studio].
-Open it and create a new project:
 
-image:res/4-1.png[creation wizard,600]
-
-Choose a project template: *Empty Activity*.
-
-image:res/4-2.png[project template,600]
-
-Then, set the application details:
+[cols="65%,<.^35%a",grid="none",frame="none"]
+|===
+|image:res/4-1.png[creation wizard,600]
+|Open it and create a new project
+|image:res/4-2.png[project template,600]
+|Choose a project template: *Empty Activity*.
+|image:res/4-3.png[project details,600]
+|
+Then, set the application's details:
 
 - package name: `com.mybusiness.android`
 - your project location
 - choose Kotlin as the language
 - set the minimum API level: `API 21: Android 5.0`
-
-image:res/4-3.png[project details,600]
+|===
 
 Click the *Finish* button, you now have an empty *_Android_* application, with one screen, ready to display a `Hello World!`.
 
@@ -34,16 +34,16 @@ Before running our app we will change the configuration and the code to integrat
 
 You can see that there are two files named `build.gradle`:
 
-- one for the project build configuration
-- one for the *_Android_* application build configuration
+- one for the project's build configuration
+- one for the *_Android_* application's build configuration
 
 We will focus on the second one: `build.gradle (Module: app)`
 
-WARNING: *_Android Studio_* generates the `build.gradle` files, in Groovy, not Kotlin.
+WARNING: *_Android Studio_* generates a `build.gradle` files, in Groovy, not Kotlin.
 
 The generated file `build.gradle` is made of three parts:
 
-. The *plugins* needed to build an Android application with Kotlin
+. The *plugins*, needed to build an Android application with Kotlin
 +
 [source,groovy]
 ----
@@ -54,7 +54,7 @@ apply plugin: 'kotlin-android-extensions'
 
 . The *android configuration*, under `android{ ... }`
 +
-This is the Gradle configuration to build any Android application defining
+This is the Gradle configuration to build any *_Android_* application defining
 which SDK to use to build the app,
 which minimum API version the app should be compatible with, etc.
 
@@ -64,7 +64,7 @@ This part contains the definition of all the libraries that we will use to devel
 This is where we will bound the application with our Kotlin multi-platform library.
 +
 Remember, in the previous step we have built and published our library on *_Maven Local_*,
-thus we need to add *_Maven Local_* to the Gradle configuration.
+thus we need to add it to the Gradle configuration.
 +
 .app > build.gradle
 [source,groovy]
@@ -76,7 +76,7 @@ repositories {
 //...
 ----
 +
-Then, add the following dependency to your `build.gradle` into the `app` module
+Then, add the following dependency to your `build.gradle`, into the `app` module
 +
 .app > build.gradle
 [source,groovy]
@@ -85,7 +85,7 @@ Then, add the following dependency to your `build.gradle` into the `app` module
 dependencies {
     // implementations
     //...
-    implementation 'com.mybusiness:business-library-jvm:1.0.0'
+    implementation 'com.mybusiness:business-library:1.0.0'
     //...
     // testImplementation
     // androidTestImplementation
@@ -95,10 +95,8 @@ dependencies {
 [cols="^,^,^"]
 |=======
 | dependency group | dependency name | version
-| `com.mybusiness` | `business-library-jvm` | `1.0.0`
+| `com.mybusiness` | `business-library` | `1.0.0`
 |=======
-+
----
 +
 By default, your project view is set to *Android*, but you can change it to be on a *Project* view
 +
@@ -112,7 +110,7 @@ image:res/4-5.png[dependencies,640]
 
 == Using your Kotlin multi-platform library
 
-Now that we are ready to use our library we need to prepare our main application activity.
+Now that we are ready to use our library, we need to prepare our application's `MainActivity`.
 
 [IMPORTANT]
 ====
@@ -141,7 +139,7 @@ android {
 
 The template used to generate our current project has created an *Empty Activity*, with two files:
 
-- an _XML_ file (`res/layout/activity_main.xml`) defining the view and the components that will be displayed on the screen
+- an _XML_ file (`res/layout/activity_main.xml`), defining the view and the components that will be displayed on the screen
 
 .res/layout/activity_main.xml
 [source,xml]
@@ -165,7 +163,7 @@ The template used to generate our current project has created an *Empty Activity
 </androidx.constraintlayout.widget.ConstraintLayout>
 ----
 
-- a _Kotlin_ file (`com.mybusiness.android.MainActivity.kt`) defining the code behind the scene,
+- a _Kotlin_ file (`com.mybusiness.android.MainActivity.kt`), defining the code behind the scene,
 where we write the actions that will be applied on the displayed screen
 
 .com.mybusiness.android.MainActivity
@@ -199,8 +197,8 @@ First, we need to change the `TextView` in the _XML_ file
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 ----
-<1> Give a unique ID to the `TextView` to be able to call it from our Kotlin code
-<2> Set the text to a bigger size
+<1> Gives a unique ID to the `TextView` to be able to call it from our Kotlin code
+<2> Sets the text to a bigger size
 <3> Center the text on the screen
 
 Then, we need to change the Kotlin code to display our message in the `TextView`
@@ -230,7 +228,7 @@ The `TextView` can be called in the code behind because:
 - we ,or auto import, added `import kotlinx.android.synthetic.main.activity_main.*`
 ====
 
-== Run the application in an Android Simulator
+== Running the application in an Android Simulator
 
 To run and test your application locally you need to configure an _Android Virtual Device_.
 
@@ -260,7 +258,7 @@ NOTE: if you do not have the SDK already, click on *Download*.
 |Click *Finish* and close the *AVD Manager*
 |===
 
-=== Run the application
+=== Running the application
 
 image:res/4-12.png[run the app, 480]
 Run the application by clicking on image:res/run-android.png[run adnroid,16]

@@ -119,7 +119,7 @@ Open the file `package.json` to add the dependency.
   }
 }
 ----
-<1> Add a reference to the manually added Node module `addressbook-common`.
+<1> Adds a reference to the manually added Node module `addressbook-common`.
 
 Finally, open a terminal in the directory of the web application  and run the command `yarn install`, you should see something like that:
 
@@ -135,7 +135,7 @@ Finally, open a terminal in the directory of the web application  and run the co
 
 Now let's code our UI!
 
-== Retrieve and display the contact list
+== Displaying the contact list
 
 Create a new file in `src`, named `ContactList.js`.
 
@@ -152,7 +152,7 @@ export default function ContactList() { } // <3>
 ----
 <1> React's dependencies
 <2> Our Kotlin multi-platform library dependency
-<3> Create our React component for the contact list
+<3> Creates our React component for the contact list
 
 In *_JavaScript_* there is such thing as interface, so we won't be able to implement our contracts.
 Instead, we will define a hook (`useEffect(...)`), that will run after that the UI rendering.
@@ -175,11 +175,11 @@ export default function ContactList() {
     }, []);
 }
 ----
-<1> Initialize the presenter while the component is created, by calling our manual dependency injection object `CommonInjector`.
-<2> Define a local variable, a list of contacts, and a function to update it. _(default value is an empty array)_
-<3> Call the attachment function of the presenter on an anonymous object, that represents the View
-<4> Define the function `displayContactList` from the `ContactList.View` interface, that is needed by the presenter to update the UI.
-<5> Update the contact list
+<1> Initializes the presenter while the component is created, by calling our manual dependency injection object `CommonInjector`.
+<2> Defines a local variable, a list of contacts, and a function to update it. _(default value is an empty array)_
+<3> Calls the attachment function of the presenter on an anonymous object, that represents the View
+<4> Defines the function `displayContactList` from the `ContactList.View` interface, that is needed by the presenter to update the UI.
+<5> Updates the contact list
 
 We now have everything we need to retrieve our contact list from the backend API. It would be nicer to display it on the web page, right ?
 
@@ -230,15 +230,15 @@ function App() {
 }
 // ...
 ----
-<1> Add the import on the `ContactList` component
-<2> Remove the `<h1>` and replace it by the `ContactList` usage
+<1> Adds the import on the `ContactList` component
+<2> Removes the `<h1>` and replace it by the `ContactList` usage
 
-=== Run the application
+=== Running the application
 
 If you reopen your web page in your browser, you should see something like that:
 image:res/12-7.png[contact list,600]
 
-== Retrieve and display the contact details
+== Displaying the contact's details
 
 We have just wrote that for each contact we show its full name on a list.
 That name is clickable, and should lead you to a new page.
@@ -261,7 +261,7 @@ export default function Contact() { } // <3>
 ----
 <1> React's dependencies
 <2> Our Kotlin multi-platform library dependency
-<3> Create our *React* component for the contact list
+<3> Creates our *React* component for the contact list
 
 Set the presenter and bind it to the view
 
@@ -283,15 +283,15 @@ export default function Contact() {
     }, []);
 }
 ----
-<1> Get the contact Id, passed as URL parameter. This will be used for retrieving contact details from the backend API.
-<2> Initialize the presenter while the component is created, by calling our manual dependency injection object `CommonInjector`.
-<3> Define a local variable, a contact, and a function to update it. _(default value is null)_.
-<4> Call the attachment function of the presenter on an anonymous object, that represents the View.
-<5> Define the function `displayContact` from the `ContactDetail.View` interface, that is needed by the presenter to update the UI.
-<6> Update the contact when retrieved from the backend API.
-<7> Trigger the API call to get the contact details.
+<1> Gets the contact `id`, passed as URL parameter. This will be used for retrieving contact's details from the backend API.
+<2> Initializes the presenter while the component is created, by calling our manual dependency injection object `CommonInjector`.
+<3> Defines a local variable, a contact, and a function to update it. _(default value is null)_.
+<4> Calls the attachment function of the presenter on an anonymous object, that represents the View.
+<5> Defines the function `displayContact` from the `ContactDetail.View` interface, that is needed by the presenter to update the UI.
+<6> Updates the contact when retrieved from the backend API.
+<7> Trigger the API call to get the contact's details.
 
-Let's ho to the end of the component to add the UI that will show our contact details.
+Let's ho to the end of the component to add the UI that will show our contact's details.
 
 .Contact.js
 [source]
@@ -334,11 +334,11 @@ export default function Contact() {
 }
 ----
 <1> If the contact is null, obvisouly nothing is displayed
-<2> Print the full name on the screen
-<3> Print a list of the contact phones
-<4> Print a list of the contact addresses
+<2> Prints the full name on the screen
+<3> Prints a list of the contact's phones
+<4> Prints a list of the contact's addresses
 
-Again, if you tried to get the contact details, you probably saw that nothing has changed.
+Again, if you tried to get the contact's details, you probably saw that nothing has changed.
 This is because we must use our component inside the `App.js`.
 
 Open the `App.js`, add an import and a usage for the `Contact` component.
@@ -364,10 +364,10 @@ function App() {
 }
 // ...
 ----
-<1> Add the import on the `Contact` component
-<2> Add a route for the path `/contact/:id`, that should display to the `Contact` component
+<1> Adds the import on the `Contact` component
+<2> Adds a route for the path `/contact/:id`, that should display to the `Contact` component
 
-=== Run the application
+=== Running the application
 
 [cols="50%,50%",grid="none",frame="none"]
 |===

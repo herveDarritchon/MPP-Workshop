@@ -12,7 +12,7 @@ So we should be able to work with every specifics of each platform in our common
 == What is ``expect``ed must ``actual``y exist
 
 Kotlin/Multiplatform provides a way to define an `expect`/`actual` mechanism.
-In the common code, we define the ``expect``ed behaviors, allowing us to provide the `actual` behaviors in each targeted platform.
+In the common code, we define the ``expect``ed behaviors, allowing us to provide the `actual` behaviors in each targeted platforms.
 
 *The expectation [`expect`] code will be defined in the common module:*
 
@@ -23,7 +23,7 @@ In the common code, we define the ``expect``ed behaviors, allowing us to provide
 expect fun logMessage(message: String)
 ----
 
-*And the implementation [`actual`] will be defined for each targeted platform:*
+*And the implementation [`actual`] will be defined for each targeted platforms:*
 
 - `jsMain`
 
@@ -55,10 +55,10 @@ actual fun logMessage(message: String) = printf("%s\n", message)
 
 == Write your first multi-platform code!
 
-In this section we will prepare our common code to be executable and testable for each targeted platform.
+In this section we will prepare our common code to be executable and testable for each targeted platforms.
 
-To show you how it works, and how yo play with the `expect`/`actual` mechanism, we will use a simple example.
-For each targeted platform, we will print on the screen/console a message, with a specific part, different for each platform.
+To show you how it works, and how to play with the `expect`/`actual` mechanism, we will use a simple example.
+For each targeted platforms, we will print on the screen/console a message, with a specific part, different for each platform.
 
 .Example of a platform specific message
 [source]
@@ -67,7 +67,7 @@ Hello KotlinConf, Kotlin/Multiplatform is awesome! <1>
 We are running on JVM! <2>
 ----
 <1> Common message for every platform
-<2> Platform specific message, for the *_JVM_* is this case
+<2> Platform specific message, for the *_JVM_* in this case
 
 *Let's code!*
 
@@ -103,7 +103,7 @@ If you put your cursor on the function name you'll see the following tooltip
 image:res/3-1.png[expect/actual error]
 ====
 
-To fix this error we will need to provide an `actual` implementation for the  `platformName()` function, for every targeted platform.
+To fix this error we will need to provide an `actual` implementation for the  `platformName()` function, for every targeted platforms.
 
 === [actual] platform specific code
 
@@ -180,9 +180,9 @@ image:res/3-4.png[actual gutter icon]
 
 === Testing your multi-platform library
 
-To empower our example, we should provide some tests for each of the targeted platform.
+To empower our example, we should provide some tests for each of the targeted platforms.
 Our test environment is already configured, so we just have to write a test for our `sayHelloKotlinConf()`
-function, on every platform.
+function, on every platforms.
 
 [NOTE]
 ====
@@ -390,7 +390,9 @@ Now you can rerun your task `allTests` and you will see new lines printed.
 
 Before going further, we need to prepare our multi-platform library by building and publishing it with Gradle.
 
-In your Gradle build file `build.gradle.kts` add the plugin `maven-publish` and change the version of your library, `1.0.0` to be proud :)
+In your Gradle build file `build.gradle.kts` add the plugin `maven-publish` and change the version of your library.
+
+`1.0.0`, be proud :)
 
 .build.gradle.kts > plugin
 [source,kotlin]
@@ -402,7 +404,7 @@ plugins {
 //...
 version = "1.0.0"
 ----
-<1> Notice the use back ticks ```
+<1> Notice the use of back ticks ```
 
 In the Gradle pane, you should see a new task group, named `publishing` (hit the refresh button if you don't).
 
@@ -434,10 +436,12 @@ business-library-jvm-1.0.0.pom
 
 NOTE: On a real world project, you may publish your library to a remote repository (Maven / Bintray / etc).
 
+NOTE: Note that we won't cover how to deploy binaries for *Native* or *_JavaScript_* targets.
+
 ==== The iOS special case
 
 Building libraries for *_iOS_* is also a special case in our build script.
-In fact, to be able to use our common library in *_Xcode_*, we need to build a *_framework_* directory.
+In fact, to be able to use our common library in *_Xcode_*, we need to build a *_framework_* file.
 
 First, in the `target` definition for *_iOS_* we need to add the following block of code:
 
@@ -456,12 +460,12 @@ kotlin {
     //...
 }
 ----
-<1> define that the output binaries must be a *_framework_* file...
+<1> Defines that the output binaries must be a *_framework_* file...
 <2> ...with the name `businessLibrary`
 
 [NOTE]
 ====
-If you run the Gradle task `build` you'll find `businessLibrary.framework` in your build directory
+If you run the Gradle task `build` you will find `businessLibrary.framework` in your build directory
 
 image:res/3-7.png[build directory]
 ====
@@ -491,12 +495,12 @@ val packForXcode by tasks.creating(Sync::class) { //<1>
 
 tasks.getByName("build").dependsOn(packForXcode) //<6>
 ----
-<1> Create a new task to make the framework available for *_Xcode_*
-<2> Selecting the right configuration depending on the environment variables set by Xcode build
+<1> Creates a new task to make the framework available for *_Xcode_*
+<2> Selects the right configuration depending on the environment variables set by *_Xcode_* build
 <3> The new task depends on the fact that the framework has been built
-<4> Move the built framework from the build directory
-<5> To a new location (could/should be a remote path)
-<6> Set the `packForXcode` task as part of the `build` task
+<4> Moves the built framework from the build directory...
+<5> ...to a new location (could/should be a remote path)
+<6> Sets the `packForXcode` task as part of the `build` task
 
 Now after running the Gradle task `build`, by double clicking on `Tasks` > `build` > `build`, you should see the following build tree:
 

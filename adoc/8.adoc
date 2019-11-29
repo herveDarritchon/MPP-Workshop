@@ -7,7 +7,7 @@ This one will be more complete, as we would like it to handle as much logic as p
 
 Thus, after creating the project, we will put in it the following parts:
 
-- The Gradle configuration for every targeted platform (_JVM_ for *_Android_*, _Native_ for *_iOS_* and *_JavaScript_*).
+- The Gradle configuration for every targets (_JVM_ for *_Android_*, _Native_ for *_iOS_* and *_JavaScript_*).
 - The business domain objects
 - The backend API interfaces
 - The MVP pattern, to handle API calls and view updates.
@@ -24,7 +24,7 @@ Open IntelliJ IDEA and create a new project:
 |*Create a new Gradle project*
 |image:res/8-2.png[project details]
 |
-*Fulfill your project details:*
+*Fulfill your project's details:*
 
 - Name: `addressbook-common`
 - Group ID: `com.mybusiness`
@@ -35,7 +35,7 @@ Open IntelliJ IDEA and create a new project:
 
 [IMPORTANT]
 ====
-To avoid any misconfiguration issues you should change the Gradle Wrapper properties right now.
+To avoid any misconfiguration issue you should change the Gradle Wrapper's properties right now.
 
 Go the the newly created file `gradle-wrapper.properties` under `/addressbook-common/gradle/wrapper/`
 and change the property `distributionUrl` with the value `https\://services.gradle.org/distributions/gradle-5.6.1-bin.zip`
@@ -56,9 +56,8 @@ The Gradle wrapper should upgrade itself within the next Gradle action.
 == Gradle configuration
 
 Now, we will take some time to explain the gradle configuration, as it is the heavy part of Kotlin multi-platform projects.
-Also, we will see a new way to define Gradle plugins.
 
-=== Plugins
+=== Plugins configuration
 
 As we saw earlier, we will need multiple Gradle plugins to achieve our Kotlin multi-platform project.
 
@@ -83,12 +82,12 @@ To do so, either *right-click* on the file, then click on *Refactor* > *Rename..
 
 Inside the file `settings.gradle.kts`, replace:
 
-`rootProject.name = 'addressbook-common'` by ``rootProject.name = "addressbook-common"`
+`rootProject.name = 'addressbook-common'` by `rootProject.name = "addressbook-common"`
 
 Simple quote are from _Groovy_.
 ====
 
-Now, go to the `settings.gradle.kts` file and add the following lines:
+Go to the `settings.gradle.kts` file and add the following lines:
 
 .settings.gradle.kts
 [source,kotlin]
@@ -116,12 +115,12 @@ repositories {
     maven(url = "https://dl.bintray.com/jetbrains/kotlin-native-dependencies") // <4>
 }
 ----
-<1> Use the *Kotlin/Multiplatform* plugin
-<2> Use the *Kotlinx.Serialization* plugin
+<1> Using the *Kotlin/Multiplatform* plugin
+<2> Using the *Kotlinx.Serialization* plugin
 <3> Needed to resolve Kotlinx dependencies (e.g. Coroutines & Serialization)
 <4> Needed to resolve Native dependencies
 
-=== Targets
+=== Targets configuration
 
 As before, we will target the three environments that are the *_JVM_*, *_iOS_* and the *_Web_*.
 
@@ -144,11 +143,11 @@ kotlin {
     js { browser() } // <5>
 }
 ----
-<1> Set the *_JVM_* target, named *android* as we will build an *_Android_* afterwards.
-<2> Set the *_iOS_* target, named *ios* to simplify usage of the target
-<3> Define that the output binaries for *_iOS_*, must be a *_framework_* file...
+<1> Sets the *_JVM_* target, named *android* as we will build an *_Android_* afterwards.
+<2> Sets the *_iOS_* target, named *ios* to simplify usage of the target
+<3> Defines that the output binaries for *_iOS_*, must be a *_framework_* file...
 <4> ...with the name `AddressBookCommon`
-<5> Set the *_JavaScript_* target, packaged for a browser usage.
+<5> Sets the *_JavaScript_* target, packaged for a browser usage.
 
 [NOTE]
 ====
@@ -167,7 +166,7 @@ There are three main dependencies that we will need to develop and use the Kotli
 Like for our backend API, we will use *Ktor* to empower our HTTP calls on the client side.
 We will have to use multiple implementations to be able to make some HTTP calls, as:
 +
-- an HTTP engine (_OkHttp_ for the *_JVM_* / _NSURLSession_ for the *_iOS_* / _Fetch_ for the *_JavaScript_*)
+- an HTTP engine (_OkHttp_ for *_Android_* / _NSURLSession_ for *_iOS_* / _Fetch_ for *_JavaScript_*)
 - a JSON implementation to be able to serialize and de-serialize the requests/responses payloads.
 - a serialization interface to render JSON into domain objects (using *Kotlinx.Serialization*)
 
@@ -188,7 +187,7 @@ kotlin {
 // ...
         sourceSets {
         // Versions
-        val ktorVersion = "1.2.5"
+        val ktorVersion = "1.2.6"
         val coroutinesVersion = "1.3.2"
         val serializationVersion = "0.14.0"
         // Shortcuts
@@ -203,10 +202,10 @@ kotlin {
     }
 }
 ----
-<1> Build the dependency name for any *kotlinx* module with its version
-<2> Build the dependency name for any *coroutines-core* module
-<3> Build the dependency name for any *serialization-runtime* module
-<4> Build the dependency name for any *ktor-client* module
+<1> Builds the dependency name for any *kotlinx* module with its version
+<2> Builds the dependency name for any *coroutines-core* module
+<3> Builds the dependency name for any *serialization-runtime* module
+<4> Builds the dependency name for any *ktor-client* module
 
 ==== *_Common_*
 
@@ -245,11 +244,11 @@ kotlin {
 <5> Common API to use Json Serializers on Kotlin multi-platform projects.
 <6> Common API to use Kotlinx.Serialization with Ktor client on Kotlin multi-platform projects.
 
-==== Targeted platform
+==== Targeted platforms
 
-Now that we have defined our common dependencies, we need to define the dependencies for each targeted platform of our Kotlin multi-platform library.
+Now that we have defined our common dependencies, we need to define the dependencies for each targeted platforms of our Kotlin multi-platform library.
 
-In fact, in our case, it is very simple as each platform need to import the corresponding implementation of each API dependencies defined in the common module.
+In fact, in our case, it is very simple as each platforms need to import the corresponding implementation of each API dependencies defined in the common module.
 
 Add the following lines to the `build.gradle.kts` file, in the `kotlin > sourceSets` block:
 
@@ -306,13 +305,13 @@ kotlin {
     }
 }
 ----
-<1> Kotlin Standard Library for the targeted platform.
-<2> Kotlinx.Coroutines implementation for the targeted platform.
-<3> Kotlinx.Serialization implementation for the targeted platform.
-<4> Implementation of Ktor client for the targeted platform.
-<5> Implementation of Json Serializers for the targeted platform.
-<6> Implementation of Kotlinx.Serialization with Ktor client for the targeted platform.
-<7> Specific HTTP client engine for the targeted platform, used by Ktor for making HTTP calls.
+<1> Kotlin Standard Library for the target.
+<2> Kotlinx.Coroutines implementation for the target.
+<3> Kotlinx.Serialization implementation for the target.
+<4> Implementation of Ktor client for the target.
+<5> Implementation of Json Serializers for the target.
+<6> Implementation of Kotlinx.Serialization with Ktor client for the target.
+<7> Specific HTTP client engine for the target, used by Ktor for making HTTP calls.
 
 [NOTE]
 ====
@@ -352,18 +351,18 @@ val packForXcode by tasks.creating(Sync::class) { //<1>
 
 tasks.getByName("build").dependsOn(packForXcode) //<6>
 ----
-<1> Create a new task to make the framework available for *_Xcode_*
-<2> Selecting the right configuration depending on the environment variables set by Xcode build
+<1> Creates a new task to make the framework available for *_Xcode_*
+<2> Selects the right configuration depending on the environment variables set by Xcode build
 <3> The new task depends on the fact that the framework has been built
-<4> Move the built framework from the build directory
-<5> To a new location (could/should be a remote path)
-<6> Set the `packForXcode` task as part of the `build` task
+<4> Moves the built framework from the build directory...
+<5> ...to a new location (could/should be a remote path)
+<6> Sets the `packForXcode` task as part of the `build` task
 
 Let's keep the configuration aside and start coding :)
 
 == Defining the domain objects
 
-First thing, we will create the domain objects needed to manage an address book.
+    First thing, we will create the domain objects needed to manage an *Address Book*.
 Here is a class diagram of our data model:
 
 // TODO use graphviz
@@ -428,7 +427,7 @@ data class Phone(
     enum class Type(val displayedName: String) { HOME("HOME"), WORK("WORK"), MOBILE("MOBILE"), OTHER("OTHER") }
 }
 ----
-<1> Make the data classes serializable
+<1> Makes the data classes serializable
 
 WARNING: the collections must be initialized, otherwise you could get some serialization exceptions.
 
@@ -469,10 +468,10 @@ class ContactApi {
     }
 }
 ----
-<1> Declare a constant for the API host IP (localhost, as our backend API is running on our local machine)
+<1> Declares a constant for the API host IP (localhost, as our backend API is running on our local machine)
 <2> An `expect` function will help define specific host IP (e.g. Android Simulator reach the local machine through `10.0.2.2`)
-<3> Create the *Ktor* HTTP client.
-<4> Define that the HTTP client will work with JSON.
+<3> Creates the *Ktor* HTTP client.
+<4> Defines that the HTTP client will work with JSON.
 <5> Register *Kotlinx.Serialization* to serialize and de-serialize JSON
 
 TIP: Every import in `ContactApi.kt` should come from `io.ktor.client` or `kotlinx.serialization``
@@ -480,9 +479,9 @@ TIP: Every import in `ContactApi.kt` should come from `io.ktor.client` or `kotli
 ==== `apiBaseUrl()` actual implementation
 
 We have defined an `expect` function in our code,
-thus we must define an `actual` behaviors foreach targeted platform to be able to compile our project.
+thus we must define an `actual` behaviors foreach targeted platforms to be able to compile our project.
 
-For each targeted platform, create a kotlin source file named `[ContactApi][platform].kt`, and add the right implementation for `apiBaseUrl()`.
+For each targets, create a kotlin source file named `[ContactApi][platform].kt`, and add the right implementation for `apiBaseUrl()`.
 
 .androidMain > kotlin > com.mybusiness.api/ContactApiAndroid.kt
 [source,kotlin]
@@ -534,10 +533,10 @@ class ContactApi {
 
 If you remember the previous section, we have ran a *Ktor* server. This server defines 4 endpoints:
 
-- _GET_ `/api/contacts`: Retrieve a list of all the contacts
-- _GET_ `/api/contacts/{id}`: Retrieve a contact, identified by its Id
-- _PUT_ `/api/contacts`: Create a new contact
-- _POST_ `/api/contacts/{id}`: Update a contact, identified by its Id
+- _GET_ `/api/contacts`: Retrieves a list of all the contacts
+- _GET_ `/api/contacts/{id}`: Retrieves a contact, identified by its `id`
+- _PUT_ `/api/contacts`: Creates a new contact
+- _POST_ `/api/contacts/{id}`: Updates a contact, identified by its `id`
 
 So, we will provide interfaces for each one of those 4 endpoints, thus we will see how to send/receive data classes through an HTTP client.
 
@@ -561,15 +560,15 @@ class ContactApi {
     }
 }
 ----
-<1> Define a `suspend` function that returns a `List<Contact>`.
-<2> Use the `Json.nonstrict.parse` function from *Kotlinx.Serialization* to transfrom Json to `Contact` data class.
+<1> Defines a `suspend` function that returns a `List<Contact>`.
+<2> Uses the `Json.nonstrict.parse` function from *Kotlinx.Serialization* to transfrom Json to `Contact` data class.
 <3> Register the serializer generated on `Contact` by the `kotlinx.serialization` plugin.
-<4> Call the backend API...
-<5>... on the path `/api/contacts/`.
+<4> Calls the backend API...
+<5> ...on the path `/api/contacts/`
 
-===== Get a specific contact by its Id
+===== Get a specific contact by its `id`
 
-Getting the list of all the contacts available on the backend just give us the `id`, `firstname` and `lastname` of the contacts.
+Getting the list of all the contacts available on the backend just gives us the `id`, `firstname` and `lastname` of the contacts.
 So, we should be able to get the detailed information for a contact giving its `id`.
 
 .ContactApi.kt
@@ -587,13 +586,13 @@ class ContactApi {
     }
 }
 ----
-<1> Define a `suspend` function that wait for a `String` as parameter and returns a `Contact`.
-<2> Use the `Json.nonstrict.parse` function from *Kotlinx.Serialization* to transfrom Json to `Contact` data class.
+<1> Defines a `suspend` function that wait for a `String` as parameter and returns a `Contact`.
+<2> Uses the `Json.nonstrict.parse` function from *Kotlinx.Serialization* to transfrom Json to `Contact` data class.
 <3> Register the serializer generated on `Contact` by the `kotlinx.serialization` plugin.
-<4> Call the backend API...
-<5>... on the path `/api/contacts/{id}`, by passing the `contactId` received by the current function.
+<4> Calls the backend API...
+<5> ...on the path `/api/contacts/{id}`, by passing the `contactId` received by the current function.
 
-==== PUT - Create contacts on the backend API
+==== PUT - Create a contact on the backend API
 
 Now that we can retrieve data from the backend API, we should be able to create some contacts.
 The backend API as an endpoint for that. We have to call the path `/api/contacts/` on the HTTP verb _PUT_,
@@ -619,17 +618,17 @@ class ContactApi {
     }
 }
 ----
-<1> Define a `suspend` function that wait for a `Contact` as parameter and returns a `String`.
-<2> Use the `Json.nonstrict.parse` function from *Kotlinx.Serialization* to transfrom Json to a `Map<String, String>`.
+<1> Defines a `suspend` function that wait for a `Contact` as parameter and returns a `String`.
+<2> Uses the `Json.nonstrict.parse` function from *Kotlinx.Serialization* to transfrom Json to a `Map<String, String>`.
 <3> Register an existing serializer from *Kotlinx.Serialization* to get a `Map<String, String>`.
-<4> Call the backend API...
+<4> Calls the backend API...
 <5> ... on the path `/api/contacts/`...
 <6> ... with the HTTP verb _PUT_.
-<7> Set the `contact` in the body of the HTTP Request, using the serializer generated on `Contact` by the `kotlinx.serialization` plugin.
+<7> Sets the `contact` in the body of the HTTP Request, using the serializer generated on `Contact` by the `kotlinx.serialization` plugin.
 
-==== POST - Update contacts on the backend API
+==== POST - Update a contact on the backend API
 
-Finally, we have to be able to update an existing contact on the backend. Of course, their is an endpoint for that.
+Finally, we have to be able to update an existing contact on the backend. Of course, their is an endpoint for that too.
 We can update a contact by calling the bakend API on `/api/contacts/{id}`,
 where `id` is a dynamic parameter that depends on the contact that we want to update.
 Plus, we must pass the new data of the `Contact` to update, in a JSON shape.
@@ -653,9 +652,9 @@ class ContactApi {
     }
 }
 ----
-<1> Define a `suspend` function that wait for a `Contact` as parameter and returns a `String`.
-<2> Declare a HTTP client call
-<3> Set the URL for the client call to `/api/contacts/{id}`, by passing the `Contact::id`, from the `Contact` received by the current function.
-<4> Set the HTTP verb to be used as _POST_.
-<5> Set the `contact` in the body of the HTTP Request, using the serializer generated on `Contact` by the `kotlinx.serialization` plugin.
+<1> Defines a `suspend` function that wait for a `Contact` as parameter and returns a `String`.
+<2> Declares a HTTP client call
+<3> Sets the URL for the client call to `/api/contacts/{id}`, by passing the `Contact::id`, from the `Contact` received by the current function.
+<4> Sets the HTTP verb to be used as _POST_.
+<5> Sets the `contact` in the body of the HTTP Request, using the serializer generated on `Contact` by the `kotlinx.serialization` plugin.
 <6> Trigger the HTTP request and wait for the response.

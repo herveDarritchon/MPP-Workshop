@@ -53,8 +53,8 @@ git clone https://github.com/SalomonBrys/MPP-Workshop-Server.git
 cd MPP-Workshop-Server/ #<1>
 ./gradlew run #<2>
 ----
-<1> Get into the backend application directory
-<2> Run the app
+<1> Gets into the backend application directory
+<2> Runs the app
 
 - On *Windows*.
 +
@@ -70,8 +70,8 @@ git clone https://github.com/SalomonBrys/MPP-Workshop-Server.git
 cd MPP-Workshop-Server #<1>
 gradlew.bat run #<2>
 ----
-<1> Get into the backend application directory
-<2> Run the app
+<1> Gets into the backend application directory
+<2> Runs the app
 
 WARNING: Do not close your terminal, otherwise the application will be terminated
 

@@ -4,7 +4,7 @@
 
 Welcome to the Mobile Multi-Platform Kotlin Workshop.
 
-Learning to develop with Kotlin multiplatform is exactly like learning for any other technology: it is a set of skills that can be divided into three categories:
+Learning to develop with Kotlin multi-platform is exactly like learning for any other technology: it is a set of skills that can be divided into three categories:
 
 * The technology: how it works.
 * The architectures and best practices: how to take the most advantage of it.
@@ -73,9 +73,9 @@ Do you have what it takes to develop with *_Kotlin/Multiplatform_*?
 Before starting this workshop, you need:
 
 * a *JDK* installed (no vendor required, 1.8 minimum)
-* https://www.jetbrains.com/idea/[IntelliJ IDEA], either Community or Ultimate (We recommend installing it via https://www.jetbrains.com/toolbox-app/[Jetbrains Toolbox]).
+* https://www.jetbrains.com/idea/[IntelliJ IDEA], either _Community_ or _Ultimate_ (We recommend installing it via https://www.jetbrains.com/toolbox-app/[Jetbrains Toolbox]).
 +
-Everyone should benefit from the same experience of this workshop. So, you must check if you Kotlin Plugin is up-to-date.
+Everyone should benefit from the same experience of this workshop. So, you must check if your Kotlin Plugin is up-to-date.
 
 [cols="^65%,<.^35%a",grid="none",frame="none"]
 |===

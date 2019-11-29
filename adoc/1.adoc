@@ -11,7 +11,7 @@ Take a deep breath, stay with us. +
 This templates...
 
 * ...gives you everything on a golden platter ; you need to learn how it is done.
-* ...creates a project where the Android app and the multiplatform code is all in one place.
+* ...creates a project where the Android app and the multi-platform code is all in one place.
 
 
 == The creation wizard
@@ -30,11 +30,11 @@ Then, give your project a group ID, and name the artifact `business-library`.
 
 image:res/1-1.png[New project configuration wizard]
 
-Finally, select where the code rests, click finish, and enjoy your newly created multiplatform project :)
+Finally, select where the code rests, click finish, and enjoy your newly created multi-platform project :)
 
 [IMPORTANT]
 ====
-To avoid any misconfiguration issues you should change the Gradle Wrapper properties right now.
+To avoid any misconfiguration issue you should change the _Gradle Wrapper's_ properties right now.
 
 Go the the newly created file `gradle-wrapper.properties` under `/business-library/gradle/wrapper/`
 and change the property `distributionUrl` with the value `https\://services.gradle.org/distributions/gradle-5.6.1-bin.zip`

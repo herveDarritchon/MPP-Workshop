@@ -2,3 +2,8 @@
 :toc:
 :icons: font
 
+- Add common dependency
+- Create kodein module
+- Change CommonInjector as Bridge for iOS and JS
+- Usage of the bridge for iOS and JS => Nothing has change
+- Enhanced usage with Android -> closestKodein

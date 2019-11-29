@@ -4,7 +4,7 @@
 
 Now that we have a working *_Android_* application, we will try, and succeed, to use our Kotlin multi-platform library on *_iOS_*.
 
-IMPORTANT: You will be able to fulfill this part only if you have a MacOS computer.
+IMPORTANT: You will be able to fulfill this part only if you have a MacOS X computer.
            Otherwise, consider either following up with your neighbor, or skipping this chapter.
 
 == Project Creation Wizard
@@ -114,8 +114,8 @@ struct ContentView: View {
     }
 }
 ----
-<1> import the Kotlin multi-platform library package named as *_businessLibrary_*.
-<2> call the `sayHelloKotlinConf()` function defined in the `ShowMessageKt` class.
+<1> Imports the Kotlin multi-platform library package named as *_businessLibrary_*.
+<2> Calls the `sayHelloKotlinConf()` function defined in the `ShowMessageKt` class.
 
 === Running the app
 

@@ -21,7 +21,7 @@ At the moment, if you want to create a package, you need to manually create the 
 image:res/2-2.png[new directory]
 ====
 
-Let's write our first multiplatform function:
+Let's write our first multi-platform function:
 
 .functions.kt
 [source,kotlin]
@@ -121,4 +121,4 @@ TIP: Gradle generated an HTML report with a link at the end.
 
 TIP: As you can see, when running the `allTests` task runs, well, all tests.
      The Kotlin/JVM is the fastest and most reliable compiler so, most of the time, running the `jvmTest` task will be faster and give results easier to understand.
-     Only once all tests have been proven correct in the JVM, you should start running `allTests` to proof your code on each other targeted platform.
+     Only once all tests have been proven correct in the JVM, you should start running `allTests` to proof your code on each other targeted platforms.
