@@ -15,26 +15,711 @@
 <div class="details">
 <span id="revnumber">version 1.0</span>
 </div>
+<div id="toc" class="toc">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#_enhancing_the_common_library">Enhancing the common library</a>
+<ul class="sectlevel2">
+<li><a href="#_dependencies">Dependencies</a></li>
+<li><a href="#_usage">Usage</a></li>
+<li><a href="#_building_and_publishing_a_new_release">Building and publishing a new release</a></li>
+</ul>
+</li>
+<li><a href="#_using_the_new_version_of_our_kotlin_multi_platform_library">Using the new version of our Kotlin multi-platform library</a>
+<ul class="sectlevel2">
+<li><a href="#_on_our_web_application">On our Web application</a></li>
+<li><a href="#_on_our_ios_application">On our iOS application</a></li>
+<li><a href="#_on_our_android_application">On our Android application</a></li>
+</ul>
+</li>
+</ul>
+</div>
 </div>
 <div id="content">
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>Well, now that we have a working Kotlin multi-platform library, and 3 three applications on top of that,
+we need to go a little bit further by exploring the Kotlin/Multiplatform ecosystem.</p>
+</div>
+<div class="paragraph">
+<p>To fulfill this journey, we will start by replacing our manual Dependency Injection mechanism by a Kotlin/Multiplatform library: <strong>Kodein-DI</strong>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_enhancing_the_common_library"><a class="anchor" href="#_enhancing_the_common_library"></a>Enhancing the common library</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Let&#8217;s re-open our <code>addressbook-common</code> project to improve it :)</p>
+</div>
+<div class="sect2">
+<h3 id="_dependencies"><a class="anchor" href="#_dependencies"></a>Dependencies</h3>
+<div class="paragraph">
+<p>As we are adding a new library to our Kotlin multi-platform project, get your <code>build.gradle.kts</code>
+file and add the following dependency in your <code>commonMain</code> group.</p>
+</div>
+<div class="listingblock">
+<div class="title">build.gradle.kts</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">kotlin {
+  sourceSets {
+    val commonMain by getting {
+      dependencies {
+        // ...
+        implementation("org.kodein.di:kodein-di-erased:6.4.1") <i class="conum" data-value="1"></i><b>(1)</b>
+      }
+    }
+  }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Adds the latest version of <code>kodein-di</code>, based on Kotlin <code>1.3.50</code></td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>In one of the previous chapters we defined that our Gradle build enables an experimental feature by adding the following configuration:</p>
+</div>
+<div class="listingblock">
+<div class="title">settings.gradle.kts</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">enableFeaturePreview("GRADLE_METADATA")</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This allows us to only define the dependency on <code>kodein-di-erased</code> into the common dependencies.
+This is because the Gradle metadata give enough information to the Kotlin plugin
+to be able to retrieve the right dependencies depending on the targeted platforms.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+The <code>kodein-di</code> libraries are available on <strong>jcenter</strong>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_usage"><a class="anchor" href="#_usage"></a>Usage</h3>
+<div class="admonitionblock caution">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-caution" title="Caution"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>If you have some issues to get your imports for the newly imported dependency, refresh your gradle project</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="images/res/13-1.png" alt="refresh gradle" width="250"></span></p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Now that our dependencies are well imported we should go to the package <code>com.mybusiness.di</code> and add some code.</p>
+</div>
+<div class="paragraph">
+<p>Create a new Kotlin source file <code>addressBookModule.kt</code> and add the following lines:</p>
+</div>
+<div class="listingblock">
+<div class="title">addressBookModule.kt</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">package com.mybusiness.di
+
+val addressBookModule = Kodein.Module("addressBookModule") { <i class="conum" data-value="1"></i><b>(1)</b>
+    bind() from singleton { ContactApi() } <i class="conum" data-value="2"></i><b>(2)</b>
+//    bind() from singleton { ContactListPresenter(instance()) } <i class="conum" data-value="3"></i><b>(3)</b>
+//    bind() from singleton { ContactDetailPresenter(instance()) } <i class="conum" data-value="3"></i><b>(3)</b>
+//    bind() from singleton { ContactCreationUpdatePresenter(instance()) } <i class="conum" data-value="3"></i><b>(3)</b>
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Creates a <strong><em>Kodein-DI</em></strong> module that could be imported later, in a <strong><em>Kodein-DI</em></strong> container.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Binds the interface for our backend API, as a singleton.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Binds every presenters, a singletons. As each of the presenters needs a <code>ContactApi</code> as parameter,
+the <code>instance()</code> function have the responsibility to retrieve the right <code>ContactApi</code> instance from the <strong><em>Kodein-DI</em></strong> container.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Now that we have a code dependency defined for <code>ContactApi</code> we could change our presenters to inject it instead of having it as a constructor parameter.</p>
+</div>
+<div class="listingblock">
+<div class="title">ContactListPresenter.kt</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">class ContactListPresenter(
+    override val kodein: Kodein, <i class="conum" data-value="2"></i><b>(2)</b>
+    coroutineContext: CoroutineContext = ApplicationDispatcher
+) : ContactList.Presenter, BasePresenter&lt;ContactList.View&gt;(coroutineContext), KodeinAware { <i class="conum" data-value="1"></i><b>(1)</b>
+
+    private val contactApi: ContactApi by instance() <i class="conum" data-value="3"></i><b>(3)</b>
+    //...
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Implements the <code>KodeinAware</code> interface to be able to use <strong><em>Kodein-DI</em></strong> functions without calling a <strong><em>Kodein-DI</em></strong> container everytime</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Overrides the <code>kodein</code> property to respect the contract from <code>KodeinAware</code></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Inject the <code>ContactApi</code> in the presenter by using the function <code>instance()</code> from <em>Kodein-DI</em>. It will retrieve the right instance of <code>ContractApi</code> depending on its type and the current context.</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="title">ContactDetailPresenter.kt</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">class ContactDetailPresenter(
+    override val kodein: Kodein, <i class="conum" data-value="2"></i><b>(2)</b>
+    coroutineContext: CoroutineContext = ApplicationDispatcher
+) : ContactDetail.Presenter, BasePresenter&lt;ContactDetail.View&gt;(coroutineContext), KodeinAware { <i class="conum" data-value="1"></i><b>(1)</b>
+
+    private val contactApi: ContactApi by instance() <i class="conum" data-value="3"></i><b>(3)</b>
+    //...
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Implements the <code>KodeinAware</code> interface to be able to use <strong><em>Kodein-DI</em></strong> functions without calling a <strong><em>Kodein-DI</em></strong> container everytime</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Overrides the <code>kodein</code> property to respect the contract from <code>KodeinAware</code></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Inject the <code>ContactApi</code> in the presenter by using the function <code>instance()</code> from <em>Kodein-DI</em>. It will retrieve the right instance of <code>ContractApi</code> depending on its type and the current context.</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="title">ContactCreationUpdatePresenter.kt</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">class ContactCreationUpdatePresenter(
+    override val kodein: Kodein, <i class="conum" data-value="2"></i><b>(2)</b>
+    coroutineContext: CoroutineContext = ApplicationDispatcher
+) : ContactCreationUpdate.Presenter, BasePresenter&lt;ContactCreationUpdate.View&gt;(coroutineContext), KodeinAware { <i class="conum" data-value="1"></i><b>(1)</b>
+
+    private val contactApi: ContactApi by instance() <i class="conum" data-value="3"></i><b>(3)</b>
+    //...
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Implements the <code>KodeinAware</code> interface to be able to use <strong><em>Kodein-DI</em></strong> functions without calling a <strong><em>Kodein-DI</em></strong> container everytime</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Overrides the <code>kodein</code> property to respect the contract from <code>KodeinAware</code></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Inject the <code>ContactApi</code> in the presenter by using the function <code>instance()</code> from <em>Kodein-DI</em>. It will retrieve the right instance of <code>ContractApi</code> depending on its type and the current context.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>We are now able to add the presenters to the <strong><em>Kodein-DI</em></strong> bindings. Let&#8217;s get back to <code>addressBookModule.kt</code> and add the following lines:</p>
+</div>
+<div class="listingblock">
+<div class="title">addressBookModule.kt</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">package com.mybusiness.di
+
+val addressBookModule = Kodein.Module("addressBookModule") {
+    // ...
+    bind&lt;Kodein&gt;() with singleton { this.kodein } <i class="conum" data-value="1"></i><b>(1)</b>
+    bind() from singleton { ContactListPresenter(instance()) } <i class="conum" data-value="2"></i><b>(2)</b>
+    bind() from singleton { ContactDetailPresenter(instance()) } <i class="conum" data-value="2"></i><b>(2)</b>
+    bind() from singleton { ContactCreationUpdatePresenter(instance()) } <i class="conum" data-value="2"></i><b>(2)</b>
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Binds the current <strong><em>Kodein-DI</em></strong> container, thus we are able to inject it in our presenters</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Binds every presenters, a singletons. As each of the presenters needs a <code>Kodein</code> object as parameter,
+the <code>instance()</code> function have the responsibility to retrieve the right <code>Kodein</code> instance from the <strong><em>Kodein-DI</em></strong> container.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>We have defined and used the code dependencies of our Kotlin multi-platform library. Now we should be able to change our <code>CommonInjector</code> before using it in the applications.</p>
+</div>
+<div class="paragraph">
+<p>So, open <code>CommonInjector.kt</code> and replace its content.</p>
+</div>
+<div class="listingblock">
+<div class="title">CommonInjector.kt</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">package com.mybusiness.di
+
+@ThreadLocal
+object CommonInjector {
+    val kodein = Kodein.lazy { <i class="conum" data-value="1"></i><b>(1)</b>
+        import(addressBookModule) <i class="conum" data-value="2"></i><b>(2)</b>
+    }
+
+    //    Presenters
+    fun contactListPresenter(): ContactListPresenter {  <i class="conum" data-value="3"></i><b>(3)</b>
+        val presenter = kodein.direct.instance&lt;ContactListPresenter&gt;()
+        println("ContactListPresenter instance: $presenter") <i class="conum" data-value="4"></i><b>(4)</b>
+        return presenter
+    }
+    fun contactDetailPresenter() = kodein.direct.instance&lt;ContactDetailPresenter&gt;() <i class="conum" data-value="3"></i><b>(3)</b>
+    fun contactCreationUpdatePresenter() = kodein.direct.instance&lt;ContactCreationUpdatePresenter&gt;() <i class="conum" data-value="3"></i><b>(3)</b>
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Creates the <strong><em>Kodein-DI</em></strong> container</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Imports our previously created <strong><em>Kodein-DI</em></strong> module <code>addressBookModule</code></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Uses the <strong><em>Kodein-DI</em></strong> container to retrieve each of the presenters</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Let&#8217;s print our <code>ContactListPresenter</code> instance to see the changes on the applications.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>That&#8217;s it for the common library part. You may have noticed that there will be no direct impact for our three different applications.
+We could call that mechanism a 'bridge' for our Kotlin multi-platform library to be used on every platforms.
+But, even if you do not any changes to do on your applications, Dependency Injection may help you to decouple your code, and make the unit tests easier.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<em>Spoiler Alert</em>: this won&#8217;t be that simple for <strong><em>Android</em></strong>, as we will fully use the power of <strong><em>Kodein-DI</em></strong>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_building_and_publishing_a_new_release"><a class="anchor" href="#_building_and_publishing_a_new_release"></a>Building and publishing a new release</h3>
+<div class="paragraph">
+<p>As always, once we have improve our library, we should build it and publish it to use it on our applications.</p>
+</div>
+<div class="paragraph">
+<p>In the Gradle script change the version from <code>1.0.0</code> to <code>2.0.0</code>!</p>
+</div>
 <div class="ulist">
 <ul>
 <li>
-<p>Add common dependency</p>
-</li>
-<li>
-<p>Create kodein module</p>
-</li>
-<li>
-<p>Change CommonInjector as Bridge for iOS and JS</p>
-</li>
-<li>
-<p>Usage of the bridge for iOS and JS &#8658; Nothing has change</p>
-</li>
-<li>
-<p>Enhanced usage with Android &#8594; closestKodein</p>
+<p>For the <strong>JVM</strong> target</p>
 </li>
 </ul>
+</div>
+<div class="paragraph">
+<p>Go to the Gradle pane, in <code>Tasks</code> &gt; <code>publishing</code>, double click on <code>publishToMavenLocal</code> to run this Gradle task.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="images/res/13-2.png" alt="gradle build" width="200"></span></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>For all the other platforms</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>To build your Kotlin multi-platform library go to the Gradle pane and run the task <code>build</code> in the <code>build</code> group.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="images/res/13-3.png" alt="gradle build" width="200"></span></p>
+</div>
+<div class="paragraph">
+<p>Done! Now we just have to use the new release on every platforms!</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_using_the_new_version_of_our_kotlin_multi_platform_library"><a class="anchor" href="#_using_the_new_version_of_our_kotlin_multi_platform_library"></a>Using the new version of our Kotlin multi-platform library</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>We are going backward, from the <strong><em>Web</em></strong> to <strong><em>Android</em></strong>,
+as the <strong><em>Android</em></strong> part will bring some nice highlights on what could/should be Kotlin multi-platform libraries in the future.</p>
+</div>
+<div class="sect2">
+<h3 id="_on_our_web_application"><a class="anchor" href="#_on_our_web_application"></a>On our Web application</h3>
+<div class="paragraph">
+<p>Open your Web application project.</p>
+</div>
+<div class="sect3">
+<h4 id="_re_import_the_js_module"><a class="anchor" href="#_re_import_the_js_module"></a>Re-import the JS module</h4>
+<div class="paragraph">
+<p>As we didn&#8217;t manage publishing libraries for <em>Kotlin/JS</em> projects we must import the new version of our Kotlin multi-platform library manually, again.</p>
+</div>
+<div class="paragraph">
+<p>In your Web application project, remove the <code>addressbook-common</code> and <code>node_modules</code> directories.</p>
+</div>
+<div class="paragraph">
+<div class="title">Kotlin multi-platform library build directory.</div>
+<p><span class="image"><img src="images/res/13-4.png" alt="build directory" width="250"></span></p>
+</div>
+<div class="paragraph">
+<p>To empower our web application with the Kotlin multi-platform library, we need to copy the generated <strong>Node</strong> module into our <strong>React</strong> project.</p>
+</div>
+<table class="tableblock frame-none grid-none stretch">
+<colgroup>
+<col style="width: 57.8947%;">
+<col style="width: 42.1053%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-center valign-middle"><div class="content"><div class="paragraph">
+<p><strong>From&#8230;&#8203;</strong></p>
+</div></div></td>
+<td class="tableblock halign-center valign-middle"><div class="content"><div class="paragraph">
+<p><strong>&#8230;&#8203;to</strong></p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-center valign-middle"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="images/res/13-5.png" alt="from"></span></p>
+</div></div></td>
+<td class="tableblock halign-center valign-middle"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="images/res/13-6.png" alt="tob"></span></p>
+</div></div></td>
+</tr>
+</tbody>
+</table>
+<table class="tableblock frame-none grid-none stretch">
+<colgroup>
+<col style="width: 45%;">
+<col style="width: 55%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-middle"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="images/res/13-7.png" alt="renamed package"></span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><div class="content"><div class="paragraph">
+<p>Then, rename the directory <code>js</code> to <code>addressbook-common</code>, to distinguish it from other modules.</p>
+</div></div></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>Finally, open a terminal in the directory of the web application  and run the command <code>yarn install</code>, you should see something like that:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre> $ yarn install
+yarn install v1.19.2
+[1/4] 🔍  Resolving packages...
+[2/4] 🚚  Fetching packages...
+[3/4] 🔗  Linking dependencies...
+[4/4] 🔨  Building fresh packages...
+✨  Done in 16.98s.</pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_running_the_application"><a class="anchor" href="#_running_the_application"></a>Running the application</h4>
+<div class="paragraph">
+<p>You can now run the Web application by using <code>yarn start</code> in your terminal.</p>
+</div>
+<table class="tableblock frame-none grid-none stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="image"><img src="images/res/13-8.png" alt="contact list"></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="image"><img src="images/res/13-9.png" alt="contact details"></span></p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>Obviously, nothing has changed, but its working right ?</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>We have wrote that when we retrieve the <code>ContactListPresenter</code> with <strong><em>Kodein-DI</em></strong> we print the instance to the standard output.
+So, if you open the console in the <em>Developer Tools</em> (<code>F12</code> key), you should see something like:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>ContactListPresenter instance: [object Object]</pre>
+</div>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Let&#8217;s get to the iOS part.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_on_our_ios_application"><a class="anchor" href="#_on_our_ios_application"></a>On our iOS application</h3>
+<div class="paragraph">
+<p>Open your <strong><em>Xcode</em></strong> project, <em>iOS AddressBook</em>.</p>
+</div>
+<div class="paragraph">
+<p>We have done a little bit of cheating here.
+Indeed, previously we have configured our <strong><em>Xcode</em></strong> project to get the <code>addressbook-common.framework</code>
+file directly into the build directory of our Kotlin multi-platform project, thus at every build we change our <strong><em>iOS</em></strong> dependency.</p>
+</div>
+<div class="paragraph">
+<p>So, just run the application to see that everything is working properly!</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>We have wrote that when we retrieve the <code>ContactListPresenter</code> with <strong><em>Kodein-DI</em></strong> we print the instance to the standard output.
+So, if you open the console in <strong><em>Xcode</em></strong>, you should see something like</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>ContactListPresenter instance: com.mybusiness.presentation.ContactListPresenter@25bfd08</pre>
+</div>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_on_our_android_application"><a class="anchor" href="#_on_our_android_application"></a>On our Android application</h3>
+<div class="paragraph">
+<p>Here come the funny part. In the first place <strong><em>Kodein-DI</em></strong> was targeting the <strong><em>JVM</em></strong>,
+and had a special treatment to be a real asset on <strong><em>Android</em></strong>.
+That&#8217;s why today its the most advanced part for the Kotlin/Multiplatform integration in <strong><em>Kodein-DI</em></strong>.</p>
+</div>
+<div class="paragraph">
+<p>So, let&#8217;s re-open <strong><em>Android Studio</em></strong> on our <code>AddressBook</code> project.</p>
+</div>
+<div class="sect3">
+<h4 id="_adding_dependencies"><a class="anchor" href="#_adding_dependencies"></a>Adding dependencies</h4>
+<div class="paragraph">
+<p>Open the Gradle script <code>build.gradle</code> in the <code>app</code> module, change the version of our Kotlin multi-platform library
+and add a new dependency on <code>Kodein-DI</code>.</p>
+</div>
+<div class="listingblock">
+<div class="title">app &gt; build.gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="groovy" class="language-groovy hljs">dependencies {
+    implementation 'com.mybusiness:addressbook-common:2.0.0' <i class="conum" data-value="1"></i><b>(1)</b>
+
+    implementation 'org.kodein.di:kodein-di-generic-jvm:6.4.1' <i class="conum" data-value="2"></i><b>(2)</b>
+    implementation 'org.kodein.di:kodein-di-framework-android-x:6.4.1' <i class="conum" data-value="3"></i><b>(3)</b>
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Moving from version <code>1.0.0</code> to <code>2.0.0</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Adding the latest <strong><em>JVM</em></strong> implementation of <strong><em>Kodein-DI</em></strong></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Adding the latest framework implementation of <strong><em>Kodein-DI</em></strong> to boost our <strong><em>AndroidX</em></strong> development</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_benefits_from_kodein_di"><a class="anchor" href="#_benefits_from_kodein_di"></a>Benefits from <strong><em>Kodein-DI</em></strong></h4>
+<div class="paragraph">
+<p>While enhancing the <strong><em>Android</em></strong> application we won&#8217;t be using the <code>CommonInjector</code> object to get our presenters.
+Instead, we will use the "closest Kodein pattern", that will find the nearest instance of Kodein from child to parent, thus from <code>Fragment</code> to <code>Activity</code>, or from <code>Activity</code> to <code>Application</code>.</p>
+</div>
+<div class="paragraph">
+<p>But, first of all, we need to set our <code>AddressBookApplication</code> class implements <code>KodeinAware</code>.</p>
+</div>
+<div class="listingblock">
+<div class="title">AddressBookApplication.kt</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">class AddressBookApplication: Application(), KodeinAware { <i class="conum" data-value="1"></i><b>(1)</b>
+    override val kodein = CommonInjector.kodein <i class="conum" data-value="2"></i><b>(2)</b>
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Implements the class <code>KodeinAware</code> that is allowing a seamless use of <strong><em>Kodein-DI</em></strong>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Overrides the <code>kodein</code> property from <code>KodeinAware</code>, this is giving us a global <strong><em>Kodein-DI</em></strong> container accessible from anywhere in our application.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Next, we can go to the views that need to inject a presenter, to be able to render contacts` information.</p>
+</div>
+<div class="listingblock">
+<div class="title">ItemListActivity.kt</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">class ItemListActivity : AppCompatActivity(), ContactList.View, KodeinAware { <i class="conum" data-value="1"></i><b>(1)</b>
+    //...
+    override val kodein: Kodein by closestKodein() <i class="conum" data-value="2"></i><b>(2)</b>
+    private val presenter by instance&lt;ContactListPresenter&gt;() <i class="conum" data-value="3"></i><b>(3)</b>
+    //...
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Implements the <code>KodeinAware</code> interface to be able to use the <strong><em>Kodein-DI</em></strong> tools without explicitly naming them (e.g. <code>instance()</code> funtion)</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Overrides the <code>kodein</code> property from <code>KodeinAware</code> by using the closest pattern to find the nearest <strong>Kodein-DI</strong> container, in our case the one defined in <code>AddressBookApplication</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Uses the <code>instance()</code> function to retrieve a <code>ContactListPresenter</code> from the <strong><em>Kodein-DI</em></strong> container, regarding of its type and the current context.</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="title">ItemDetailFragment.kt</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">class ItemDetailFragment : Fragment() , ContactDetail.View, KodeinAware { <i class="conum" data-value="1"></i><b>(1)</b>
+    //...
+    override val kodein: Kodein by closestKodein() <i class="conum" data-value="2"></i><b>(2)</b>
+    private val presenter by instance&lt;ContactDetailPresenter&gt;() <i class="conum" data-value="3"></i><b>(3)</b>
+    //...
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Implements the <code>KodeinAware</code> interface to be able to use the <strong><em>Kodein-DI</em></strong> tools without explicitly naming them (e.g. <code>instance()</code> funtion)</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Overrides the <code>kodein</code> property from <code>KodeinAware</code> by using the closest pattern to find the nearest <strong>Kodein-DI</strong> container, in our case the one defined in <code>AddressBookApplication</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Uses the <code>instance()</code> function to retrieve a <code>ContactDetailPresenter</code> from the <strong><em>Kodein-DI</em></strong> container, regarding of its type and the current context.</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_running_the_application_2"><a class="anchor" href="#_running_the_application_2"></a>Running the application</h4>
+<div class="paragraph">
+<p>Just running the <strong><em>Android</em></strong> application inside an <strong><em>Android</em></strong> Simulator should work.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>We have wrote that when we retrieve the <code>ContactListPresenter</code> with <strong><em>Kodein-DI</em></strong>, through the <code>CommonInjector</code> object,
+we print the instance to the standard output.</p>
+</div>
+<div class="paragraph">
+<p>Nothing should be printed in this case, because we did not use the <code>CommonInjector</code> object to retrieve our dependencies,
+but we used our own <strong><em>Kodein-DI</em></strong> container.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
 </div>
 </div>
 <link rel="stylesheet" href="highlightjs/styles/idea.min.css">

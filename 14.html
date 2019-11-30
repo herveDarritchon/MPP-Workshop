@@ -15,9 +15,487 @@
 <div class="details">
 <span id="revnumber">version 1.0</span>
 </div>
+<div id="toc" class="toc">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#_enhancing_the_common_library">Enhancing the common library</a>
+<ul class="sectlevel2">
+<li><a href="#_dependencies">Dependencies</a></li>
+<li><a href="#_usage">Usage</a></li>
+<li><a href="#_building_and_publishing_a_new_release">Building and publishing a new release</a></li>
+</ul>
+</li>
+<li><a href="#_using_the_new_version_of_our_kotlin_multi_platform_library">Using the new version of our Kotlin multi-platform library</a>
+<ul class="sectlevel2">
+<li><a href="#_on_our_web_application">On our Web application</a></li>
+<li><a href="#_on_our_ios_application">On our iOS application</a></li>
+<li><a href="#_on_our_android_application">On our Android application</a></li>
+</ul>
+</li>
+<li><a href="#_whats_next">What&#8217;s next ?</a></li>
+</ul>
+</div>
 </div>
 <div id="content">
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>We are at the end of this workshop, you did it! Now is the time to play with dates!
+While we are waiting JetBrains to release a Kotlin/Multiplatform date API, some folks have develop their own,
+like <strong><em>Klock</em></strong>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_enhancing_the_common_library"><a class="anchor" href="#_enhancing_the_common_library"></a>Enhancing the common library</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Re-open the <code>addressbook-common</code> one last time!</p>
+</div>
+<div class="sect2">
+<h3 id="_dependencies"><a class="anchor" href="#_dependencies"></a>Dependencies</h3>
+<div class="paragraph">
+<p>Again, we will add a new Kotlin/Multiplatform library to our shared project.
+Thus, open the Gradle build script <code>build.gradle.kts</code> and add the common dependency.</p>
+</div>
+<div class="listingblock">
+<div class="title">build.gradle.kts</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">kotlin {
+  sourceSets {
+    val commonMain by getting {
+      dependencies {
+        // ...
+        implementation ("com.soywiz.korlibs.klock:klock:1.7.5") <i class="conum" data-value="1"></i><b>(1)</b>
+      }
+    }
+  }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Adds the latest version of <code>klock</code>, based on Kotlin <code>1.3.50</code></td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>In one of the previous chapters we defined that our Gradle build enables an experimental feature by adding the following configuration:</p>
+</div>
+<div class="listingblock">
+<div class="title">settings.gradle.kts</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">enableFeaturePreview("GRADLE_METADATA")</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This allows us to only define the dependency on <code>klock</code> into the common dependencies.
+This is because the Gradle metadata give enough information to the Kotlin plugin
+to be able to retrieve the right dependencies depending on the targeted platforms.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_usage"><a class="anchor" href="#_usage"></a>Usage</h3>
+<div class="admonitionblock caution">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-caution" title="Caution"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>If you have some issues to get your imports for the newly imported dependency, refresh your gradle project</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="images/res/14-1.png" alt="refresh gradle" width="250"></span></p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>To demonstrate the use of <code>klock</code>, we will change our domain object <code>Contact</code>,
+by adding a <code>birthday</code> property that randomly generate a <code>DateTime</code>.</p>
+</div>
+<div class="listingblock">
+<div class="title">Contact.kt</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">//...
+@Serializable
+class Contact(
+    val id: String,
+    val name: Name,
+    val addresses: List&lt;Address&gt; = mutableListOf(),
+    val phones: List&lt;Phone&gt; = mutableListOf()
+) {
+    val fullName: String
+        get() = "${name.lastName} ${name.firstName}"
 
+    val birthday: DateTime <i class="conum" data-value="1"></i><b>(1)</b>
+        get() = DateTime(
+            year = Random.nextInt(1950, 2019), <i class="conum" data-value="2"></i><b>(2)</b>
+            month = Random.nextInt(1, 12), <i class="conum" data-value="2"></i><b>(2)</b>
+            day = Random.nextInt(1, 28) <i class="conum" data-value="2"></i><b>(2)</b>
+        )
+}
+//...</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Creates a new property</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Randomly generate a <em>year</em>, a <em>month</em> and a <em>day</em>.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>That&#8217;s it, we just need to build and publish before using it across our three targets.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_building_and_publishing_a_new_release"><a class="anchor" href="#_building_and_publishing_a_new_release"></a>Building and publishing a new release</h3>
+<div class="paragraph">
+<p>As always, once we have improve our library, we should build it and publish it to use it on our applications.</p>
+</div>
+<div class="paragraph">
+<p>In the Gradle script change the version from <code>2.0.0</code> to <code>3.0.0</code>!</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>For the <strong>JVM</strong> target</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Go to the Gradle pane, in <code>Tasks</code> &gt; <code>publishing</code>, double click on <code>publishToMavenLocal</code> to run this Gradle task.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="images/res/14-2.png" alt="gradle build" width="200"></span></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>For all the other platforms</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>To build your Kotlin multi-platform library go to the Gradle pane and run the task <code>build</code> in the <code>build</code> group.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="images/res/14-3.png" alt="gradle build" width="200"></span></p>
+</div>
+<div class="paragraph">
+<p>Now we should be able to display this new property in our different applications.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_using_the_new_version_of_our_kotlin_multi_platform_library"><a class="anchor" href="#_using_the_new_version_of_our_kotlin_multi_platform_library"></a>Using the new version of our Kotlin multi-platform library</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In this exercise, you will see that every platforms has a different interpretation for the <code>DateTime</code> API from <code>klock</code>.
+That&#8217;s not bad, here this is just dates and timestamps, but in other cases it could be more difficult to grasp.</p>
+</div>
+<div class="sect2">
+<h3 id="_on_our_web_application"><a class="anchor" href="#_on_our_web_application"></a>On our Web application</h3>
+<div class="paragraph">
+<p>Open your Web application project.</p>
+</div>
+<div class="sect3">
+<h4 id="_re_import_the_js_module"><a class="anchor" href="#_re_import_the_js_module"></a>Re-import the JS module</h4>
+<div class="paragraph">
+<p>As we didn&#8217;t manage publishing libraries for <em>Kotlin/JS</em> projects we must import the new version of our Kotlin multi-platform library manually, again.</p>
+</div>
+<div class="paragraph">
+<p>In your Web application project, remove the <code>addressbook-common</code> and <code>node_modules</code> directories.</p>
+</div>
+<div class="paragraph">
+<div class="title">Kotlin multi-platform library build directory.</div>
+<p><span class="image"><img src="images/res/14-4.png" alt="build directory" width="250"></span></p>
+</div>
+<div class="paragraph">
+<p>To empower our web application with the Kotlin multi-platform library, we need to copy the generated <strong>Node</strong> module into our <strong>React</strong> project.</p>
+</div>
+<table class="tableblock frame-none grid-none stretch">
+<colgroup>
+<col style="width: 57.8947%;">
+<col style="width: 42.1053%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-center valign-middle"><div class="content"><div class="paragraph">
+<p><strong>From&#8230;&#8203;</strong></p>
+</div></div></td>
+<td class="tableblock halign-center valign-middle"><div class="content"><div class="paragraph">
+<p><strong>&#8230;&#8203;to</strong></p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-center valign-middle"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="images/res/14-5.png" alt="from"></span></p>
+</div></div></td>
+<td class="tableblock halign-center valign-middle"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="images/res/14-6.png" alt="tob"></span></p>
+</div></div></td>
+</tr>
+</tbody>
+</table>
+<table class="tableblock frame-none grid-none stretch">
+<colgroup>
+<col style="width: 45%;">
+<col style="width: 55%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-middle"><div class="content"><div class="paragraph">
+<p><span class="image"><img src="images/res/14-7.png" alt="renamed package"></span></p>
+</div></div></td>
+<td class="tableblock halign-left valign-middle"><div class="content"><div class="paragraph">
+<p>Then, rename the directory <code>js</code> to <code>addressbook-common</code>, to distinguish it from other modules.</p>
+</div></div></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>Finally, open a terminal in the directory of the web application and run the command <code>yarn install</code>, you should see something like that:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre> $ yarn install
+yarn install v1.19.2
+[1/4] 🔍  Resolving packages...
+[2/4] 🚚  Fetching packages...
+[3/4] 🔗  Linking dependencies...
+[4/4] 🔨  Building fresh packages...
+✨  Done in 16.98s.</pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_add_the_birthday_to_the_view"><a class="anchor" href="#_add_the_birthday_to_the_view"></a>Add the birthday to the view</h4>
+<div class="paragraph">
+<p>We will show the birthday right below the contact&#8217;s name.
+Open the file <code>Contact.js</code>, and add the following line inside the <code>return</code> statement:</p>
+</div>
+<div class="listingblock">
+<div class="title">Contact.js</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="html" class="language-html hljs">&lt;p&gt;First name: {contact.name.firstName}&lt;/p&gt;
+&lt;p&gt;Last name: {contact.name.lastName}&lt;/p&gt;
+&lt;p&gt;Birthday: {contact.birthday.date.toString()}&lt;/p&gt; <i class="conum" data-value="1"></i><b>(1)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Getting the <code>date</code> member from the <code>birthday</code> property, and apply the <code>toString()</code> function to format it.</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_running_the_application"><a class="anchor" href="#_running_the_application"></a>Running the application</h4>
+<div class="paragraph">
+<p>You can now run the Web application by using <code>yarn start</code> in your terminal.</p>
+</div>
+<table class="tableblock frame-none grid-none stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="image"><img src="images/res/14-8.png" alt="contact details"></span></p></td>
+<td class="tableblock halign-left valign-middle"><p class="tableblock">Yeah, its there!</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>Now let&#8217;s get to the iOS part.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_on_our_ios_application"><a class="anchor" href="#_on_our_ios_application"></a>On our iOS application</h3>
+<div class="paragraph">
+<p>Open your <strong><em>Xcode</em></strong> project, <em>iOS AddressBook</em>.</p>
+</div>
+<div class="paragraph">
+<p>Again, no configuration here.
+Indeed, previously we have configured our <strong><em>Xcode</em></strong> project to get the <code>addressbook-common.framework</code>
+file directly into the build directory of our Kotlin multi-platform project, thus at every build we change our <strong><em>iOS</em></strong> dependency.</p>
+</div>
+<div class="paragraph">
+<p>We just have to get the <code>DetailViewController.swift</code> to update our birthday <code>UILabel</code>.
+You may have notice in the previous exercise a non used variable <code>@IBOutlet weak var birthdayLabel: UILabel!</code>.
+Well, its time to update it!</p>
+</div>
+<div class="paragraph">
+<p>Here the Kotlin/Native compiler has inlined the <code>DateTime</code> class to its value, a millis second timestamp.
+So we need to transform that timestamp to an <strong><em>iOS</em></strong> date to be able to display it.</p>
+</div>
+<div class="listingblock">
+<div class="title">DetailViewController.swift</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="swift" class="language-swift hljs">func displayContact(contact: Contact) {
+    //...
+    let date = Date(timeIntervalSince1970: contact.birthday / 1000) <i class="conum" data-value="1"></i><b>(1)</b>
+    let dateFormatter = DateFormatter()
+    dateFormatter.dateFormat = "yyyy-MM-dd"
+    birthdayLabel.text = dateFormatter.string(from: date) <i class="conum" data-value="2"></i><b>(2)</b>
+    //...
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Transforms the timestamp to a <strong><em>iOS</em></strong> date</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Displays the formatted date in the view</td>
+</tr>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_running_the_application_2"><a class="anchor" href="#_running_the_application_2"></a>Running the application</h4>
+<div class="paragraph">
+<p>Now, you can run the application onto an <strong>iOS Simulator</strong> by clicking the button <span class="image"><img src="images/res/run-ios.png" alt="run" width="16"></span> in <strong>Xcode</strong>.</p>
+</div>
+<table class="tableblock frame-none grid-none stretch">
+<colgroup>
+<col style="width: 40%;">
+<col style="width: 60%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><span class="image"><img src="images/res/14-9.png" alt="contact details" width="300"></span></p></td>
+<td class="tableblock halign-left valign-middle"><div class="content"><div class="paragraph">
+<p>Take a look at the birthday displayed :)</p>
+</div></div></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>Now let&#8217;s go to the final part, <strong><em>Android</em></strong>!</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_on_our_android_application"><a class="anchor" href="#_on_our_android_application"></a>On our Android application</h3>
+<div class="paragraph">
+<p>Let&#8217;s open our <code>AddressBook</code> project in <strong><em>Android Studio</em></strong>.</p>
+</div>
+<div class="sect3">
+<h4 id="_adding_dependencies"><a class="anchor" href="#_adding_dependencies"></a>Adding dependencies</h4>
+<div class="paragraph">
+<p>To be able to use our <code>birthday</code> property of type <code>DateTime</code>, we need to add <code>klock</code> as a dependency.</p>
+</div>
+<div class="paragraph">
+<p>Open the Gradle script <code>build.gradle</code> in the <code>app</code> module, change the version of our Kotlin multi-platform library
+and add a new dependency on <code>Kodein-DI</code>.</p>
+</div>
+<div class="listingblock">
+<div class="title">app &gt; build.gradle</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="groovy" class="language-groovy hljs">dependencies {
+    //...
+    implementation 'com.mybusiness:addressbook-common:3.0.0' <i class="conum" data-value="1"></i><b>(1)</b>
+    implementation ("com.soywiz.korlibs.klock:klock-jvm:1.7.5") <i class="conum" data-value="2"></i><b>(2)</b>
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Moving from version <code>2.0.0</code> to <code>3.0.0</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Adding the <code>klock</code> implementation for the <strong><em>JVM</em></strong> target</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>We now just have to update the UI.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_adding_the_birthday_on_the_view"><a class="anchor" href="#_adding_the_birthday_on_the_view"></a>Adding the birthday on the view</h4>
+<div class="paragraph">
+<p>If you have been curious and took a look at the contact&#8217;s details layout,
+you may have seen the <code>TextView</code> with the id <code>birthdayTextView</code>.
+So, we will give him the birthday to print on the screen, well formatted.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">override fun displayContact(contact: Contact) {
+  //...
+  birthdayTextView.text = contact.birthday.date.format("yyyy-MM-dd")
+  //...
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_running_the_application_3"><a class="anchor" href="#_running_the_application_3"></a>Running the application</h4>
+<div class="paragraph">
+<p>Finally, run the application on an <strong>Android</strong> Simulator to see your changes!</p>
+</div>
+<table class="tableblock frame-none grid-none stretch">
+<colgroup>
+<col style="width: 40%;">
+<col style="width: 60%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><span class="image"><img src="images/res/14-10.png" alt="contact details" width="300"></span></p></td>
+<td class="tableblock halign-left valign-middle"><div class="content"><div class="paragraph">
+<p>Here is our birthday :)</p>
+</div></div></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_whats_next"><a class="anchor" href="#_whats_next"></a>What&#8217;s next ?</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Congrats ! We have finished the <em>Mobile Multi-Platform Kotlin Workshop</em>, after all.</p>
+</div>
+<div class="paragraph">
+<p>But, do not leave, we have a last thing to learn together. :)</p>
+</div>
+</div>
+</div>
 </div>
 <link rel="stylesheet" href="highlightjs/styles/idea.min.css">
 <script src="highlightjs/highlight.min.js"></script>
