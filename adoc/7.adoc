@@ -20,15 +20,18 @@ For the exercice you will build an *Address Book*, to manage contacts. Of course
 To help you achieve your application you will clone a backend application from Github.
 This backend application, developed with *_Ktor_* and an embedded database, will provide REST endpoints to read, create and update contacts.
 
- // TODO
-* Kotlin/Multiplatform Library
-    - Data classes
-    - Abstracted behavior with MVP
-    - Using MPP libraries
-    - networking with ktor-client
-    - read JSON with kotlinx-serialization
-    - Kodein ? Korlibs ?
-* Unit Tests
+=== Goals
+
+In this second part of the workshop you should learn:
+
+* How to build an advanced Kotlin multi-platform library, with:
+- data classes
+- abstracted behavior with MVP
+* How to use Kotlin multi-platform libraries, to:
+- do some networking with ktor-client
+- read JSON with kotlinx-serialization
+- use Dependency Injection with *_Kodein-DI_*
+- use dates across platforms with *_Klock_*
 
 == Requirements
 
