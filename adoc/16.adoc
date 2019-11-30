@@ -2,3 +2,11 @@
 :toc:
 :icons: font
 
+== Final thought
+
+You may have noticed that the experience remains different from each platforms for most of the Kotlin/Multiplatform libraries.
+But we, at *_https://kodein.net/#/home/en[Kodein Koders]_*, are working on it.
+
+Indeed, *_Kodein-DI_* is just one of the libraries from the *_https://kodein.org/[Kodein Framework]_*
+that we are developing to empower Kotlin/Multiplatform projects.
+And we want to improve our libraries to make them work seamlessly from every platforms targeted by Kotlin!

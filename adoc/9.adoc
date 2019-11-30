@@ -423,7 +423,7 @@ image:res/9-8.png[gradle publishing, 250]
 +
 Then, in `Tasks` > `publishing`, double click on `publishToMavenLocal` to run this Gradle task.
 
-* For all the other platform
+* For all the other platforms
 +
 As told before, we won't cover library publication for *_Native_* and *_JavaScript_* is this workshop.
 So, to use our Kotlin multi-platform library on those platform we will generate and import them manually.
