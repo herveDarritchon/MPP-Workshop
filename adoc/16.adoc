@@ -27,5 +27,6 @@ We hope you had fun, and of course have learnt what you came for!
 
 == Any suggestions ?
 
-Please take 5 minutes to complete our survey.
+Please take 5 minutes to complete our https://docs.google.com/forms/d/1WkxjdzOuICtA1OxUZgnSM30M1dISHSbGeVUny2qrMFY/prefill[*survey*].
+
 It will help us evaluate the correctness of our course, and eventually improve it.
