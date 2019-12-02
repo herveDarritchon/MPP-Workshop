@@ -435,4 +435,6 @@ To build your Kotlin multi-platform library go to the Gradle pane and run the ta
 Now your Kotlin multi-platform library is all set up.
 In the next chapters we will see how to enjoy our common code across the different platforms that we are targeting.
 
+TIP: You can find the full code on https://github.com/romainbsl/mpp-workshop-addressbook-common[Github]
+
 Let's start with *_Android_*!

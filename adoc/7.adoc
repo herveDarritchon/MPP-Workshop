@@ -24,14 +24,14 @@ This backend application, developed with *_Ktor_* and an embedded database, will
 
 In this second part of the workshop you should learn:
 
-* How to build an advanced Kotlin multi-platform library, with:
-- data classes
-- abstracted behavior with MVP
-* How to use Kotlin multi-platform libraries, to:
-- do some networking with ktor-client
-- read JSON with kotlinx-serialization
-- use Dependency Injection with *_Kodein-DI_*
-- use dates across platforms with *_Klock_*
+* How to build an advanced Kotlin multi-platform library:
+- by sharing domain objects with data classes
+- by abstracting behavior with MVP
+* How to use Kotlin multi-platform libraries:
+- to do some networking with ktor-client
+- to read JSON with kotlinx-serialization
+- to use Dependency Injection with *_Kodein-DI_*
+- to use dates across platforms with *_Klock_*
 
 == Requirements
 

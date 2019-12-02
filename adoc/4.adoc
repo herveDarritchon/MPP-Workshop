@@ -85,7 +85,7 @@ Then, add the following dependency to your `build.gradle`, into the `app` module
 dependencies {
     // implementations
     //...
-    implementation 'com.mybusiness:business-library:1.0.0'
+    implementation 'com.mybusiness:business-library-jvm:1.0.0'
     //...
     // testImplementation
     // androidTestImplementation
@@ -95,7 +95,7 @@ dependencies {
 [cols="^,^,^"]
 |=======
 | dependency group | dependency name | version
-| `com.mybusiness` | `business-library` | `1.0.0`
+| `com.mybusiness` | `business-library-jvm` | `1.0.0`
 |=======
 +
 By default, your project view is set to *Android*, but you can change it to be on a *Project* view
@@ -184,18 +184,18 @@ What we want is to display in the `TextView` the message from `sayHelloKotlinCon
 First, we need to change the `TextView` in the _XML_ file
 
 .res/layout/activity_main.xml
-[source,xml]
+[source]
 ----
-    <TextView
-        android:id="@+id/mainTextView" <!--1-->
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="40sp" <!--2-->
-        android:textAlignment="center" <!--3-->
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+<TextView
+    android:id="@+id/mainTextView" <1>
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:textSize="40sp" <2>
+    android:textAlignment="center" <3>
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintLeft_toLeftOf="parent"
+    app:layout_constraintRight_toRightOf="parent"
+    app:layout_constraintTop_toTopOf="parent" />
 ----
 <1> Gives a unique ID to the `TextView` to be able to call it from our Kotlin code
 <2> Sets the text to a bigger size

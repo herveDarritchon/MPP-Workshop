@@ -162,7 +162,7 @@ Set the presenter and bind it to the view
 [source,js]
 ----
 export default function ContactList() {
-    let [presenter] = useState(() => addressBook.com.mybusiness.di.CommonInjector.contactListPresenter()); // <1>
+    let [presenter] = useState(() => AddressBook.com.mybusiness.di.CommonInjector.contactListPresenter()); // <1>
     let [contacts, setContacts] = useState([]) // <2>
 
     useEffect(() => {
@@ -373,6 +373,8 @@ function App() {
 |image:res/12-7.png[contact list]
 |image:res/12-8.png[contact details]
 |===
+
+TIP: You can find the full code of this exercise on the branch `addressbook-common-usage`
 
 == What's next ?
 

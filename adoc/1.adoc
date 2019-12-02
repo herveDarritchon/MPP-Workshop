@@ -295,7 +295,7 @@ Create the following directories:
 ====
 If your using IntelliJ IDEA 2019.3 EAP or superior, it will suggest you the right folder to create regarding of your build script.
 
-image:res/1-2.png[new directory]
+image:res/1-2.png[new directory,300]
 
 Select all and type RETURN
 ====

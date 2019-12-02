@@ -104,6 +104,8 @@ To build your Kotlin multi-platform library go to the Gradle pane and run the ta
 
 image:res/14-3.png[gradle build, 200]
 
+TIP: You can find the full code on https://github.com/romainbsl/mpp-workshop-addressbook-common[Github], on the `klock` branch.
+
 Now we should be able to display this new property in our different applications.
 
 == Using the new version of our Kotlin multi-platform library
@@ -174,6 +176,8 @@ You can now run the Web application by using `yarn start` in your terminal.
 |Yeah, its there!
 |===
 
+TIP: You can find the full code of this exercise on the branch `klock-usage`
+
 Now let's get to the iOS part.
 
 === On our iOS application
@@ -215,6 +219,8 @@ Now, you can run the application onto an *iOS Simulator* by clicking the button 
 |image:res/14-9.png[contact details,300]
 | Take a look at the birthday displayed :)
 |===
+
+TIP: You can find the full code of this exercise on the branch `klock-usage`
 
 Now let's go to the final part, *_Android_*!
 
@@ -267,6 +273,8 @@ Finally, run the application on an *Android* Simulator to see your changes!
 |image:res/14-10.png[contact details,300]
 |Here is our birthday :)
 |===
+
+TIP: You can find the full code of this exercise on the branch `klock-usage`
 
 == What's next ?
 

@@ -69,15 +69,10 @@ package com.mybusiness.di
 
 val addressBookModule = Kodein.Module("addressBookModule") { // <1>
     bind() from singleton { ContactApi() } // <2>
-//    bind() from singleton { ContactListPresenter(instance()) } // <3>
-//    bind() from singleton { ContactDetailPresenter(instance()) } // <3>
-//    bind() from singleton { ContactCreationUpdatePresenter(instance()) } // <3>
 }
 ----
 <1> Creates a *_Kodein-DI_* module that could be imported later, in a *_Kodein-DI_* container.
 <2> Binds the interface for our backend API, as a singleton.
-<3> Binds every presenters, a singletons. As each of the presenters needs a `ContactApi` as parameter,
-the `instance()` function have the responsibility to retrieve the right `ContactApi` instance from the *_Kodein-DI_* container.
 
 Now that we have a code dependency defined for `ContactApi` we could change our presenters to inject it instead of having it as a constructor parameter.
 
@@ -205,6 +200,8 @@ image:res/13-3.png[gradle build, 200]
 
 Done! Now we just have to use the new release on every platforms!
 
+TIP: You can find the full code on https://github.com/romainbsl/mpp-workshop-addressbook-common[Github], on the `kodein` branch.
+
 == Using the new version of our Kotlin multi-platform library
 
 We are going backward, from the *_Web_* to *_Android_*,
@@ -220,8 +217,13 @@ As we didn't manage publishing libraries for _Kotlin/JS_ projects we must import
 
 In your Web application project, remove the `addressbook-common` and `node_modules` directories.
 
+[NOTE]
+====
+Remember, we have generated our JavaScript module:
+
 .Kotlin multi-platform library build directory.
 image:res/13-4.png[build directory,250]
+====
 
 To empower our web application with the Kotlin multi-platform library, we need to copy the generated *Node* module into our *React* project.
 
@@ -269,6 +271,8 @@ So, if you open the console in the _Developer Tools_ (`F12` key), you should see
     ContactListPresenter instance: [object Object]
 ====
 
+TIP: You can find the full code of this exercise on the branch `kodein-usage`
+
 Let's get to the iOS part.
 
 === On our iOS application
@@ -288,6 +292,8 @@ So, if you open the console in *_Xcode_*, you should see something like
 
     ContactListPresenter instance: com.mybusiness.presentation.ContactListPresenter@25bfd08
 ====
+
+TIP: You can find the full code of this exercise on the branch `kodein-usage`
 
 === On our Android application
 
@@ -375,3 +381,5 @@ we print the instance to the standard output.
 Nothing should be printed in this case, because we did not use the `CommonInjector` object to retrieve our dependencies,
 but we used our own *_Kodein-DI_* container.
 ====
+
+TIP: You can find the full code of this exercise on the branch `kodein-usage`

@@ -211,6 +211,8 @@ override fun onDestroy() {
 
 You can run the application onto an *Android Emulator* by clicking the button image:res/run-android.png[run,16] in *Android Studio*.
 
+TIP: It happens that running to app does not work. Sometimes uninstalling the application from simulator solve the issue...
+
 [cols="^40%,<.^60%a",grid="none",frame="none"]
 |===
 |image:res/10-2.png[contact list,300]
@@ -332,6 +334,8 @@ You can run the application onto an *Android Emulator* by clicking the button im
 |image:res/10-2.png[contact list,300]
 |image:res/10-3.png[contact details,300]
 |===
+
+TIP: You can find the full code of this exercise on the branch `addressbook-common-usage`
 
 == What's next ?
 

@@ -130,7 +130,13 @@ Open the `build.gradle.kts` file and add the following code into the `kotlin` bl
 [source,kotlin]
 ----
 kotlin {
-    jvm("android") // <1>
+    jvm("android") { // <1>
+        val main by compilations.getting {
+            kotlinOptions {
+                jvmTarget = "1.8"
+            }
+        }
+    }
 
     iosX64("ios") { // <2>
         binaries {
@@ -151,7 +157,7 @@ kotlin {
 
 [NOTE]
 ====
-*_Android_* is running on a JVM, so it's just a JVM target. As we could have different JVM target we can specify it,
+*_Android_* is running on a JVM, so it's just a JVM target. As we could have different JVM targets we can specify it,
 and as we know for sure that we want to target *_Android_*, we will name it in the target declaration *android*.
 ====
 
@@ -362,7 +368,7 @@ Let's keep the configuration aside and start coding :)
 
 == Defining the domain objects
 
-    First thing, we will create the domain objects needed to manage an *Address Book*.
+First thing, we will create the domain objects needed to manage an *Address Book*.
 Here is a class diagram of our data model:
 
 // TODO use graphviz

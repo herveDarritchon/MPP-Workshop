@@ -213,7 +213,7 @@ To use our Kotlin multi-platform library in our *_HTML_* project we need to refe
 <html lang="en">
 <head>
 <!-- ... -->
-    <script type="text/javascript" src="libraries/kotlin.js`"></script>
+    <script type="text/javascript" src="libraries/kotlin.js"></script>
     <script type="text/javascript" src="libraries/business-library.js"></script>
 </head>
 <!-- ... -->

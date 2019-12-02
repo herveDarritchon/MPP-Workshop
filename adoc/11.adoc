@@ -248,6 +248,20 @@ This is our next part, showing the contact's details.
 While we were displaying the contact list, we also prepared the transition between the _Master_ and _Detail_ screens,
 by giving to the _Detail_ view the contact `id` for which we need to display the contact's details.
 
+First of all, add the import onto our common library.
+
+.DetailViewController.swift
+[source,swift]
+----
+import UIKit
+import AddressBookCommon // <1>
+
+class DetailViewController: UIViewController {
+    // ...
+}
+----
+<1> Imports the common library
+
 Like for the _Master_ view we must implement a contract and bind to a presenter.
 
 1. Implementing the `ContactDetail.View` interface
@@ -262,6 +276,7 @@ class DetailViewController: UIViewController, ContactDetailView { // <1>
     // ...
     // <2>
     @IBOutlet weak var nameLabel: UILabel!
+    @IBOutlet weak var birthfayLabel: UILabel!
     @IBOutlet weak var phonesLabel: UILabel!
     @IBOutlet weak var addressesLabel: UILabel!
     // ...
@@ -351,6 +366,8 @@ Now, you can run the application onto an *iOS Simulator* by clicking the button 
 |image:res/11-9.png[contact list,300]
 |image:res/11-10.png[contact details,300]
 |===
+
+TIP: You can find the full code of this exercise on the branch `addressbook-common-usage`
 
 == What's next ?
 
