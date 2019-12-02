@@ -330,7 +330,7 @@ Instead, we will define a hook (<code>useEffect(&#8230;&#8203;)</code>), that wi
 <div class="title">ContactList.js</div>
 <div class="content">
 <pre class="highlightjs highlight"><code data-lang="js" class="language-js hljs">export default function ContactList() {
-    let [presenter] = useState(() =&gt; addressBook.com.mybusiness.di.CommonInjector.contactListPresenter()); <i class="conum" data-value="1"></i><b>(1)</b>
+    let [presenter] = useState(() =&gt; AddressBook.com.mybusiness.di.CommonInjector.contactListPresenter()); <i class="conum" data-value="1"></i><b>(1)</b>
     let [contacts, setContacts] = useState([]) <i class="conum" data-value="2"></i><b>(2)</b>
 
     useEffect(() =&gt; {
@@ -667,6 +667,18 @@ function App() {
 </tr>
 </tbody>
 </table>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+You can find the full code of this exercise on the branch <code>addressbook-common-usage</code>
+</td>
+</tr>
+</table>
+</div>
 </div>
 </div>
 </div>

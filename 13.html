@@ -152,9 +152,6 @@ The <code>kodein-di</code> libraries are available on <strong>jcenter</strong>
 
 val addressBookModule = Kodein.Module("addressBookModule") { <i class="conum" data-value="1"></i><b>(1)</b>
     bind() from singleton { ContactApi() } <i class="conum" data-value="2"></i><b>(2)</b>
-//    bind() from singleton { ContactListPresenter(instance()) } <i class="conum" data-value="3"></i><b>(3)</b>
-//    bind() from singleton { ContactDetailPresenter(instance()) } <i class="conum" data-value="3"></i><b>(3)</b>
-//    bind() from singleton { ContactCreationUpdatePresenter(instance()) } <i class="conum" data-value="3"></i><b>(3)</b>
 }</code></pre>
 </div>
 </div>
@@ -167,11 +164,6 @@ val addressBookModule = Kodein.Module("addressBookModule") { <i class="conum" da
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
 <td>Binds the interface for our backend API, as a singleton.</td>
-</tr>
-<tr>
-<td><i class="conum" data-value="3"></i><b>3</b></td>
-<td>Binds every presenters, a singletons. As each of the presenters needs a <code>ContactApi</code> as parameter,
-the <code>instance()</code> function have the responsibility to retrieve the right <code>ContactApi</code> instance from the <strong><em>Kodein-DI</em></strong> container.</td>
 </tr>
 </table>
 </div>
@@ -398,6 +390,18 @@ But, even if you do not any changes to do on your applications, Dependency Injec
 <div class="paragraph">
 <p>Done! Now we just have to use the new release on every platforms!</p>
 </div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+You can find the full code on <a href="https://github.com/romainbsl/mpp-workshop-addressbook-common">Github</a>, on the <code>kodein</code> branch.
+</td>
+</tr>
+</table>
+</div>
 </div>
 </div>
 </div>
@@ -421,9 +425,23 @@ as the <strong><em>Android</em></strong> part will bring some nice highlights on
 <div class="paragraph">
 <p>In your Web application project, remove the <code>addressbook-common</code> and <code>node_modules</code> directories.</p>
 </div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Remember, we have generated our JavaScript module:</p>
+</div>
 <div class="paragraph">
 <div class="title">Kotlin multi-platform library build directory.</div>
 <p><span class="image"><img src="images/res/13-4.png" alt="build directory" width="250"></span></p>
+</div>
+</td>
+</tr>
+</table>
 </div>
 <div class="paragraph">
 <p>To empower our web application with the Kotlin multi-platform library, we need to copy the generated <strong>Node</strong> module into our <strong>React</strong> project.</p>
@@ -523,6 +541,18 @@ So, if you open the console in the <em>Developer Tools</em> (<code>F12</code> ke
 </tr>
 </table>
 </div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+You can find the full code of this exercise on the branch <code>kodein-usage</code>
+</td>
+</tr>
+</table>
+</div>
 <div class="paragraph">
 <p>Let&#8217;s get to the iOS part.</p>
 </div>
@@ -557,6 +587,18 @@ So, if you open the console in <strong><em>Xcode</em></strong>, you should see s
 <pre>ContactListPresenter instance: com.mybusiness.presentation.ContactListPresenter@25bfd08</pre>
 </div>
 </div>
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+You can find the full code of this exercise on the branch <code>kodein-usage</code>
 </td>
 </tr>
 </table>
@@ -713,6 +755,18 @@ we print the instance to the standard output.</p>
 <p>Nothing should be printed in this case, because we did not use the <code>CommonInjector</code> object to retrieve our dependencies,
 but we used our own <strong><em>Kodein-DI</em></strong> container.</p>
 </div>
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+You can find the full code of this exercise on the branch <code>kodein-usage</code>
 </td>
 </tr>
 </table>

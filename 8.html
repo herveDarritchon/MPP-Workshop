@@ -274,7 +274,13 @@ repositories {
 <div class="title">build.gradle.kts</div>
 <div class="content">
 <pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">kotlin {
-    jvm("android") <i class="conum" data-value="1"></i><b>(1)</b>
+    jvm("android") { <i class="conum" data-value="1"></i><b>(1)</b>
+        val main by compilations.getting {
+            kotlinOptions {
+                jvmTarget = "1.8"
+            }
+        }
+    }
 
     iosX64("ios") { <i class="conum" data-value="2"></i><b>(2)</b>
         binaries {
@@ -320,7 +326,7 @@ repositories {
 </td>
 <td class="content">
 <div class="paragraph">
-<p><strong><em>Android</em></strong> is running on a JVM, so it&#8217;s just a JVM target. As we could have different JVM target we can specify it,
+<p><strong><em>Android</em></strong> is running on a JVM, so it&#8217;s just a JVM target. As we could have different JVM targets we can specify it,
 and as we know for sure that we want to target <strong><em>Android</em></strong>, we will name it in the target declaration <strong>android</strong>.</p>
 </div>
 </td>
@@ -683,11 +689,9 @@ tasks.getByName("build").dependsOn(packForXcode) <i class="conum" data-value="6"
 <div class="sect1">
 <h2 id="_defining_the_domain_objects"><a class="anchor" href="#_defining_the_domain_objects"></a>Defining the domain objects</h2>
 <div class="sectionbody">
-<div class="literalblock">
-<div class="content">
-<pre>    First thing, we will create the domain objects needed to manage an *Address Book*.
-Here is a class diagram of our data model:</pre>
-</div>
+<div class="paragraph">
+<p>First thing, we will create the domain objects needed to manage an <strong>Address Book</strong>.
+Here is a class diagram of our data model:</p>
 </div>
 <div class="paragraph">
 <p><span class="image"><img src="images/res/8-4.png" alt="class diagram" width="350"></span></p>

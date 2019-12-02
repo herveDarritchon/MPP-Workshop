@@ -487,6 +487,28 @@ This is our next part, showing the contact&#8217;s details.
 by giving to the <em>Detail</em> view the contact <code>id</code> for which we need to display the contact&#8217;s details.</p>
 </div>
 <div class="paragraph">
+<p>First of all, add the import onto our common library.</p>
+</div>
+<div class="listingblock">
+<div class="title">DetailViewController.swift</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="swift" class="language-swift hljs">import UIKit
+import AddressBookCommon <i class="conum" data-value="1"></i><b>(1)</b>
+
+class DetailViewController: UIViewController {
+    // ...
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Imports the common library</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
 <p>Like for the <em>Master</em> view we must implement a contract and bind to a presenter.</p>
 </div>
 <div class="olist arabic">
@@ -513,6 +535,7 @@ In Kotlin/Native, <code>ContactDetail.View</code> has been renamed <code>Contact
     // ...
     <i class="conum" data-value="2"></i><b>(2)</b>
     @IBOutlet weak var nameLabel: UILabel!
+    @IBOutlet weak var birthfayLabel: UILabel!
     @IBOutlet weak var phonesLabel: UILabel!
     @IBOutlet weak var addressesLabel: UILabel!
     // ...
@@ -647,6 +670,18 @@ override func viewWillDisappear(_ animated: Bool) {
 </tr>
 </tbody>
 </table>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+You can find the full code of this exercise on the branch <code>addressbook-common-usage</code>
+</td>
+</tr>
+</table>
+</div>
 </div>
 </div>
 </div>

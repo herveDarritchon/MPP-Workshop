@@ -187,7 +187,7 @@ repositories {
 dependencies {
     // implementations
     //...
-    implementation 'com.mybusiness:business-library:1.0.0'
+    implementation 'com.mybusiness:business-library-jvm:1.0.0'
     //...
     // testImplementation
     // androidTestImplementation
@@ -208,7 +208,7 @@ dependencies {
 </tr>
 <tr>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>com.mybusiness</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>business-library</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>business-library-jvm</code></p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>1.0.0</code></p></td>
 </tr>
 </tbody>
@@ -338,16 +338,16 @@ where we write the actions that will be applied on the displayed screen</p>
 <div class="listingblock">
 <div class="title">res/layout/activity_main.xml</div>
 <div class="content">
-<pre class="highlightjs highlight"><code data-lang="xml" class="language-xml hljs">    &lt;TextView
-        android:id="@+id/mainTextView" <i class="conum" data-value="1"></i><b>(1)</b>
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="40sp" <i class="conum" data-value="2"></i><b>(2)</b>
-        android:textAlignment="center" <i class="conum" data-value="3"></i><b>(3)</b>
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" /&gt;</code></pre>
+<pre class="highlightjs highlight"><code class="language-none hljs">&lt;TextView
+    android:id="@+id/mainTextView" <i class="conum" data-value="1"></i><b>(1)</b>
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:textSize="40sp" <i class="conum" data-value="2"></i><b>(2)</b>
+    android:textAlignment="center" <i class="conum" data-value="3"></i><b>(3)</b>
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintLeft_toLeftOf="parent"
+    app:layout_constraintRight_toRightOf="parent"
+    app:layout_constraintTop_toTopOf="parent" /&gt;</code></pre>
 </div>
 </div>
 <div class="colist arabic">
