@@ -1,32 +1,3 @@
-= This is the end...
+= iOS Universal Framework
 :toc:
 :icons: font
-
-== Final thought
-
-You may have noticed that the experience remains different from each platforms for most of the Kotlin/Multiplatform libraries.
-But we, at *_https://kodein.net/#/home/en[Kodein Koders]_*, are working on it.
-
-Indeed, *_Kodein-DI_* is just one of the libraries from the *_https://kodein.org/[Kodein Framework]_*
-that we are developing to empower Kotlin/Multiplatform projects.
-And we want to improve our libraries to make them work seamlessly from every platforms targeted by Kotlin!
-
-.Congratulations
-****
-You just finished the *_Mobile Multi-Platform Kotlin Workshop_*!
-****
-
-== Thank you !
-
-We hope you had fun, and of course have learnt what you came for!
-
-****
-> Enjoy your KotlinConf experience!
--- Salomon Brys & Romain Boisselle, Kodein Koders
-****
-
-== Any suggestions ?
-
-Please take 5 minutes to complete our https://docs.google.com/forms/d/1WkxjdzOuICtA1OxUZgnSM30M1dISHSbGeVUny2qrMFY/prefill[*survey*].
-
-It will help us evaluate the correctness of our course, and eventually improve it.

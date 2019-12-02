@@ -87,13 +87,17 @@ tasks {
     getByName("assemble").dependsOn("pagesJson")
 
     create("compileAll") {
-        dependsOn("asciidoctor", "pagesJson", "compileKotlinJs")
+        dependsOn("asciidoctor", "pagesJson", "compileKotlinJs", "processResources")
     }
 }
 
 kotlin {
     target {
-        browser()
+        browser {
+            this.runTask {
+                devServer = devServer?.copy(overlay = true)
+            }
+        }
 
         (tasks[compilations["main"].processResourcesTaskName] as ProcessResources).apply {
             dependsOn("asciidoctor")
