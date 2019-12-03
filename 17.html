@@ -5,13 +5,13 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="generator" content="Asciidoctor 2.0.10">
-<title>Bonus: Full Kotlin app with iOS &amp; Android SDKs</title>
+<title>Bonus: Access to iOS &amp; Android SDKs</title>
 <link rel="stylesheet" href="./golo.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 <body class="article">
 <div id="header">
-<h1>Bonus: Full Kotlin app with iOS &amp; Android SDKs</h1>
+<h1>Bonus: Access to iOS &amp; Android SDKs</h1>
 <div class="details">
 <span id="revnumber">version 1.0</span>
 </div>
@@ -25,7 +25,12 @@
 <li><a href="#_android_the_android_plugin_to_the_mix">Android the Android plugin to the mix</a></li>
 </ul>
 </li>
+<li><a href="#_write_your_entire_application_in_kotlin">Write your entire application in Kotlin</a>
+<ul class="sectlevel2">
 <li><a href="#_write_an_ios_screen_in_kotlin">Write an iOS screen in Kotlin</a></li>
+<li><a href="#_write_a_js_screen_in_kotlin">Write a JS screen in Kotlin</a></li>
+</ul>
+</li>
 </ul>
 </div>
 </div>
@@ -34,14 +39,38 @@
 <div class="sectionbody">
 <div class="paragraph">
 <p>So far, we&#8217;ve seen how to develop the shared business part of your application in one project.
-Kotlin multiplatform also allows you to develop the platform part.</p>
+But what if your library needs to access platform specific APIs, such as GPS location, or contact list &amp; details?</p>
 </div>
 <div class="paragraph">
-<p>You can develop you&#8217;re activities and view-controllers directly in the Kotlin library, and then use them in the final application.</p>
+<p>You need to access the platform&#8217;s APIs.<br>
+You already have access to the platform&#8217;s APIs when targetting iOS &amp; JS.
+Android is a little bit trickier.</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+Kotlin/Multiplatform also allows you to develop your entire application in Kotlin.
+     You can develop your Android, iOS &amp; Web app, completely in Kotlin!
+</td>
+</tr>
+</table>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>By targetting any of the three <code>iOS</code> platforms you already have access to the Cocoa-touch APIs.</p>
+</li>
+<li>
+<p>By targetting JavaScript, you already have access to the DOM &amp; HTML5 APIs.</p>
+</li>
+</ul>
 </div>
 <div class="paragraph">
-<p>By targetting any of the three <code>iOS</code> platforms you already have access to the Cocoa-touch APIs.
-Let&#8217;s see how we can access the Android APIs.</p>
+<p>Let&#8217;s see how we can access the Android APIs.</p>
 </div>
 </div>
 </div>
@@ -434,8 +463,10 @@ Because you applied the Android plugin to project module, IntelliJ will likely c
 </div>
 </div>
 <div class="sect1">
-<h2 id="_write_an_ios_screen_in_kotlin"><a class="anchor" href="#_write_an_ios_screen_in_kotlin"></a>Write an iOS screen in Kotlin</h2>
+<h2 id="_write_your_entire_application_in_kotlin"><a class="anchor" href="#_write_your_entire_application_in_kotlin"></a>Write your entire application in Kotlin</h2>
 <div class="sectionbody">
+<div class="sect2">
+<h3 id="_write_an_ios_screen_in_kotlin"><a class="anchor" href="#_write_an_ios_screen_in_kotlin"></a>Write an iOS screen in Kotlin</h3>
 <div class="paragraph">
 <p>You can write part of your iOS application (or even all of it) in Kotlin.</p>
 </div>
@@ -504,6 +535,13 @@ class MasterViewController: UITableViewController(), ContactList.View {
         return cell
     }
 }</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_write_a_js_screen_in_kotlin"><a class="anchor" href="#_write_a_js_screen_in_kotlin"></a>Write a JS screen in Kotlin</h3>
+<div class="paragraph">
+<p>Using the <a href="https://github.com/JetBrains/kotlin-wrappers/tree/master/kotlin-react">Kotlin React Wrapper</a>, you can write your web app entirely in Kotlin!</p>
 </div>
 </div>
 </div>
