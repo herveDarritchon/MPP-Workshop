@@ -1,13 +1,20 @@
-= Bonus: Full Kotlin app with iOS & Android SDKs
+= Bonus: Access to iOS & Android SDKs
 :toc:
 :icons: font
 
 So far, we've seen how to develop the shared business part of your application in one project.
-Kotlin multiplatform also allows you to develop the platform part.
+But what if your library needs to access platform specific APIs, such as GPS location, or contact list & details?
 
-You can develop you're activities and view-controllers directly in the Kotlin library, and then use them in the final application.
+You need to access the platform's APIs. +
+You already have access to the platform's APIs when targetting iOS & JS.
+Android is a little bit trickier.
 
-By targetting any of the three `iOS` platforms you already have access to the Cocoa-touch APIs.
+TIP: Kotlin/Multiplatform also allows you to develop your entire application in Kotlin.
+     You can develop your Android, iOS & Web app, completely in Kotlin!
+
+- By targetting any of the three `iOS` platforms you already have access to the Cocoa-touch APIs.
+- By targetting JavaScript, you already have access to the DOM & HTML5 APIs.
+
 Let's see how we can access the Android APIs.
 
 
@@ -237,7 +244,9 @@ NOTE: Because you applied the Android plugin to project module, IntelliJ will li
 Now you can port part of your application (or all of it) in your project.
 
 
-== Write an iOS screen in Kotlin
+== Write your entire application in Kotlin
+
+=== Write an iOS screen in Kotlin
 
 You can write part of your iOS application (or even all of it) in Kotlin.
 
@@ -306,3 +315,7 @@ class MasterViewController: UITableViewController(), ContactList.View {
     }
 }
 ----
+
+=== Write a JS screen in Kotlin
+
+Using the https://github.com/JetBrains/kotlin-wrappers/tree/master/kotlin-react[Kotlin React Wrapper], you can write your web app entirely in Kotlin!
