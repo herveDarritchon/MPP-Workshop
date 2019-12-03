@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 2.0.10">
+<title>Bonus: Full Kotlin app with iOS &amp; Android SDKs</title>
+<link rel="stylesheet" href="./golo.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<body class="article">
+<div id="header">
+<h1>Bonus: Full Kotlin app with iOS &amp; Android SDKs</h1>
+<div class="details">
+<span id="revnumber">version 1.0</span>
+</div>
+<div id="toc" class="toc">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#_adding_the_android_sdk">Adding the Android SDK</a>
+<ul class="sectlevel2">
+<li><a href="#_adding_an_android_only_module">Adding an Android only module</a></li>
+<li><a href="#_adding_the_android_jar_as_a_dependency">Adding the Android JAR as a dependency</a></li>
+<li><a href="#_android_the_android_plugin_to_the_mix">Android the Android plugin to the mix</a></li>
+</ul>
+</li>
+<li><a href="#_write_an_ios_screen_in_kotlin">Write an iOS screen in Kotlin</a></li>
+</ul>
+</div>
+</div>
+<div id="content">
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>So far, we&#8217;ve seen how to develop the shared business part of your application in one project.
+Kotlin multiplatform also allows you to develop the platform part.</p>
+</div>
+<div class="paragraph">
+<p>You can develop you&#8217;re activities and view-controllers directly in the Kotlin library, and then use them in the final application.</p>
+</div>
+<div class="paragraph">
+<p>By targetting any of the three <code>iOS</code> platforms you already have access to the Cocoa-touch APIs.
+Let&#8217;s see how we can access the Android APIs.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_adding_the_android_sdk"><a class="anchor" href="#_adding_the_android_sdk"></a>Adding the Android SDK</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>There are three ways you can include the Android SDK into your multiplatform project.
+Each have benefits and limitations.</p>
+</div>
+<div class="sect2">
+<h3 id="_adding_an_android_only_module"><a class="anchor" href="#_adding_an_android_only_module"></a>Adding an Android only module</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Benefits</th>
+<th class="tableblock halign-left valign-top">Drawbacks</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="ulist">
+<ul>
+<li>
+<p>Very simple, no project "invasion".</p>
+</li>
+<li>
+<p>Can embed resources (images, XMLs, etc.).</p>
+</li>
+</ul>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="ulist">
+<ul>
+<li>
+<p>Cannot contain <code>actual</code> declarations.</p>
+</li>
+</ul>
+</div></div></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>This is by far the easier solution, but its main limitation comes from the fact that you cannot have an <code>expect</code> declaration in a module, and a corresponding <code>actual</code> declaration in another module.</p>
+</div>
+<div class="paragraph">
+<p>You should use this approach if your business code does not uses platform specific features (such as GPS location, contact access, etc.).</p>
+</div>
+<table class="tableblock frame-none grid-none stretch">
+<colgroup>
+<col style="width: 65%;">
+<col style="width: 35%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="image"><img src="images/res/17-1.png" alt="creation wizard" width="600"></span></p></td>
+<td class="tableblock halign-left valign-middle"><div class="content"><div class="paragraph">
+<p>Create a new Android Library module</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="image"><img src="images/res/17-2.png" alt="creation wizard" width="600"></span></p></td>
+<td class="tableblock halign-left valign-middle"><div class="content"><div class="paragraph">
+<p>Configure its name and properties.</p>
+</div></div></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>Since the Android plugin does not understand Gradle script Kotlin, we need to add a few more steps:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Delete the newly created <code>build.gradle</code> file.
+Add the following to below the <code>plugins</code> block in your <code>build.gradle.kts</code> file:</p>
+<div class="listingblock">
+<div class="title">build.gradle.kts</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">buildscript {
+    repositories {
+        google()
+    }
+    dependencies {
+        classpath("com.android.tools.build:gradle:3.5.2")
+    }
+}</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>Delete the newly created <code>settings.gradle</code> file.
+Add the following at the end your <code>settings.gradle.kts</code> file:</p>
+<div class="listingblock">
+<div class="title">settings.gradle.kts</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">include(":adressbook-android") // or whatever the name of your module is</code></pre>
+</div>
+</div>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Finaly, we need to add the library as a dependency to our newly created android module.<br>
+At the end of the <code>dependency</code> block of its <code>build.gradle</code> file, add the dependency:</p>
+</div>
+<div class="listingblock">
+<div class="title">settings.gradle.kts</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="groovy" class="language-groovy hljs">dependencies {
+    implementation rootProject
+}</code></pre>
+</div>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+If you are creating a new Android module for Android specific client code, then you should probably create an iOS Kotlin/Native specific module for the same type of code for iOS.
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Because you applied the Android plugin to project module, IntelliJ will likely create a bunch of <code>.iml</code> files to the directory structure.
+      There&#8217;s nothing you can do unless accept this pollution.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_adding_the_android_jar_as_a_dependency"><a class="anchor" href="#_adding_the_android_jar_as_a_dependency"></a>Adding the Android JAR as a dependency</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Benefits</th>
+<th class="tableblock halign-left valign-top">Drawbacks</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="ulist">
+<ul>
+<li>
+<p>Very little Gradle "invasion".</p>
+</li>
+<li>
+<p>Can contain <code>actual</code> declarations.</p>
+</li>
+</ul>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="ulist">
+<ul>
+<li>
+<p>Cannot embed resources (images, XMLs, etc.) or declare Manifest.</p>
+</li>
+<li>
+<p>Manual SDK management</p>
+</li>
+</ul>
+</div></div></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>By adding the Android SDK directly as a dependency, you can generated a simple JAR that compile against the Android SDK.
+However, your library will still be considered a simple JVM library.
+As such, you cannot use all the power of the Android toolchain and embed resources or declare a manifest.</p>
+</div>
+<div class="paragraph">
+<p>First, create a <code>gradle.properties</code> root file if you haven&#8217;t already (see previous chapter).
+In this file, add the following property:</p>
+</div>
+<div class="listingblock">
+<div class="title">gradle.properties</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="properties" class="language-properties hljs">androidSdk = /path/to/your/Android/sdk</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Then, add the jar dependency to your <code>androidMain</code> source set:</p>
+</div>
+<div class="listingblock">
+<div class="title">build.gradle.kts</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">kotlin {
+    //...
+    sourceSets {
+        //...
+        val androidMain by getting {
+            dependencies {
+                //...
+
+                val androidSdk: String by project
+                implementation(files("$androidSdk/platforms/android-28/android.jar"))
+            }
+        }
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_android_the_android_plugin_to_the_mix"><a class="anchor" href="#_android_the_android_plugin_to_the_mix"></a>Android the Android plugin to the mix</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Benefits</th>
+<th class="tableblock halign-left valign-top">Drawbacks</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="ulist">
+<ul>
+<li>
+<p>Can contain <code>actual</code> declarations.</p>
+</li>
+<li>
+<p>Can embed resources (images, XMLs, etc.) or declare Manifest.</p>
+</li>
+</ul>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="ulist">
+<ul>
+<li>
+<p>High Gradle and project source architecture "invasion".</p>
+</li>
+</ul>
+</div></div></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>The fact is that the <code>android</code> gradle plugin wasn&#8217;t created to play well with Kotlin/Multiplatform.
+The Jetbrains team have tried their best to make the Kotlin/Multiplatform Gradle plugin to play well with Android, but their are compromises they had to make.</p>
+</div>
+<div class="paragraph">
+<p>First, add the following to your <code>settings.gradle.kts</code> file:</p>
+</div>
+<div class="listingblock">
+<div class="title">settings.gradle.kts</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        google()
+    }
+    resolutionStrategy {
+        eachPlugin {
+            if (requested.id.id == "com.android.library")
+                useModule("com.android.tools.build:gradle:${requested.version}")
+        }
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Then, in your <code>build.gradle.kts</code> add the android plugins:</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+Order of plugin declaration <strong>is important</strong>.
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="title">build.gradle.kts</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">plugins {
+    id("com.android.library") version "3.5.2" <i class="conum" data-value="1"></i><b>(1)</b>
+    kotlin("multiplatform") version "1.3.50"
+    kotlin("android.extensions") version "1.3.50" <i class="conum" data-value="2"></i><b>(2)</b>
+    kotlin("plugin.serialization") version "1.3.50"
+    `maven-publish`
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The Android plugin</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Kotlin android synthetic extensions</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Add the Android specific configuration block:</p>
+</div>
+<div class="listingblock">
+<div class="title">build.gradle.kts</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">android {
+    compileSdkVersion(28)
+    defaultConfig {
+        minSdkVersion(15)
+        sourceSets.getByName("main").manifest.srcFile("src/androidMain/AndroidManifest.xml")
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Add the Google repository:</p>
+</div>
+<div class="listingblock">
+<div class="title">build.gradle.kts</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">repositories {
+    jcenter()
+    google() <i class="conum" data-value="1"></i><b>(1)</b>
+    maven(url = "https://kotlin.bintray.com/kotlinx")
+    maven(url = "https://dl.bintray.com/jetbrains/kotlin-native-dependencies")
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The Google repository</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Finaly, instead of a <code>jvm("android")</code> target, declare an <code>android</code> target:</p>
+</div>
+<div class="listingblock">
+<div class="title">build.gradle.kts</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">kotlin {
+    android {
+        compilations.all {
+            kotlinOptions {
+                jvmTarget = "1.8"
+            }
+        }
+    }
+    //...
+}</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Because you applied the Android plugin to project module, IntelliJ will likely create a bunch of <code>.iml</code> files to the directory structure.
+      There&#8217;s nothing you can do unless accept this pollution.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Now you can port part of your application (or all of it) in your project.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_write_an_ios_screen_in_kotlin"><a class="anchor" href="#_write_an_ios_screen_in_kotlin"></a>Write an iOS screen in Kotlin</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>You can write part of your iOS application (or even all of it) in Kotlin.</p>
+</div>
+<div class="paragraph">
+<p>Here&#8217;s an example of the first screen of the application in Kotlin:</p>
+</div>
+<div class="listingblock">
+<div class="title">build.gradle.kts</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">package com.mybusiness.ios
+
+import com.mybusiness.di.CommonInjector
+import com.mybusiness.model.Contact
+import com.mybusiness.presentation.ContactList
+import com.mybusiness.presentation.ContactListPresenter
+import platform.Foundation.NSIndexPath
+import platform.UIKit.*
+import platform.darwin.NSInteger
+
+class MasterViewController: UITableViewController(), ContactList.View {
+
+    private var contactList: List&lt;Contact&gt; = emptyList()
+    private lateinit var presenter: ContactListPresenter
+//    var detailViewController: DetailViewController? = nil
+
+    override fun viewDidLoad() {
+        super.viewDidLoad()
+        presenter = CommonInjector.contactListPresenter()
+    }
+
+    override fun viewWillAppear(animated: Boolean) {
+        super.viewWillAppear(animated)
+        presenter.attachView(this)
+    }
+
+    override fun viewWillDisappear(animated: Boolean) {
+        super.viewWillDisappear(animated)
+        presenter.detachView()
+    }
+
+    override fun displayContactList(contactList: List&lt;Contact&gt;) {
+        this.contactList = contactList
+        tableView.reloadData()
+    }
+
+    override fun prepareForSegue(segue: UIStoryboardSegue, sender: Any?) {
+        if (segue.identifier == "showDetail") {
+            tableView.indexPathForSelectedRow()?.let { indexPath -&gt;
+                val contact = contactList[indexPath.row.toInt()]
+                // Uncoment once DetailViewController is in Kotlin
+//                val controller = (segue.destinationViewController as UINavigationController).topViewController as DetailViewController
+//                controller.contactId = contact.id
+            }
+        }
+    }
+
+    override fun tableView(tableView: UITableView, numberOfRowsInSection: NSInteger): NSInteger {
+        return contactList.size.toLong()
+    }
+
+    @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
+    override fun tableView(tableView: UITableView, indexPath: NSIndexPath): UITableViewCell {
+        val cell = tableView.dequeueReusableCellWithIdentifier("Cell", indexPath)
+        val contact = contactList[indexPath.row.toInt()]
+        cell.textLabel!!.text = contact.fullName
+        return cell
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<link rel="stylesheet" href="highlightjs/styles/idea.min.css">
+<script src="highlightjs/highlight.min.js"></script>
+<script>hljs.initHighlighting()</script>
+</body>
+</html>

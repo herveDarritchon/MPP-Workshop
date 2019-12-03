@@ -5,79 +5,197 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="generator" content="Asciidoctor 2.0.10">
-<title>This is the end&#8230;&#8203;</title>
+<title>Bonus: easier iOS deployment</title>
 <link rel="stylesheet" href="./golo.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 <body class="article">
 <div id="header">
-<h1>This is the end&#8230;&#8203;</h1>
+<h1>Bonus: easier iOS deployment</h1>
 <div class="details">
 <span id="revnumber">version 1.0</span>
 </div>
 <div id="toc" class="toc">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
-<li><a href="#_final_thought">Final thought</a></li>
-<li><a href="#_thank_you">Thank you !</a></li>
-<li><a href="#_any_suggestions">Any suggestions ?</a></li>
+<li><a href="#_universal_framework">Universal framework</a>
+<ul class="sectlevel2">
+<li><a href="#_definition">Definition</a></li>
+<li><a href="#_create_the_universal_framework">Create the universal framework</a></li>
+</ul>
+</li>
+<li><a href="#_being_compatible_with_cocoa_pods">Being compatible with Cocoa Pods</a></li>
 </ul>
 </div>
 </div>
 <div id="content">
-<div class="sect1">
-<h2 id="_final_thought"><a class="anchor" href="#_final_thought"></a>Final thought</h2>
+<div id="preamble">
 <div class="sectionbody">
 <div class="paragraph">
-<p>You may have noticed that the experience remains different from each platforms for most of the Kotlin/Multiplatform libraries.
-But we, at <strong><em><a href="https://kodein.net/#/home/en">Kodein Koders</a></em></strong>, are working on it.</p>
+<p>So far, we have tested our iOS library on the simulator only.
+It&#8217;s time to deploy on real world devices.</p>
 </div>
 <div class="paragraph">
-<p>Indeed, <strong><em>Kodein-DI</em></strong> is just one of the libraries from the <strong><em><a href="https://kodein.org/">Kodein Framework</a></em></strong>
-that we are developing to empower Kotlin/Multiplatform projects.
-And we want to improve our libraries to make them work seamlessly from every platforms targeted by Kotlin!</p>
+<p>There are three ways you can provide your library for all iPhones AND the simulator:</p>
 </div>
-<div class="sidebarblock">
+<div class="ulist">
+<ul>
+<li>
+<p>Provide three frameworks, for the three targets, and configure XCode to refer to the correct framework for each compilation target.</p>
+</li>
+<li>
+<p>Provide one universal framework (also named fat framework) that contains all three targets at once.</p>
+</li>
+<li>
+<p>Have your project be compatible with Cocoa Pods.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_universal_framework"><a class="anchor" href="#_universal_framework"></a>Universal framework</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_definition"><a class="anchor" href="#_definition"></a>Definition</h3>
+<div class="paragraph">
+<p>Although a <code>.framework</code> file looks like a file, it actually is a directory.
+In this directory, you will find:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>The Objective-C and/or Swift headers for the library.</p>
+</li>
+<li>
+<p>The library&#8217;s binary.</p>
+</li>
+<li>
+<p>Various metadata for the library.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>In essence, when you compile for the three targets, all three frameworks contain the exact same file, with the exception of the binary file that contains binary for the target it was compiled for.</p>
+</div>
+<div class="paragraph">
+<p>A "universal framework" or "fat framework" is a framework whose binary file is special in that it contains binary code for multiple platforms.
+When XCode compiles an app that refers to a universal framework, it will extract from it the binary for the target it is compiling and ignore the other "slices" of that universal binary file.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_create_the_universal_framework"><a class="anchor" href="#_create_the_universal_framework"></a>Create the universal framework</h3>
+<div class="paragraph">
+<p>We are going to add two tasks to our build.gradle.kts file:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>The <code>iosUniversalCopy</code> task simply makes a copy of one of the three frameworks (it doesn&#8217;t matter which) without its binary file.</p>
+</li>
+<li>
+<p>The <code>iosUniversalLipo</code> task uses the <code>lipo</code> command line tool to create a binary file that merges all three targets binary files into one universal binary.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>In your <code>build.gradle.kts</code> file, replace the <code>packForXcode</code> task with:</p>
+</div>
+<div class="listingblock">
+<div class="title">build.gradle.kts</div>
 <div class="content">
-<div class="title">Congratulations</div>
-<div class="paragraph">
-<p>You just finished the <strong><em>Mobile Multi-Platform Kotlin Workshop</em></strong>!</p>
+<pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">if (org.gradle.internal.os.OperatingSystem.current().isMacOsX) { <i class="conum" data-value="1"></i><b>(1)</b>
+    val mode = System.getenv("CONFIGURATION") ?: "DEBUG"
+    val binaries = listOf(kotlin.iosX64(), kotlin.iosArm64(), kotlin.iosArm32())
+            .map { it.binaries.getFramework(mode) }
+    val x64Binary = kotlin.iosX64().binaries.getFramework(mode)
+    val universalFramework = buildDir
+            .resolve("bin/iosUniversal/${mode.toLowerCase()}Framework/${x64Binary.baseName}.framework")
+
+    if (!iosDevHackEnabled) { <i class="conum" data-value="2"></i><b>(2)</b>
+        val iosUniversalCopy by tasks.creating(Sync::class) {
+            inputs.property("mode", mode)
+            dependsOn(x64Binary.linkTask)
+            from(x64Binary.outputFile)
+            into(universalFramework)
+            exclude(x64Binary.baseName)
+        }
+
+        val iosUniversalLipo by tasks.creating(Exec::class) {
+            binaries.forEach {
+                dependsOn(it.linkTask)
+                inputs.file(it.outputFile.resolve(it.baseName))
+            }
+            dependsOn(iosUniversalCopy)
+            outputs.file(universalFramework.resolve(x64Binary.baseName))
+
+            executable = "lipo"
+
+            args(listOf(
+                    listOf("-create"),
+                    binaries.flatMap { listOf(it.outputFile.resolve(it.baseName).absolutePath) },
+                    listOf("-output", universalFramework.resolve(x64Binary.baseName).absolutePath)
+            ).flatten())
+        }
+
+        tasks.getByName("assemble").dependsOn(iosUniversalLipo)
+    }
+
+    val packForXcode by tasks.creating(Sync::class) { <i class="conum" data-value="3"></i><b>(3)</b>
+        inputs.property("mode", mode)
+
+        dependsOn(if (iosDevHackEnabled) x64Binary.linkTask else tasks["iosUniversalLipo"])
+
+        val targetDir = File(buildDir, "xcode-frameworks")
+        from(if (iosDevHackEnabled) x64Binary.outputFile else universalFramework)
+        into(targetDir.resolve(x64Binary.outputFile.name))
+    }
+
+    tasks.getByName("assemble").dependsOn(packForXcode)
+}</code></pre>
 </div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>These tasks should only exist if you are running on a Mac OS X computer.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Do not create the universal framework if the hack from the previous chapter is enabled.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>The packForXcode task now exports the universal framework if the hack is not enabled.</td>
+</tr>
+</table>
 </div>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_thank_you"><a class="anchor" href="#_thank_you"></a>Thank you !</h2>
+<h2 id="_being_compatible_with_cocoa_pods"><a class="anchor" href="#_being_compatible_with_cocoa_pods"></a>Being compatible with Cocoa Pods</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>We hope you had fun, and of course have learnt what you came for!</p>
-</div>
-<div class="sidebarblock">
-<div class="content">
-<div class="quoteblock">
-<blockquote>
-<div class="paragraph">
-<p>Enjoy your KotlinConf experience!</p>
-</div>
-</blockquote>
-<div class="attribution">
-&#8212; Salomon Brys &amp; Romain Boisselle<br>
-<cite>Kodein Koders</cite>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_any_suggestions"><a class="anchor" href="#_any_suggestions"></a>Any suggestions ?</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>Please take 5 minutes to complete our <a href="https://docs.google.com/forms/d/1WkxjdzOuICtA1OxUZgnSM30M1dISHSbGeVUny2qrMFY/prefill"><strong>survey</strong></a>.</p>
+<p>Cocoa Pods is a source level specification.
+This means that, by deploying with Cocoa Pods, you will only distribute the sources of your library which will be compiled by the XCode compiling the final app.</p>
 </div>
 <div class="paragraph">
-<p>It will help us evaluate the correctness of our course, and eventually improve it.</p>
+<p>While this ensures that the application can developpers always access the last version of your library, this provides two disadvantages:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>The compilation is quite slow, and having each dev recompile all three targets everytime can be frustrating for them.</p>
+</li>
+<li>
+<p>If the library contains native C-interop, it may be necessary for iOS developers to install a C++ compilation toolchains and additional native developer libraries.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>However, if you feel the benefits outweigh the downsides, head to <a href="https://github.com/JetBrains/kotlin-native/blob/master/COCOAPODS.md">the official Kotlin/Native Cocoapods plugin documentation</a>.</p>
 </div>
 </div>
 </div>
