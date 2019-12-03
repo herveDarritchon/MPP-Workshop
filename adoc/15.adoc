@@ -283,6 +283,8 @@ Here is an example for the targets the `iOS` group:
 [source,kotlin]
 ----
 kotlin {
+    //...
+
     configure(listOf(iosX64(), iosArm64(), iosArm32())) { //<1>
         binaries {
             framework {
@@ -291,7 +293,6 @@ kotlin {
         }
     }
 
-    //...
     sourceSets {
         val commonMain by getting {
             dependencies {
@@ -362,7 +363,7 @@ CAUTION: Once again, this is supposed to be fixed with the "hierarchical multipl
 Open the `dispatcherIos.kt` source file in the `iosMain` source set.
 The IDE now shows an error.
 
-image:res/15-1.png[]
+image:res/15-1.png[source errors, 700]
 
 Don't worry, nothing's actually broken...
 In fact, everything still compiles and works fine.
@@ -386,3 +387,108 @@ This means that, while the iOS specific code do compile and behaves as expected,
 There is a workaround, but it is quite a horrible hack, and renders the developer experience a bit difficult.
 It consists in maintaining two different gradle configurations: one to develop, and one to deploy.
 
+First, create a `gradle.properties` file at the root of your project.
+
+image:res/15-2.png[new gradle.properties file, 400]
+
+Add this line to the file:
+
+.gradle.properties
+[source,properties]
+----
+iosDevHack = true
+----
+
+TIP: The `gradle.properties` file is usually not commited, and used to set developer specific options.
+
+Here is the updated `build.gradle.kts` with the hack:
+
+.build.gradle.kts
+[source,kotlin]
+----
+val iosDevHack: String? by project
+val iosDevHackEnabled = iosDevHack == "true" //<1>
+
+kotlin {
+    //...
+
+    val iosTargets = //<2>
+            if (iosDevHackEnabled) listOf(iosX64("ios"))
+            else listOf(iosX64(), iosArm64(), iosArm32())
+    configure(iosTargets) {
+        binaries {
+            framework {
+                baseName = "AddressBookCommon"
+            }
+        }
+    }
+
+    sourceSets {
+        val commonMain by getting {
+            dependencies {
+                implementation(kotlin("stdlib-common"))
+                implementation(coroutines("-common"))
+                implementation(serialization("-common"))
+                implementation(ktorClient("core"))
+                implementation(ktorClient("json"))
+                implementation(ktorClient("serialization"))
+            }
+        }
+        val commonTest by getting {
+            dependencies {
+                implementation(kotlin("test-common"))
+                implementation(kotlin("test-annotations-common"))
+            }
+        }
+
+        if (!iosDevHackEnabled) { //<3>
+            create("iosMain").apply {
+                dependsOn(commonMain)
+            }
+        }
+
+        val iosMain by getting { //<4>
+            dependencies {
+                implementation(coroutines("-native"))
+                implementation(serialization("-native"))
+                implementation(ktorClient("core-native"))
+                implementation(ktorClient("json-native"))
+                implementation(ktorClient("serialization-native"))
+                implementation(ktorClient("ios"))
+            }
+        }
+
+        if (!iosDevHackEnabled) { //<3>
+            create("iosTest").apply {
+                dependsOn(commonTest)
+                dependsOn(iosMain)
+            }
+        }
+
+        val iosTest by getting {} //<4>
+
+        if (!iosDevHackEnabled) { //<5>
+            listOf("iosX64", "iosArm64", "iosArm32").forEach {
+                getByName("${it}Main") {
+                    dependsOn(iosMain)
+                }
+                getByName("${it}Test") {
+                    dependsOn(iosTest)
+                }
+            }
+        }
+
+    }
+}
+----
+<1> Get the `iosDevHack` property value.
+<2> Configures either only one `iOS` target, or three.
+<3> Create and configure the intermediate source set if the hack is not enabled.
+<4> Configuring the source set, it could be intermediate or not.
+<5> If the hack is not enabled, configure each target's source set to depend on the intermediate source set.
+
+And there you have it, the `iosMain` source set is either:
+- a target's platform source set, or
+- an intermediate source set.
+
+Not that we have seen how to target all three iOS targets, let's see how to deploy for the three targets at once.

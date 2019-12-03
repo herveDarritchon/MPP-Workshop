@@ -1,3 +1,107 @@
-= iOS Universal Framework
+= Bonus: easier iOS deployment
 :toc:
 :icons: font
+
+So far, we have tested our iOS library on the simulator only.
+It's time to deploy on real world devices.
+
+There are three ways you can provide your library for all iPhones AND the simulator:
+
+- Provide three frameworks, for the three targets, and configure XCode to refer to the correct framework for each compilation target.
+- Provide one universal framework (also named fat framework) that contains all three targets at once.
+- Have your project be compatible with Cocoa Pods.
+
+== Universal framework
+
+=== Definition
+
+Although a `.framework` file looks like a file, it actually is a directory.
+In this directory, you will find:
+
+- The Objective-C and/or Swift headers for the library.
+- The library's binary.
+- Various metadata for the library.
+
+In essence, when you compile for the three targets, all three frameworks contain the exact same file, with the exception of the binary file that contains binary for the target it was compiled for.
+
+A "universal framework" or "fat framework" is a framework whose binary file is special in that it contains binary code for multiple platforms.
+When XCode compiles an app that refers to a universal framework, it will extract from it the binary for the target it is compiling and ignore the other "slices" of that universal binary file.
+
+
+=== Create the universal framework
+
+We are going to add two tasks to our build.gradle.kts file:
+
+- The `iosUniversalCopy` task simply makes a copy of one of the three frameworks (it doesn't matter which) without its binary file.
+- The `iosUniversalLipo` task uses the `lipo` command line tool to create a binary file that merges all three targets binary files into one universal binary.
+
+In your `build.gradle.kts` file, replace the `packForXcode` task with:
+
+.build.gradle.kts
+[source,kotlin]
+----
+if (org.gradle.internal.os.OperatingSystem.current().isMacOsX) { //<1>
+    val mode = System.getenv("CONFIGURATION") ?: "DEBUG"
+    val binaries = listOf(kotlin.iosX64(), kotlin.iosArm64(), kotlin.iosArm32())
+            .map { it.binaries.getFramework(mode) }
+    val x64Binary = kotlin.iosX64().binaries.getFramework(mode)
+    val universalFramework = buildDir
+            .resolve("bin/iosUniversal/${mode.toLowerCase()}Framework/${x64Binary.baseName}.framework")
+
+    if (!iosDevHackEnabled) { //<2>
+        val iosUniversalCopy by tasks.creating(Sync::class) {
+            inputs.property("mode", mode)
+            dependsOn(x64Binary.linkTask)
+            from(x64Binary.outputFile)
+            into(universalFramework)
+            exclude(x64Binary.baseName)
+        }
+
+        val iosUniversalLipo by tasks.creating(Exec::class) {
+            binaries.forEach {
+                dependsOn(it.linkTask)
+                inputs.file(it.outputFile.resolve(it.baseName))
+            }
+            dependsOn(iosUniversalCopy)
+            outputs.file(universalFramework.resolve(x64Binary.baseName))
+
+            executable = "lipo"
+
+            args(listOf(
+                    listOf("-create"),
+                    binaries.flatMap { listOf(it.outputFile.resolve(it.baseName).absolutePath) },
+                    listOf("-output", universalFramework.resolve(x64Binary.baseName).absolutePath)
+            ).flatten())
+        }
+
+        tasks.getByName("assemble").dependsOn(iosUniversalLipo)
+    }
+
+    val packForXcode by tasks.creating(Sync::class) { //<3>
+        inputs.property("mode", mode)
+
+        dependsOn(if (iosDevHackEnabled) x64Binary.linkTask else tasks["iosUniversalLipo"])
+
+        val targetDir = File(buildDir, "xcode-frameworks")
+        from(if (iosDevHackEnabled) x64Binary.outputFile else universalFramework)
+        into(targetDir.resolve(x64Binary.outputFile.name))
+    }
+
+    tasks.getByName("assemble").dependsOn(packForXcode)
+}
+----
+<1> These tasks should only exist if you are running on a Mac OS X computer.
+<2> Do not create the universal framework if the hack from the previous chapter is enabled.
+<3> The packForXcode task now exports the universal framework if the hack is not enabled.
+
+== Being compatible with Cocoa Pods
+
+Cocoa Pods is a source level specification.
+This means that, by deploying with Cocoa Pods, you will only distribute the sources of your library which will be compiled by the XCode compiling the final app.
+
+While this ensures that the application can developpers always access the last version of your library, this provides two disadvantages:
+
+- The compilation is quite slow, and having each dev recompile all three targets everytime can be frustrating for them.
+- If the library contains native C-interop, it may be necessary for iOS developers to install a C++ compilation toolchains and additional native developer libraries.
+
+However, if you feel the benefits outweigh the downsides, head to https://github.com/JetBrains/kotlin-native/blob/master/COCOAPODS.md[the official Kotlin/Native Cocoapods plugin documentation].
