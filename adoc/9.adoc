@@ -239,7 +239,7 @@ class ContactList {
 class ContactListPresenter(
     private val contactApi: ContactApi, // <1>
     coroutineContext: CoroutineContext = ApplicationDispatcher // <2>
-) : ContactList.Presenter, BasePresenter<ContactList.View>(coroutineContext) { // <3>
+) : BasePresenter<ContactList.View>(coroutineContext) { // <3>
     override fun onViewAttached(view: ContactList.View) {
         scope.launch { // <4>
             val contactList = contactApi.getAllContacts()
@@ -285,7 +285,7 @@ class ContactDetail {
 class ContactDetailPresenter(
     private val contactApi: ContactApi, // <1>
     coroutineContext: CoroutineContext = ApplicationDispatcher // <2>
-) : ContactDetail.Presenter, BasePresenter<ContactDetail.View>(coroutineContext) { // <3>
+) : BasePresenter<ContactDetail.View>(coroutineContext) { // <3>
     @JsName("getContact")
     fun getContact(contactId: String) {
         scope.launch { // <4>
