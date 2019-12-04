@@ -282,7 +282,7 @@ In this file, add the following property:</p>
                 //...
 
                 val androidSdk: String by project
-                implementation(files("$androidSdk/platforms/android-28/android.jar"))
+                copileOnly(files("$androidSdk/platforms/android-28/android.jar"))
             }
         }
     }
