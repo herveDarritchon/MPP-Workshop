@@ -223,7 +223,6 @@ image:res/9-4.png[source directory structure,300]
 [source,kotlin]
 ----
 class ContactList {
-    interface Presenter
     interface View {
         @JsName("displayContactList")
         fun displayContactList(contactList: List<Contact>) // <1>
@@ -270,18 +269,13 @@ image:res/9-5.png[source directory structure,300]
 [source,kotlin]
 ----
 class ContactDetail {
-    interface Presenter {
-        @JsName("getContact")
-        fun getContact(contactId: String) // <1>
-    }
     interface View {
         @JsName("displayContact")
-        fun displayContact(contact: Contact) // <2>
+        fun displayContact(contact: Contact) // <1>
     }
 }
 ----
-<1> Function called by the view to retrieve all the details of a contact, giving its `id`.
-<2> Function called by the presenter when the data are ready to be displayed.
+<1> Function called by the presenter when the data are ready to be displayed.
 
 * The presenter implementation
 +
@@ -292,7 +286,8 @@ class ContactDetailPresenter(
     private val contactApi: ContactApi, // <1>
     coroutineContext: CoroutineContext = ApplicationDispatcher // <2>
 ) : ContactDetail.Presenter, BasePresenter<ContactDetail.View>(coroutineContext) { // <3>
-    override fun getContact(contactId: String) {
+    @JsName("getContact")
+    fun getContact(contactId: String) {
         scope.launch { // <4>
             val contact = contactApi.getContactById(contactId)
             withContext(UIDispatcher) { // <5>
