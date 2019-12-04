@@ -543,6 +543,52 @@ class MasterViewController: UITableViewController(), ContactList.View {
 <div class="paragraph">
 <p>Using the <a href="https://github.com/JetBrains/kotlin-wrappers/tree/master/kotlin-react">Kotlin React Wrapper</a>, you can write your web app entirely in Kotlin!</p>
 </div>
+<div class="paragraph">
+<p>Here&#8217;s an example of the first screen of the application in Kotlin:</p>
+</div>
+<div class="listingblock">
+<div class="title">build.gradle.kts</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">package com.mybusiness.js
+
+import com.mybusiness.di.CommonInjector
+import com.mybusiness.model.Contact
+import com.mybusiness.presentation.ContactList
+import react.RProps
+import react.dom.li
+import react.dom.ul
+import react.functionalComponent
+import react.router.dom.routeLink
+import react.useEffect
+import react.useState
+
+val ContactList = functionalComponent&lt;RProps&gt; {
+
+    val (presenter, _) = useState { CommonInjector.contactListPresenter() }
+
+    val (contacts, setContacts) = useState(emptyList&lt;Contact&gt;())
+
+    useEffect(emptyList()) {
+        presenter.attachView(object : ContactList.View {
+            override fun displayContactList(contactList: List&lt;Contact&gt;) {
+                setContacts(contactList)
+            }
+        })
+    }
+
+    ul {
+        contacts.forEach {
+            li {
+                routeLink(to = "/contact/${it.id}") {
+                    +it.fullName
+                }
+            }
+        }
+    }
+
+}</code></pre>
+</div>
+</div>
 </div>
 </div>
 </div>
