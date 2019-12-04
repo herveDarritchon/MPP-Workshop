@@ -452,7 +452,7 @@ internal actual val UIDispatcher: CoroutineContext = Dispatchers.Main <i class="
 <pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">class ContactListPresenter(
     private val contactApi: ContactApi, <i class="conum" data-value="1"></i><b>(1)</b>
     coroutineContext: CoroutineContext = ApplicationDispatcher <i class="conum" data-value="2"></i><b>(2)</b>
-) : ContactList.Presenter, BasePresenter&lt;ContactList.View&gt;(coroutineContext) { <i class="conum" data-value="3"></i><b>(3)</b>
+) : BasePresenter&lt;ContactList.View&gt;(coroutineContext) { <i class="conum" data-value="3"></i><b>(3)</b>
     override fun onViewAttached(view: ContactList.View) {
         scope.launch { <i class="conum" data-value="4"></i><b>(4)</b>
             val contactList = contactApi.getAllContacts()
@@ -536,7 +536,7 @@ internal actual val UIDispatcher: CoroutineContext = Dispatchers.Main <i class="
 <pre class="highlightjs highlight"><code data-lang="kotlin" class="language-kotlin hljs">class ContactDetailPresenter(
     private val contactApi: ContactApi, <i class="conum" data-value="1"></i><b>(1)</b>
     coroutineContext: CoroutineContext = ApplicationDispatcher <i class="conum" data-value="2"></i><b>(2)</b>
-) : ContactDetail.Presenter, BasePresenter&lt;ContactDetail.View&gt;(coroutineContext) { <i class="conum" data-value="3"></i><b>(3)</b>
+) : BasePresenter&lt;ContactDetail.View&gt;(coroutineContext) { <i class="conum" data-value="3"></i><b>(3)</b>
     @JsName("getContact")
     fun getContact(contactId: String) {
         scope.launch { <i class="conum" data-value="4"></i><b>(4)</b>
