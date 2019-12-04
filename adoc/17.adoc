@@ -319,3 +319,48 @@ class MasterViewController: UITableViewController(), ContactList.View {
 === Write a JS screen in Kotlin
 
 Using the https://github.com/JetBrains/kotlin-wrappers/tree/master/kotlin-react[Kotlin React Wrapper], you can write your web app entirely in Kotlin!
+
+Here's an example of the first screen of the application in Kotlin:
+
+.build.gradle.kts
+[source,kotlin]
+----
+package com.mybusiness.js
+
+import com.mybusiness.di.CommonInjector
+import com.mybusiness.model.Contact
+import com.mybusiness.presentation.ContactList
+import react.RProps
+import react.dom.li
+import react.dom.ul
+import react.functionalComponent
+import react.router.dom.routeLink
+import react.useEffect
+import react.useState
+
+val ContactList = functionalComponent<RProps> {
+
+    val (presenter, _) = useState { CommonInjector.contactListPresenter() }
+
+    val (contacts, setContacts) = useState(emptyList<Contact>())
+
+    useEffect(emptyList()) {
+        presenter.attachView(object : ContactList.View {
+            override fun displayContactList(contactList: List<Contact>) {
+                setContacts(contactList)
+            }
+        })
+    }
+
+    ul {
+        contacts.forEach {
+            li {
+                routeLink(to = "/contact/${it.id}") {
+                    +it.fullName
+                }
+            }
+        }
+    }
+
+}
+----
